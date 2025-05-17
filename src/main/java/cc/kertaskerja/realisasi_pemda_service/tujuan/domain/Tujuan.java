@@ -15,6 +15,8 @@ public record Tujuan(
 
         String tujuanId,
         String tujuan,
+        String indikatorId,
+        String indikator,
         Double target,
         Double realisasi,
         String satuan,
@@ -30,6 +32,8 @@ public record Tujuan(
     public static Tujuan of(
             String tujuanId,
             String tujuan,
+            String indikatorId,
+            String indikator,
             Double target,
             Double realisasi,
             String satuan,
@@ -38,7 +42,7 @@ public record Tujuan(
             TujuanStatus status
     ) {
         return new Tujuan(null,
-                tujuanId, tujuan, target, realisasi, satuan, tahun, jenisRealisasi, status,
+                tujuanId, tujuan, indikatorId, indikator, target, realisasi, satuan, tahun, jenisRealisasi, status,
                 null, null, 0);
     }
 }

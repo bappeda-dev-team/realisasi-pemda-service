@@ -8,6 +8,10 @@ public record TujuanRequest(
         @NotEmpty(message = "ID tujuan tidak boleh kosong")
         String tujuanId,
 
+        @NotNull(message = "ID indikator tidak boleh kosong")
+        @NotEmpty(message = "ID indikator tidak boleh kosong")
+        String indikatorId,
+
         @NotNull(message = "Target harus terdefinisi")
         @Positive(message = "Target harus positif")
         Double target,

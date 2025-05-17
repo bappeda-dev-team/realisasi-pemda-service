@@ -41,6 +41,7 @@ public class TujuanController {
     public Mono<Tujuan> submitRealisasiTujuan(@RequestBody @Valid TujuanRequest tujuanRequest) {
         return tujuanService.submitRealisasiTujuan(
                 tujuanRequest.tujuanId(),
+                tujuanRequest.indikatorId(),
                 tujuanRequest.target(),
                 tujuanRequest.realisasi(),
                 tujuanRequest.satuan(),

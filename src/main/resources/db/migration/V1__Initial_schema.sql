@@ -3,6 +3,8 @@ CREATE TABLE tujuans
     id                 BIGSERIAL PRIMARY KEY NOT NULL,
     tujuan_id          varchar(255)          NOT NULL,
     tujuan             varchar(255)          NOT NULL,
+    indikator_id       varchar(255)          NOT NULL,
+    indikator          varchar(255)          NOT NULL,
     target             double precision      NOT NULL,
     realisasi          double precision      NOT NULL,
     satuan             varchar(255)          NOT NULL,
