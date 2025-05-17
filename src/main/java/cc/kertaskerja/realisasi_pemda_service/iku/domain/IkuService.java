@@ -26,7 +26,7 @@ public class IkuService {
                         t.satuan(),
                         t.tahun(),
                         t.jenisRealisasi()
-                        ));
+                ));
 
         Flux<Iku> ikuSasaran = sasaranRepository.findAll()
                 .map(s -> buildIkuSasaran(
@@ -74,6 +74,6 @@ public class IkuService {
     }
 
     public static Iku buildIkuSasaran(String indikatorId, String indikator, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
-        return Iku.of(indikatorId, indikator, target, realisasi, satuan, tahun, jenisRealisasi,JenisIku.SASARAN);
+        return Iku.of(indikatorId, indikator, target, realisasi, satuan, tahun, jenisRealisasi, JenisIku.SASARAN);
     }
 }
