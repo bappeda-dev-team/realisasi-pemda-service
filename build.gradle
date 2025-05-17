@@ -1,0 +1,64 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.5'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'cc.kertaskerja'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+	runtimeOnly 'org.postgresql:postgresql'
+	runtimeOnly 'org.postgresql:r2dbc-postgresql'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'io.projectreactor:reactor-test'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:postgresql'
+	testImplementation 'org.testcontainers:r2dbc'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// fix for macos
+	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.79.Final:osx-aarch_64'
+	// flyway
+	runtimeOnly 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+	runtimeOnly 'org.springframework:spring-jdbc'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+bootBuildImage {
+	imageName = "${project.name}"
+	environment = ["BP_JVM_VERSION" : "17.*"]
+
+	if (System.getProperty( "os.arch" ).toLowerCase().startsWith('aarch')) {
+		builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"
+		buildpacks = [ "gcr.io/paketo-buildpacks/java" ]
+	} else {
+		builder = "docker.io/paketobuildpacks/builder-jammy-tiny"
+	}
+
+	docker {
+		publishRegistry {
+			username = project.findProperty("registryUsername")
+			password = project.findProperty("registryToken")
+			url = project.findProperty("registryUrl")
+		}
+	}
+}

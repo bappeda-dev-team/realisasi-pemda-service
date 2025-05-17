@@ -1,0 +1,15 @@
+### GET all realisasi
+GET http://localhost:9001/tujuans
+
+### POST submit realisasi
+POST http://localhost:9001/tujuans
+Content-Type: application/json
+
+{
+    "tujuanId": "123",
+    "target": 10.0,
+    "realisasi": 10.0,
+    "satuan": "%",
+    "tahun": "2025",
+    "jenisRealisasi": "NAIK"
+}
