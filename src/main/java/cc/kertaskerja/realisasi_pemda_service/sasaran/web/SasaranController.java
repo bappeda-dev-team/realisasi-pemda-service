@@ -39,7 +39,7 @@ public class SasaranController {
     @PostMapping
     public Mono<Sasaran> submitRealisasiSasaran(@RequestBody @Valid SasaranRequest sasaranRequest) {
         return sasaranService.submitRealisasiSasaran(
-                sasaranRequest.saaranId(),
+                sasaranRequest.sasaranId(),
                 sasaranRequest.indikatorId(),
                 sasaranRequest.target(),
                 sasaranRequest.realisasi(),

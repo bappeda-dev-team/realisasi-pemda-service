@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 public record SasaranRequest(
         @NotNull(message = "ID sasaran tidak boleh kosong")
         @NotEmpty(message = "ID sasaran tidak boleh kosong")
-        String saaranId,
+        String sasaranId,
 
         @NotNull(message = "ID indikator tidak boleh kosong")
         @NotEmpty(message = "ID indikator tidak boleh kosong")
