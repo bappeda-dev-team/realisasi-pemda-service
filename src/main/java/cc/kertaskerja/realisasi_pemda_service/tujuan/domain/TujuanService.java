@@ -21,6 +21,10 @@ public class TujuanService {
         return tujuanRepository.findAllByTahun(tahun);
     }
 
+    public Flux<Tujuan> getRealisasiTujuanByTahunAndTujuanId(String tahun, String tujuanId) {
+        return tujuanRepository.findAllByTahunAndTujuanId(tahun, tujuanId);
+    }
+
     public Flux<Tujuan> getRealisasiTujuanByTujuanId(String tujuanId) {
         return tujuanRepository.findAllByTujuanId(tujuanId);
     }
@@ -37,7 +41,7 @@ public class TujuanService {
     }
 
     public static Tujuan buildUncheckedRealisasiTujuan(String tujuanId, String indikatorId, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
-        return Tujuan.of( tujuanId,
+        return Tujuan.of(tujuanId,
                 "Realisasi Tujuan " + tujuanId,
                 indikatorId,
                 "Realisasi Indikator " + indikatorId,

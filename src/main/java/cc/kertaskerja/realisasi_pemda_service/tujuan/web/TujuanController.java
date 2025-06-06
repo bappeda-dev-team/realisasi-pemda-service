@@ -16,25 +16,30 @@ public class TujuanController {
         this.tujuanService = tujuanService;
     }
 
+    // for editing purposes
+    @GetMapping("{id}")
+    public Mono<Tujuan> getRealisasiTujuanById(@PathVariable Long id) {
+        return tujuanService.getRealisasiTujuanById(id);
+    }
+
     @GetMapping
     public Flux<Tujuan> getAllRealisasiTujuan() {
         return tujuanService.getAllRealisasiTujuan();
     }
 
-    @GetMapping("{tahun}")
-    public Flux<Tujuan> getRealisasiTujuanByTahun(@PathVariable String tahun) {
-        return tujuanService.getRealisasiTujuanByTahun(tahun);
-    }
-
-    @GetMapping("{tujuanId}")
+    @GetMapping("/by-tujuan/{tujuanId}")
     public Flux<Tujuan> getRealisasiTujuanByTujuanId(@PathVariable String tujuanId) {
         return tujuanService.getRealisasiTujuanByTujuanId(tujuanId);
     }
 
-    // for editing purposes
-    @GetMapping("{id}")
-    public Mono<Tujuan> getRealisasiTujuanById(@PathVariable Long id) {
-        return tujuanService.getRealisasiTujuanById(id);
+    @GetMapping("/by-tahun/{tahun}")
+    public Flux<Tujuan> getRealisasiTujuanByTahunAndOptionalTujuanId(
+            @PathVariable String tahun,
+            @RequestParam(required = false) String tujuanId) {
+        if (tujuanId != null && !tujuanId.isBlank()) {
+            return tujuanService.getRealisasiTujuanByTahunAndTujuanId(tahun, tujuanId);
+        }
+        return tujuanService.getRealisasiTujuanByTahun(tahun);
     }
 
     @PostMapping
