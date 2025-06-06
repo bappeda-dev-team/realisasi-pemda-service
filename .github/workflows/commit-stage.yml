@@ -4,7 +4,7 @@ on: push
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: bappeda-dev-team/realisasi-pemda-service
-  VERSION: latest
+  VERSION: ${{ github.sha }}
 
 jobs:
   build:
