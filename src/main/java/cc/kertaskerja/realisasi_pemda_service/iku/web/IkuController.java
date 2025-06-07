@@ -22,7 +22,7 @@ public class IkuController {
         return ikuService.getAllIku();
     }
 
-    @GetMapping("{tahun}")
+    @GetMapping("/by-tahun/{tahun}")
     public Flux<Iku> getAllRealisasiIkuByTahun(@PathVariable String tahun) {
         return ikuService.getAllIkuByTahun(tahun);
     }
