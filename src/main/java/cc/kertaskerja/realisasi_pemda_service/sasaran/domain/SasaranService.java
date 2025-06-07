@@ -21,6 +21,10 @@ public class SasaranService {
         return sasaranRepository.findAllByTahun(tahun);
     }
 
+    public Flux<Sasaran> getAllRealisasiSasaranByTahunAndSasaranId(String tahun, String sasaranId) {
+        return sasaranRepository.findAllByTahunAndSasaranId(tahun,  sasaranId);
+    }
+
     public Flux<Sasaran> getAllRealisasiSasaranBySasaranId(String sasaranId) {
         return sasaranRepository.findAllBySasaranId(sasaranId);
     }

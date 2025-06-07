@@ -16,24 +16,28 @@ public class SasaranController {
         this.sasaranService = sasaranService;
     }
 
+    @GetMapping("{id}")
+    public Mono<Sasaran> getSasaranById(@PathVariable Long id) {
+        return sasaranService.getSasaranById(id);
+    }
     @GetMapping
     public Flux<Sasaran> getAllRealisasiSasaran() {
         return sasaranService.getAllRealisasiSasaran();
     }
 
-    @GetMapping("{tahun}")
-    public Flux<Sasaran> getAllRealisasiSasaranByTahun(@PathVariable String tahun) {
+    @GetMapping("/by-tahun/{tahun}")
+    public Flux<Sasaran> getAllRealisasiSasaranByTahun(
+            @PathVariable String tahun,
+            @RequestParam(required = false) String sasaranId) {
+        if (sasaranId != null && !sasaranId.isEmpty()) {
+            return sasaranService.getAllRealisasiSasaranByTahunAndSasaranId(tahun, sasaranId);
+        }
         return sasaranService.getAllRealisasiSasaranByTahun(tahun);
     }
 
-    @GetMapping("{sasaranId}")
+    @GetMapping("/by-sasaran/{sasaranId}")
     public Flux<Sasaran> getAllRealisasiSasaranBySasaranId(@PathVariable String sasaranId) {
         return sasaranService.getAllRealisasiSasaranBySasaranId(sasaranId);
-    }
-
-    @GetMapping("{id}")
-    public Mono<Sasaran> getSasaranById(@PathVariable Long id) {
-        return sasaranService.getSasaranById(id);
     }
 
     @PostMapping
