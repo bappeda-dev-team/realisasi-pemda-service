@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: realisasi-pemda-service
-          image: realisasi-pemda-service
+          image: realisasi-pemda-service:dev
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:
@@ -27,10 +27,12 @@ spec:
           env:
             - name: BPL_JVM_THREAD_COUNT
               value: "50"
-            - name: SPRING_R2DBC_URL
-              value: r2dbc:postgresql://kertaskerja-postgres:5432/kertaskerja_realisasi_pemda
-            - name: SPRING_FLYWAY_URL
-              value: jdbc:postgresql://kertaskerja-postgres:5432/kertaskerja_realisasi_pemda
             - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
-              value: "http://localhost:8080/realms/KertasKerja"
-
+              value: "http://keycloak.kertaskerja.local/realms/KabMadiun"
+          volumeMounts:
+            - name: realisasi-pemda-config-volume
+              mountPath: /workspace/config
+      volumes:
+        - name: realisasi-pemda-config-volume
+          configMap:
+            name: realisasi-pemda-config

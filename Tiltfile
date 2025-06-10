@@ -7,11 +7,13 @@ custom_build(
     command = './gradlew bootBuildImage --imageName $EXPECTED_REF',
 
     # Files to watch that trigger a new build
-    deps = ['build.gradle', 'src']
+    deps = ['build.gradle', 'src'],
+    disable_push=True,
+    tag='dev'
 )
 
 # Deploy
-k8s_yaml(['k8s/deployment.yml', 'k8s/service.yml'])
+k8s_yaml(kustomize('k8s'))
 
 # Manage
 k8s_resource('realisasi-pemda-service', port_forwards=['9001'])
