@@ -42,6 +42,16 @@ public class TujuanController {
         return tujuanService.getRealisasiTujuanByTahun(tahun);
     }
 
+    @GetMapping("/by-indikator/{indikatorId}")
+    public Flux<Tujuan> getRealisasiTujuanByIndikatorId(@PathVariable String indikatorId) {
+        return tujuanService.getRealisasiTujuanByIndikatorId(indikatorId);
+    }
+
+    @GetMapping("/by-periode/{tahunAwal}/{tahunAkhir}/rpjmd")
+    public Flux<Tujuan> getRealisasiTujuanByPeriodeRpjmd(@PathVariable String tahunAwal, @PathVariable String tahunAkhir) {
+        return tujuanService.getRealisasiTujuanByPeriodeRpjmd(tahunAwal, tahunAkhir);
+    }
+
     @PostMapping
     public Mono<Tujuan> submitRealisasiTujuan(@RequestBody @Valid TujuanRequest tujuanRequest) {
         return tujuanService.submitRealisasiTujuan(

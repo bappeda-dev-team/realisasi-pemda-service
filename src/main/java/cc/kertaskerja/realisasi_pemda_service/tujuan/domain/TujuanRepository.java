@@ -9,4 +9,8 @@ public interface TujuanRepository extends ReactiveCrudRepository<Tujuan, Long> {
     Flux<Tujuan> findAllByTujuanId(String tujuanId);
 
     Flux<Tujuan> findAllByTahunAndTujuanId(String tahun, String tujuanId);
+
+    Flux<Tujuan> findAllByIndikatorId(String indikatorId);
+
+    Flux<Tujuan> findAllByTahunBetween(String tahunAwal, String tahunAkhir);
 }

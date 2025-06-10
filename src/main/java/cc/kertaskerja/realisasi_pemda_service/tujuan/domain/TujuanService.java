@@ -40,6 +40,10 @@ public class TujuanService {
                 .flatMap(tujuanRepository::save);
     }
 
+    public Flux<Tujuan> getRealisasiTujuanByIndikatorId(String indikatorId) {
+        return tujuanRepository.findAllByIndikatorId(indikatorId);
+    }
+
     public static Tujuan buildUncheckedRealisasiTujuan(String tujuanId, String indikatorId, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Tujuan.of(tujuanId,
                 "Realisasi Tujuan " + tujuanId,
@@ -47,5 +51,9 @@ public class TujuanService {
                 "Realisasi Indikator " + indikatorId,
                 target, realisasi, satuan, tahun, jenisRealisasi,
                 TujuanStatus.UNCHECKED);
+    }
+
+    public Flux<Tujuan> getRealisasiTujuanByPeriodeRpjmd(String tahunAwal, String tahunAkhir) {
+        return tujuanRepository.findAllByTahunBetween(tahunAwal, tahunAkhir);
     }
 }
