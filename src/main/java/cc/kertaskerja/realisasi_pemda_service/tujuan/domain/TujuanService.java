@@ -1,9 +1,12 @@
 package cc.kertaskerja.realisasi_pemda_service.tujuan.domain;
 
 import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi_pemda_service.tujuan.web.TujuanRequest;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Service
 public class TujuanService {
@@ -37,6 +40,20 @@ public class TujuanService {
     // check target, satuan, tahun, and get tujuan text
     public Mono<Tujuan> submitRealisasiTujuan(String tujuanId, String indikatorId, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Mono.just(buildUncheckedRealisasiTujuan(tujuanId, indikatorId, target, realisasi, satuan, tahun, jenisRealisasi))
+                .flatMap(tujuanRepository::save);
+    }
+
+    public Flux<Tujuan> batchSubmitRealisasiTujuan(List<TujuanRequest> tujuans) {
+        return Flux.fromIterable(tujuans)
+                .map(req -> buildUncheckedRealisasiTujuan(
+                        req.tujuanId(),
+                        req.indikatorId(),
+                        req.target(),
+                        req.realisasi(),
+                        req.satuan(),
+                        req.tahun(),
+                        req.jenisRealisasi()
+                ))
                 .flatMap(tujuanRepository::save);
     }
 

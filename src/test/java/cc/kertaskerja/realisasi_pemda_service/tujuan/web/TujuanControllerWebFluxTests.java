@@ -4,8 +4,9 @@ import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_pemda_service.tujuan.domain.Tujuan;
 import cc.kertaskerja.realisasi_pemda_service.tujuan.domain.TujuanService;
 import cc.kertaskerja.realisasi_pemda_service.tujuan.domain.TujuanStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +17,10 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+
 @WebFluxTest(TujuanController.class)
 public class TujuanControllerWebFluxTests {
     @Autowired
@@ -24,6 +29,9 @@ public class TujuanControllerWebFluxTests {
     @MockitoBean
     private TujuanService tujuanService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     void whenTujuanIdParamsExistsInByTahunShouldReturnRealisasiTujuanByTahunAndTujuanId() {
         List<Tujuan> mockTujuans = List.of(
@@ -31,7 +39,7 @@ public class TujuanControllerWebFluxTests {
                         "IND-TUJ-123", "Produk-A",
                         100.0, 100.0, "%", "2025",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED));
-        Mockito.when(tujuanService.getRealisasiTujuanByTahunAndTujuanId("2025", "TUJ-123"))
+        when(tujuanService.getRealisasiTujuanByTahunAndTujuanId("2025", "TUJ-123"))
                 .thenReturn(Flux.fromIterable(mockTujuans));
 
         webTestClient
@@ -59,8 +67,8 @@ public class TujuanControllerWebFluxTests {
                         "IND-TUJ-123", "Produk-A",
                         100.0, 100.0, "%", "2026",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED)
-                );
-        Mockito.when(tujuanService.getRealisasiTujuanByTahun("2025"))
+        );
+        when(tujuanService.getRealisasiTujuanByTahun("2025"))
                 .thenReturn(Flux.just(mockTujuans.get(0)));
 
         webTestClient
@@ -82,7 +90,7 @@ public class TujuanControllerWebFluxTests {
                         "IND-TUJ-123", "Produk-A",
                         100.0, 100.0, "%", "2025",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED));
-        Mockito.when(tujuanService.getRealisasiTujuanByIndikatorId("IND-TUJ-123"))
+        when(tujuanService.getRealisasiTujuanByIndikatorId("IND-TUJ-123"))
                 .thenReturn(Flux.fromIterable(mockTujuans));
 
         webTestClient
@@ -116,7 +124,7 @@ public class TujuanControllerWebFluxTests {
                         180.0, 180.0, "%", "2027",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED)
         );
-        Mockito.when(tujuanService.getRealisasiTujuanByPeriodeRpjmd("2025", "2030"))
+        when(tujuanService.getRealisasiTujuanByPeriodeRpjmd("2025", "2030"))
                 .thenReturn(Flux.fromIterable(mockTujuans));
 
         webTestClient
@@ -128,5 +136,45 @@ public class TujuanControllerWebFluxTests {
                 .expectBodyList(Tujuan.class)
                 .hasSize(4)
                 .contains(mockTujuans.get(0));
+    }
+
+    @Test
+    void whenBatchSubmit_thenReturnsSavedTujuans() throws Exception {
+        // prepare requests
+        TujuanRequest r1 = new TujuanRequest("T1", "I1", 100.0, 50.0, "unit1", "2025", JenisRealisasi.NAIK);
+        TujuanRequest r2 = new TujuanRequest("T2", "I2", 200.0, 75.0, "unit2", "2026", JenisRealisasi.TURUN);
+
+        // prepare expected domain objects
+        Tujuan t1 = TujuanService.buildUncheckedRealisasiTujuan(
+                r1.tujuanId(), r1.indikatorId(), r1.target(), r1.realisasi(),
+                r1.satuan(), r1.tahun(), r1.jenisRealisasi()
+        );
+        Tujuan t2 = TujuanService.buildUncheckedRealisasiTujuan(
+                r2.tujuanId(), r2.indikatorId(), r2.target(), r2.realisasi(),
+                r2.satuan(), r2.tahun(), r2.jenisRealisasi()
+        );
+
+        when(tujuanService.batchSubmitRealisasiTujuan(anyList()))
+                .thenReturn(Flux.just(t1, t2));
+
+        // execute POST /tujuans/batch
+        webTestClient
+                .mutateWith(csrf())
+                .mutateWith(SecurityMockServerConfigurers.mockJwt()
+                        .authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
+                .post()
+                .uri("/tujuans/batch")
+                .bodyValue(objectMapper.writeValueAsString(List.of(r1, r2)))
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBodyList(Tujuan.class)
+                .consumeWith(response -> {
+                    var body = response.getResponseBody();
+                    Assertions.assertNotNull(body);
+                    Assertions.assertEquals(2, body.size());
+                    Assertions.assertEquals(t1, body.get(0));
+                    Assertions.assertEquals(t2, body.get(1));
+                });
     }
 }
