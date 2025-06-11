@@ -50,5 +50,7 @@ public class TujuanJsonTests {
                .isEqualTo(realisasiTujuan.createdDate().toString());
        assertThat(jsonContent).extractingJsonPathStringValue("@.lastModifiedDate")
                .isEqualTo(realisasiTujuan.lastModifiedDate().toString());
+       assertThat(jsonContent).extractingJsonPathStringValue("@.capaian")
+               .isEqualTo("100.00%");
    }
 }
