@@ -37,7 +37,7 @@ public class TujuanControllerWebFluxTests {
         List<Tujuan> mockTujuans = List.of(
                 Tujuan.of("TUJ-123", "Test-Tujuan",
                         "IND-TUJ-123", "Produk-A",
-                        100.0, 100.0, "%", "2025",
+                        "100.0", 100.0, "%", "2025",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED));
         when(tujuanService.getRealisasiTujuanByTahunAndTujuanId("2025", "TUJ-123"))
                 .thenReturn(Flux.fromIterable(mockTujuans));
@@ -61,11 +61,11 @@ public class TujuanControllerWebFluxTests {
         List<Tujuan> mockTujuans = List.of(
                 Tujuan.of("TUJ-123", "Test-Tujuan",
                         "IND-TUJ-123", "Produk-A",
-                        100.0, 100.0, "%", "2025",
+                        "100.0", 100.0, "%", "2025",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED),
                 Tujuan.of("TUJ-123", "Test-Tujuan",
                         "IND-TUJ-123", "Produk-A",
-                        100.0, 100.0, "%", "2026",
+                        "100.0", 100.0, "%", "2026",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED)
         );
         when(tujuanService.getRealisasiTujuanByTahun("2025"))
@@ -88,7 +88,7 @@ public class TujuanControllerWebFluxTests {
         List<Tujuan> mockTujuans = List.of(
                 Tujuan.of("TUJ-123", "Test-Tujuan",
                         "IND-TUJ-123", "Produk-A",
-                        100.0, 100.0, "%", "2025",
+                        "100.0", 100.0, "%", "2025",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED));
         when(tujuanService.getRealisasiTujuanByIndikatorId("IND-TUJ-123"))
                 .thenReturn(Flux.fromIterable(mockTujuans));
@@ -109,19 +109,19 @@ public class TujuanControllerWebFluxTests {
         List<Tujuan> mockTujuans = List.of(
                 Tujuan.of("TUJ-123", "Test-Tujuan",
                         "IND-TUJ-123", "Produk-A",
-                        100.0, 100.0, "%", "2025",
+                        "100.0", 100.0, "%", "2025",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED),
                 Tujuan.of("TUJ-123", "Test-Tujuan",
                         "IND-TUJ-123", "Produk-A",
-                        100.0, 100.0, "%", "2026",
+                        "100.0", 100.0, "%", "2026",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED),
                 Tujuan.of("TUJ-12", "Test-Tujuan",
                         "IND-TUJ-124", "Produk-B",
-                        150.0, 150.0, "%", "2025",
+                        "4,70 - 4,75", 4.75, "%", "2025",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED),
                 Tujuan.of("TUJ-12", "Test-Tujuan",
                         "IND-TUJ-124", "Produk-B",
-                        180.0, 180.0, "%", "2027",
+                        "4,85 - 4,90", 4.50, "%", "2027",
                         JenisRealisasi.NAIK, TujuanStatus.UNCHECKED)
         );
         when(tujuanService.getRealisasiTujuanByPeriodeRpjmd("2025", "2030"))
@@ -141,8 +141,8 @@ public class TujuanControllerWebFluxTests {
     @Test
     void whenBatchSubmit_thenReturnsSavedTujuans() throws Exception {
         // prepare requests
-        TujuanRequest r1 = new TujuanRequest("T1", "I1", 100.0, 50.0, "unit1", "2025", JenisRealisasi.NAIK);
-        TujuanRequest r2 = new TujuanRequest("T2", "I2", 200.0, 75.0, "unit2", "2026", JenisRealisasi.TURUN);
+        TujuanRequest r1 = new TujuanRequest("T1", "I1", "100.0", 50.0, "unit1", "2025", JenisRealisasi.NAIK);
+        TujuanRequest r2 = new TujuanRequest("T2", "I2", "200.0", 75.0, "unit2", "2026", JenisRealisasi.TURUN);
 
         // prepare expected domain objects
         Tujuan t1 = TujuanService.buildUncheckedRealisasiTujuan(

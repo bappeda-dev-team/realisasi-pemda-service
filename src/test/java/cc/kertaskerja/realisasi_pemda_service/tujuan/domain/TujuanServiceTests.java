@@ -27,8 +27,8 @@ public class TujuanServiceTests {
     @Test
     void batchSubmitRealisasiTujuanShouldBuildAndSaveAllItem() {
         // given
-        TujuanRequest r1 = new TujuanRequest("T1", "I1", 100.0, 50.0, "unit1", "2025", JenisRealisasi.NAIK);
-        TujuanRequest r2 = new TujuanRequest("T2", "I2", 200.0, 75.0, "unit2", "2026", JenisRealisasi.NAIK);
+        TujuanRequest r1 = new TujuanRequest("T1", "I1", "100.0", 50.0, "unit1", "2025", JenisRealisasi.NAIK);
+        TujuanRequest r2 = new TujuanRequest("T2", "I2", "200.0", 75.0, "unit2", "2026", JenisRealisasi.NAIK);
         when(tujuanRepository.save(ArgumentMatchers.any(Tujuan.class)))
                 .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
         // when
@@ -39,13 +39,13 @@ public class TujuanServiceTests {
                 .expectNextMatches(t ->
                         t.tujuanId().equals("T1") &&
                         t.indikatorId().equals("I1") &&
-                        t.target().equals(100.0) &&
+                        t.target().equals("100.0") &&
                         t.realisasi().equals(50.0)
                 )
                 .expectNextMatches(t ->
                         t.tujuanId().equals("T2") &&
                         t.indikatorId().equals("I2") &&
-                        t.target().equals(200.0) &&
+                        t.target().equals("200.0") &&
                         t.realisasi().equals(75.0)
                 )
                 .verifyComplete();

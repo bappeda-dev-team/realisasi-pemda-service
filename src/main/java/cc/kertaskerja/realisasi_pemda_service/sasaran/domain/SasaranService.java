@@ -33,14 +33,14 @@ public class SasaranService {
         return sasaranRepository.findById(id);
     }
 
-    public Mono<Sasaran> submitRealisasiSasaran(String sasaranId, String indikatorId, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+    public Mono<Sasaran> submitRealisasiSasaran(String sasaranId, String indikatorId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Mono.just(buildUnchekcedRealisasiSasaran(sasaranId, indikatorId, target, realisasi, satuan, tahun, jenisRealisasi))
                 .flatMap(sasaranRepository::save);
     }
 
     // sasaranId check to sasaranService
     // and modify sasaran, check target, satuan, and change status to CHECKED
-    public static Sasaran buildUnchekcedRealisasiSasaran(String sasaranId, String indikatorId, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+    public static Sasaran buildUnchekcedRealisasiSasaran(String sasaranId, String indikatorId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Sasaran.of(sasaranId,
                 "Realisasi Sasaran " + sasaranId,
                 indikatorId,

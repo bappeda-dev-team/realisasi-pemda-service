@@ -13,8 +13,7 @@ public record SasaranRequest(
         String indikatorId,
 
         @NotNull(message = "Target harus terdefinisi")
-        @Positive(message = "Target harus positif")
-        Double target,
+        String target,
 
         @NotNull(message = "Realisasi harus terdefinisi")
         @PositiveOrZero(message = "Realisasi tidak boleh negatif")

@@ -17,7 +17,7 @@ public record Sasaran(
         String sasaran,
         String indikatorId,
         String indikator,
-        Double target,
+        String target,
         Double realisasi,
         String satuan,
         String tahun,
@@ -33,7 +33,7 @@ public record Sasaran(
             String sasaran,
             String indikatorId,
             String indikator,
-            Double target,
+            String target,
             Double realisasi,
             String satuan,
             String tahun,
@@ -43,16 +43,5 @@ public record Sasaran(
         return new Sasaran(null,
                 sasaranId, sasaran, indikatorId, indikator, target, realisasi, satuan, tahun, jenisRealisasi, status,
                 null, null, 0);
-    }
-
-    public Double capaian() {
-        if (realisasi == null) {
-            return 0.0;
-        }
-        return realisasi / target * 100;
-    }
-
-    public String capaianString() {
-        return String.format("%.2f", capaian());
     }
 }

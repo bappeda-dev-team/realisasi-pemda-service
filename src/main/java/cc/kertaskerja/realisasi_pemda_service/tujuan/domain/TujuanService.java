@@ -36,9 +36,7 @@ public class TujuanService {
         return tujuanRepository.findById(id);
     }
 
-    // tujuanId check to tujuanService
-    // check target, satuan, tahun, and get tujuan text
-    public Mono<Tujuan> submitRealisasiTujuan(String tujuanId, String indikatorId, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+    public Mono<Tujuan> submitRealisasiTujuan(String tujuanId, String indikatorId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Mono.just(buildUncheckedRealisasiTujuan(tujuanId, indikatorId, target, realisasi, satuan, tahun, jenisRealisasi))
                 .flatMap(tujuanRepository::save);
     }
@@ -61,7 +59,7 @@ public class TujuanService {
         return tujuanRepository.findAllByIndikatorId(indikatorId);
     }
 
-    public static Tujuan buildUncheckedRealisasiTujuan(String tujuanId, String indikatorId, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+    public static Tujuan buildUncheckedRealisasiTujuan(String tujuanId, String indikatorId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Tujuan.of(tujuanId,
                 "Realisasi Tujuan " + tujuanId,
                 indikatorId,

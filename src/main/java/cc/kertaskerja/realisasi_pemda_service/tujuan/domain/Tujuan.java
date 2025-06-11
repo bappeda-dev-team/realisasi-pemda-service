@@ -17,7 +17,7 @@ public record Tujuan(
         String tujuan,
         String indikatorId,
         String indikator,
-        Double target,
+        String target,
         Double realisasi,
         String satuan,
         String tahun,
@@ -34,7 +34,7 @@ public record Tujuan(
             String tujuan,
             String indikatorId,
             String indikator,
-            Double target,
+            String target,
             Double realisasi,
             String satuan,
             String tahun,
@@ -46,14 +46,10 @@ public record Tujuan(
                 null, null, 0);
     }
 
-    public Double capaian() {
-        if (realisasi == null) {
-            return 0.0;
-        }
-        return realisasi / target * 100;
-    }
-
-    public String capaianString() {
-        return String.format("%.2f", capaian());
-    }
+//    public Double capaian() {
+//        if (realisasi == null) {
+//            return 0.0;
+//        }
+//        return realisasi / target * 100;
+//    }
 }

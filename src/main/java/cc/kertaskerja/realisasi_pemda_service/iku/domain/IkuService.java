@@ -69,11 +69,11 @@ public class IkuService {
     }
 
 
-    public static Iku buildIkuTujuan(String indikatorId, String indikator, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+    public static Iku buildIkuTujuan(String indikatorId, String indikator, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Iku.of(indikatorId, indikator, target, realisasi, satuan, tahun, jenisRealisasi, JenisIku.TUJUAN);
     }
 
-    public static Iku buildIkuSasaran(String indikatorId, String indikator, Double target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+    public static Iku buildIkuSasaran(String indikatorId, String indikator, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Iku.of(indikatorId, indikator, target, realisasi, satuan, tahun, jenisRealisasi, JenisIku.SASARAN);
     }
 }

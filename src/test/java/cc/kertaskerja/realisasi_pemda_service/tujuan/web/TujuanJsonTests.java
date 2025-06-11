@@ -19,7 +19,7 @@ public class TujuanJsonTests {
    @Test
    void testSerializeRealisasiTujuan() throws Exception {
        var realisasiTujuan = new Tujuan(304L, "T1", "TUJ-1",
-               "I1", "IND-1", 10.0, 10.0, "%",
+               "I1", "IND-1", "10.0", 10.0, "%",
                "2025", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED, Instant.now(), Instant.now(), 1);
        var jsonContent = json.write(realisasiTujuan);
        assertThat(jsonContent).extractingJsonPathNumberValue("@.id")
@@ -34,8 +34,8 @@ public class TujuanJsonTests {
                .isEqualTo(realisasiTujuan.indikatorId());
        assertThat(jsonContent).extractingJsonPathStringValue("@.indikator")
                .isEqualTo(realisasiTujuan.indikator());
-       assertThat(jsonContent).extractingJsonPathNumberValue("@.target")
-               .isEqualTo(realisasiTujuan.realisasi());
+       assertThat(jsonContent).extractingJsonPathStringValue("@.target")
+               .isEqualTo(realisasiTujuan.target());
        assertThat(jsonContent).extractingJsonPathNumberValue("@.realisasi")
                .isEqualTo(realisasiTujuan.realisasi());
        assertThat(jsonContent).extractingJsonPathStringValue("@.satuan")
