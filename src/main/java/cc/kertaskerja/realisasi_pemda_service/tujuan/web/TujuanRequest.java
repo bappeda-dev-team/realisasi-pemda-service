@@ -3,8 +3,6 @@ package cc.kertaskerja.realisasi_pemda_service.tujuan.web;
 import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
 import jakarta.validation.constraints.*;
 
-import java.util.List;
-
 public record TujuanRequest(
         @NotNull(message = "ID tujuan tidak boleh kosong")
         @NotEmpty(message = "ID tujuan tidak boleh kosong")
