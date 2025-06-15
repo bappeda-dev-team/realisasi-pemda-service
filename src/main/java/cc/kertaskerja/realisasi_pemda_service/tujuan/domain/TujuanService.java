@@ -36,8 +36,8 @@ public class TujuanService {
         return tujuanRepository.findById(id);
     }
 
-    public Mono<Tujuan> submitRealisasiTujuan(String tujuanId, String indikatorId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
-        return Mono.just(buildUncheckedRealisasiTujuan(tujuanId, indikatorId, target, realisasi, satuan, tahun, jenisRealisasi))
+    public Mono<Tujuan> submitRealisasiTujuan(String tujuanId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+        return Mono.just(buildUncheckedRealisasiTujuan(tujuanId, indikatorId, targetId, target, realisasi, satuan, tahun, jenisRealisasi))
                 .flatMap(tujuanRepository::save);
     }
 
@@ -46,6 +46,7 @@ public class TujuanService {
                 .map(req -> buildUncheckedRealisasiTujuan(
                         req.tujuanId(),
                         req.indikatorId(),
+                        req.targetId(),
                         req.target(),
                         req.realisasi(),
                         req.satuan(),
@@ -59,12 +60,12 @@ public class TujuanService {
         return tujuanRepository.findAllByIndikatorId(indikatorId);
     }
 
-    public static Tujuan buildUncheckedRealisasiTujuan(String tujuanId, String indikatorId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+    public static Tujuan buildUncheckedRealisasiTujuan(String tujuanId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Tujuan.of(tujuanId,
                 "Realisasi Tujuan " + tujuanId,
                 indikatorId,
                 "Realisasi Indikator " + indikatorId,
-                target, realisasi, satuan, tahun, jenisRealisasi,
+                targetId, target, realisasi, satuan, tahun, jenisRealisasi,
                 TujuanStatus.UNCHECKED);
     }
 

@@ -22,7 +22,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/KabMadiun
+          issuer-uri: http://keycloak.kertaskerja.local/realms/KabMadiun
 
 server:
   port: 9001
@@ -30,3 +30,8 @@ server:
   netty:
     connection-timeout: 2s
     idle-timeout: 15s
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web.server: DEBUG
+    reactor.netty.http.server: DEBUG

@@ -59,6 +59,7 @@ public class TujuanController {
         return tujuanService.submitRealisasiTujuan(
                 tujuanRequest.tujuanId(),
                 tujuanRequest.indikatorId(),
+                tujuanRequest.targetId(),
                 tujuanRequest.target(),
                 tujuanRequest.realisasi(),
                 tujuanRequest.satuan(),

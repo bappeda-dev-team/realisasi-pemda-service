@@ -13,6 +13,10 @@ public record TujuanRequest(
         String indikatorId,
 
         @NotNull(message = "Target harus terdefinisi")
+        @NotEmpty(message = "ID target tidak boleh kosong")
+        String targetId,
+
+        @NotNull(message = "Target harus terdefinisi")
         String target,
 
         @NotNull(message = "Realisasi harus terdefinisi")
