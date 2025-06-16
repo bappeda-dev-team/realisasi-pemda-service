@@ -67,11 +67,7 @@ public record Tujuan(
 
     private Double handleMultiTarget(List<Double> targets) {
         var minTarget = targets.get(0);
-        var maxTarget = targets.get(targets.size() - 1);
-        if (realisasi < minTarget) {
-            return realisasi / minTarget * 100;
-        }
-        return  realisasi / maxTarget * 100;
+        return  realisasi / minTarget * 100;
     }
 
     private List<Double> handleTarget() {

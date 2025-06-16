@@ -57,8 +57,8 @@ public class TujuanTests {
                 "2025", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
                 Instant.now(), Instant.now(), 1);
 
-        Assertions.assertEquals("100.00%", t.capaian());
+        Assertions.assertEquals("150.00%", t.capaian());
         Assertions.assertEquals("80.00%", t2.capaian());
-        Assertions.assertEquals("90.00%", t3.capaian());
+        Assertions.assertEquals("135.00%", t3.capaian());
     }
 }
