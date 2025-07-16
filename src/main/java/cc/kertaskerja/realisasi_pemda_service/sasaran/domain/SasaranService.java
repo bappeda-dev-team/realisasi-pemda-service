@@ -33,20 +33,24 @@ public class SasaranService {
         return sasaranRepository.findById(id);
     }
 
-    public Mono<Sasaran> submitRealisasiSasaran(String sasaranId, String indikatorId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
-        return Mono.just(buildUnchekcedRealisasiSasaran(sasaranId, indikatorId, target, realisasi, satuan, tahun, jenisRealisasi))
+    public Mono<Sasaran> submitRealisasiSasaran(String sasaranId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+        return Mono.just(buildUnchekcedRealisasiSasaran(sasaranId, indikatorId, targetId, target, realisasi, satuan, tahun, jenisRealisasi))
                 .flatMap(sasaranRepository::save);
     }
 
     // sasaranId check to sasaranService
     // and modify sasaran, check target, satuan, and change status to CHECKED
-    public static Sasaran buildUnchekcedRealisasiSasaran(String sasaranId, String indikatorId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
+    public static Sasaran buildUnchekcedRealisasiSasaran(String sasaranId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Sasaran.of(sasaranId,
                 "Realisasi Sasaran " + sasaranId,
                 indikatorId,
                 "Realisasi Indikator " + indikatorId,
-                target, realisasi, satuan, tahun,
+                targetId, target, realisasi, satuan, tahun,
                 jenisRealisasi,
                 SasaranStatus.UNCHECKED);
+    }
+
+    public Flux<Sasaran> getRealisasiSasaranByPeriodeRpjmd(String tahunAwal, String tahunAkhir) {
+        return sasaranRepository.findAllByTahunBetween(tahunAwal, tahunAkhir);
     }
 }

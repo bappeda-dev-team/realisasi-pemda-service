@@ -40,11 +40,17 @@ public class SasaranController {
         return sasaranService.getAllRealisasiSasaranBySasaranId(sasaranId);
     }
 
+    @GetMapping("/by-periode/{tahunAwal}/{tahunAkhir}/rpjmd")
+    public Flux<Sasaran> getRealisasiSasaranByPeriodeRpjmd(@PathVariable String tahunAwal, @PathVariable String tahunAkhir) {
+        return sasaranService.getRealisasiSasaranByPeriodeRpjmd(tahunAwal, tahunAkhir);
+    }
+
     @PostMapping
     public Mono<Sasaran> submitRealisasiSasaran(@RequestBody @Valid SasaranRequest sasaranRequest) {
         return sasaranService.submitRealisasiSasaran(
                 sasaranRequest.sasaranId(),
                 sasaranRequest.indikatorId(),
+                sasaranRequest.targetId(),
                 sasaranRequest.target(),
                 sasaranRequest.realisasi(),
                 sasaranRequest.satuan(),

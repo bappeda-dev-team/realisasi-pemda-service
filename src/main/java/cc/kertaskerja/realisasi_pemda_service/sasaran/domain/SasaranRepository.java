@@ -9,4 +9,6 @@ public interface SasaranRepository extends ReactiveCrudRepository<Sasaran, Long>
     Flux<Sasaran> findAllBySasaranId(String sasaranId);
 
     Flux<Sasaran> findAllByTahunAndSasaranId(String tahun, String sasaranId);
+
+    Flux<Sasaran> findAllByTahunBetween(String tahunAfter, String tahunBefore);
 }
