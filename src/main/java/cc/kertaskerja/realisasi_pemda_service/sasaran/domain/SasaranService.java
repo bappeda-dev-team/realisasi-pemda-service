@@ -1,9 +1,13 @@
 package cc.kertaskerja.realisasi_pemda_service.sasaran.domain;
 
 import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi_pemda_service.sasaran.web.SasaranRequest;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Service
 public class SasaranService {
@@ -52,5 +56,20 @@ public class SasaranService {
 
     public Flux<Sasaran> getRealisasiSasaranByPeriodeRpjmd(String tahunAwal, String tahunAkhir) {
         return sasaranRepository.findAllByTahunBetween(tahunAwal, tahunAkhir);
+    }
+
+    public Flux<Sasaran> batchSubmitRealisasiSasaran(@Valid List<SasaranRequest> sasaranRequests) {
+        return Flux.fromIterable(sasaranRequests)
+                .map(req -> buildUnchekcedRealisasiSasaran(
+                        req.sasaranId(),
+                        req.indikatorId(),
+                        req.targetId(),
+                        req.target(),
+                        req.realisasi(),
+                        req.satuan(),
+                        req.tahun(),
+                        req.jenisRealisasi()
+                ))
+                .flatMap(sasaranRepository::save);
     }
 }

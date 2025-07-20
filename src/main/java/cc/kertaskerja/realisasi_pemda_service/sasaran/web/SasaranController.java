@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("sasarans")
 public class SasaranController {
@@ -57,5 +59,10 @@ public class SasaranController {
                 sasaranRequest.tahun(),
                 sasaranRequest.jenisRealisasi()
         );
+    }
+
+    @PostMapping("/batch")
+    public Flux<Sasaran> batchSubmitRealisasiSasaran(@RequestBody @Valid List<SasaranRequest> sasaranRequest) {
+        return sasaranService.batchSubmitRealisasiSasaran(sasaranRequest);
     }
 }
