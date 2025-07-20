@@ -60,16 +60,56 @@ public class SasaranService {
 
     public Flux<Sasaran> batchSubmitRealisasiSasaran(@Valid List<SasaranRequest> sasaranRequests) {
         return Flux.fromIterable(sasaranRequests)
-                .map(req -> buildUnchekcedRealisasiSasaran(
-                        req.sasaranId(),
-                        req.indikatorId(),
-                        req.targetId(),
-                        req.target(),
-                        req.realisasi(),
-                        req.satuan(),
-                        req.tahun(),
-                        req.jenisRealisasi()
-                ))
-                .flatMap(sasaranRepository::save);
+                .flatMap(req -> {
+                    if (req.targetRealisasiId() != null) {
+                        return sasaranRepository.findById(req.targetRealisasiId())
+                                .flatMap(existing -> {
+                                    Sasaran updated = new Sasaran(
+                                            existing.id(),
+                                            existing.sasaranId(),
+                                            existing.sasaran(),
+                                            existing.indikatorId(),
+                                            existing.indikator(),
+                                            existing.targetId(),
+                                            req.target(),
+                                            req.realisasi(),
+                                            req.satuan(),
+                                            req.tahun(),
+                                            req.jenisRealisasi(),
+                                            SasaranStatus.UNCHECKED,
+                                            existing.createdDate(),
+                                            existing.lastModifiedDate(),
+                                            existing.version()
+                                    );
+                                    return sasaranRepository.save(updated);
+                                })
+                                .switchIfEmpty(Mono.defer(() -> {
+                                    Sasaran baru = buildUnchekcedRealisasiSasaran(
+                                            req.sasaranId(),
+                                            req.indikatorId(),
+                                            req.targetId(),
+                                            req.target(),
+                                            req.realisasi(),
+                                            req.satuan(),
+                                            req.tahun(),
+                                            req.jenisRealisasi()
+                                    );
+                                    return sasaranRepository.save(baru);
+                                }));
+                    }
+                    else {
+                        Sasaran baru = buildUnchekcedRealisasiSasaran(
+                                req.sasaranId(),
+                                req.indikatorId(),
+                                req.targetId(),
+                                req.target(),
+                                req.realisasi(),
+                                req.satuan(),
+                                req.tahun(),
+                                req.jenisRealisasi()
+                        );
+                        return sasaranRepository.save(baru);
+                    }
+                });
     }
 }

@@ -1,9 +1,13 @@
 package cc.kertaskerja.realisasi_pemda_service.sasaran.web;
 
 import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 
 public record SasaranRequest(
+        @Nullable
+        Long targetRealisasiId,
+
         @NotNull(message = "ID sasaran tidak boleh kosong")
         @NotEmpty(message = "ID sasaran tidak boleh kosong")
         String sasaranId,

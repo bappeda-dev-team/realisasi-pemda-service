@@ -35,9 +35,9 @@ public class SasaranControllerWebFluxTests {
     @Test
     void whenBatchSubmit_thenReturnSavedSasarans() throws Exception {
         // prepare data
-        SasaranRequest s1 = new SasaranRequest("S-1", "IS-1", "TIS-1",
+        SasaranRequest s1 = new SasaranRequest(null, "S-1", "IS-1", "TIS-1",
                 "10", 10.0, "%", "2025", JenisRealisasi.NAIK);
-        SasaranRequest s2 = new SasaranRequest("S-12", "IS-12", "TIS-12",
+        SasaranRequest s2 = new SasaranRequest(null, "S-12", "IS-12", "TIS-12",
                 "10", 5.0, "%", "2025", JenisRealisasi.NAIK);
 
         Sasaran ss1 = SasaranService.buildUnchekcedRealisasiSasaran(
