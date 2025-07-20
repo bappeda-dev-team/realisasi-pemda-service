@@ -1,9 +1,13 @@
 package cc.kertaskerja.realisasi_pemda_service.tujuan.web;
 
 import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 
 public record TujuanRequest(
+        @Nullable
+        Long targetRealisasiId,
+
         @NotNull(message = "ID tujuan tidak boleh kosong")
         @NotEmpty(message = "ID tujuan tidak boleh kosong")
         String tujuanId,
@@ -26,6 +30,7 @@ public record TujuanRequest(
         @NotEmpty(message = "Satuan tidak boleh kosong")
         String satuan,
 
+        @NotNull(message = "Tahun harus terdefinisi")
         @NotEmpty(message = "Tahun tidak boleh kosong")
         String tahun,
 

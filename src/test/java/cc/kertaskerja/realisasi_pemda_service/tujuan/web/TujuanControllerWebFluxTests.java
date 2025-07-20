@@ -141,8 +141,8 @@ public class TujuanControllerWebFluxTests {
     @Test
     void whenBatchSubmit_thenReturnsSavedTujuans() throws Exception {
         // prepare requests
-        TujuanRequest r1 = new TujuanRequest("T1", "I1", "TAR-1", "100.0", 50.0, "unit1", "2025", JenisRealisasi.NAIK);
-        TujuanRequest r2 = new TujuanRequest("T2", "I2", "TAR-2", "200.0", 75.0, "unit2", "2026", JenisRealisasi.TURUN);
+        TujuanRequest r1 = new TujuanRequest(null, "T1", "I1", "TAR-1", "100.0", 50.0, "unit1", "2025", JenisRealisasi.NAIK);
+        TujuanRequest r2 = new TujuanRequest(null, "T2", "I2", "TAR-2", "200.0", 75.0, "unit2", "2026", JenisRealisasi.TURUN);
 
         // prepare expected domain objects
         Tujuan t1 = TujuanService.buildUncheckedRealisasiTujuan(
