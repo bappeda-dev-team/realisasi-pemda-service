@@ -21,9 +21,11 @@ public class IkuService {
                 .map(t -> buildIkuTujuan(
                         t.indikatorId(),
                         t.indikator(),
+                        t.targetId(),
                         t.target(),
                         t.realisasi(),
                         t.satuan(),
+                        t.capaian(),
                         t.tahun(),
                         t.jenisRealisasi()
                 ));
@@ -32,9 +34,11 @@ public class IkuService {
                 .map(s -> buildIkuSasaran(
                         s.indikatorId(),
                         s.indikator(),
+                        s.targetId(),
                         s.target(),
                         s.realisasi(),
                         s.satuan(),
+                        s.capaian(),
                         s.tahun(),
                         s.jenisRealisasi()
                 ));
@@ -47,9 +51,11 @@ public class IkuService {
                 .map(t -> buildIkuTujuan(
                         t.indikatorId(),
                         t.indikator(),
+                        t.targetId(),
                         t.target(),
                         t.realisasi(),
                         t.satuan(),
+                        t.capaian(),
                         t.tahun(),
                         t.jenisRealisasi()
                 ));
@@ -58,9 +64,11 @@ public class IkuService {
                 .map(s -> buildIkuSasaran(
                         s.indikatorId(),
                         s.indikator(),
+                        s.targetId(),
                         s.target(),
                         s.realisasi(),
                         s.satuan(),
+                        s.capaian(),
                         s.tahun(),
                         s.jenisRealisasi()
                 ));
@@ -69,11 +77,11 @@ public class IkuService {
     }
 
 
-    public static Iku buildIkuTujuan(String indikatorId, String indikator, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
-        return Iku.of(indikatorId, indikator, target, realisasi, satuan, tahun, jenisRealisasi, JenisIku.TUJUAN);
+    public static Iku buildIkuTujuan(String indikatorId, String indikator, String targetId, String target, Double realisasi, String satuan, String capaian, String tahun, JenisRealisasi jenisRealisasi) {
+        return Iku.of(indikatorId, indikator, targetId, target, realisasi, satuan, capaian, tahun, jenisRealisasi, JenisIku.TUJUAN);
     }
 
-    public static Iku buildIkuSasaran(String indikatorId, String indikator, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi) {
-        return Iku.of(indikatorId, indikator, target, realisasi, satuan, tahun, jenisRealisasi, JenisIku.SASARAN);
+    public static Iku buildIkuSasaran(String indikatorId, String indikator, String targetId, String target, Double realisasi, String satuan, String capaian, String tahun, JenisRealisasi jenisRealisasi) {
+        return Iku.of(indikatorId, indikator, targetId, target, realisasi, satuan, capaian, tahun, jenisRealisasi, JenisIku.SASARAN);
     }
 }

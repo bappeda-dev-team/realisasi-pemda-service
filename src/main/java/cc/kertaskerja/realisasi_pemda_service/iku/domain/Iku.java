@@ -7,17 +7,20 @@ public record Iku(
         String id,
         String indikatorId,
         String indikator,
+        String targetId,
         String target,
         Double realisasi,
         String satuan,
+        String capaian,
         String tahun,
         JenisRealisasi jenisRealisasi,
         JenisIku jenisIku
 ) {
-    public static Iku of(String indikatorId, String indikator, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi, JenisIku jenisIku) {
+    public static Iku of(String indikatorId, String indikator, String targetId, String target, Double realisasi, String satuan, String capaian, String tahun, JenisRealisasi jenisRealisasi, JenisIku jenisIku) {
         return new Iku(
                 "IKU-" + jenisIku + "-" + indikatorId,
-                indikatorId, indikator, target, realisasi, satuan, tahun,
+                indikatorId, indikator, targetId,
+                target, realisasi, satuan, capaian, tahun,
                 jenisRealisasi, jenisIku);
     }
 }
