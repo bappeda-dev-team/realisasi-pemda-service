@@ -1,6 +1,6 @@
 package cc.kertaskerja.realisasi_pemda_service.iku.domain;
 
-import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_pemda_service.sasaran.domain.SasaranRepository;
 import cc.kertaskerja.realisasi_pemda_service.tujuan.domain.TujuanRepository;
 import org.springframework.stereotype.Service;

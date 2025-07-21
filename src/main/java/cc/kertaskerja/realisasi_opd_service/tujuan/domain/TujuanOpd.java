@@ -1,6 +1,6 @@
 package cc.kertaskerja.realisasi_opd_service.tujuan.domain;
 
-import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_pemda_service.tujuan.domain.TujuanStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;

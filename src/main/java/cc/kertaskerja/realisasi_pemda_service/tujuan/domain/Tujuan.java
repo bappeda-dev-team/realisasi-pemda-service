@@ -1,6 +1,6 @@
 package cc.kertaskerja.realisasi_pemda_service.tujuan.domain;
 
-import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;

@@ -1,6 +1,6 @@
 package cc.kertaskerja.realisasi_pemda_service.iku.domain;
 
-import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 
 // IKU Take realisasi tujuan and sasaran
 public record Iku(
