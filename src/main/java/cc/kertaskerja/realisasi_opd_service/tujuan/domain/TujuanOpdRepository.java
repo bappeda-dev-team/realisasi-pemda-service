@@ -15,4 +15,6 @@ public interface TujuanOpdRepository extends ReactiveCrudRepository<TujuanOpd, L
     Flux<TujuanOpd> findAllByTahunBetweenAndKodeOpd(String tahunAwal, String tahunAkhir, String kodeOpd);
 
     Flux<TujuanOpd> findAllByKodeOpd(String kodeOpd);
+
+    Flux<TujuanOpd> findAllByTahunAndTujuanIdAndKodeOpd(String tahun, String tujuanId, String kodeOpd);
 }

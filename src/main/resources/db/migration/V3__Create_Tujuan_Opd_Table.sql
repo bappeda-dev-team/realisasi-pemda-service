@@ -6,7 +6,7 @@ CREATE TABLE tujuan_opd
     indikator_id       varchar(255)          NOT NULL,
     indikator          varchar(255)          NOT NULL,
     target_id          varchar(255)          NOT NULL UNIQUE,
-    target             double precision      NOT NULL,
+    target             text                  NOT NULL,
     realisasi          double precision      NOT NULL,
     satuan             varchar(255)          NOT NULL,
     tahun              varchar(10)           NOT NULL,
