@@ -1,4 +1,4 @@
-package cc.kertaskerja.realisasi_pemda_service.config;
+package cc.kertaskerja.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

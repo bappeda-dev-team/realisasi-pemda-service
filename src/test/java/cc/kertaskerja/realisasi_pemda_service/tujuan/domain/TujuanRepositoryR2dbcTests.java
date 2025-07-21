@@ -1,6 +1,6 @@
 package cc.kertaskerja.realisasi_pemda_service.tujuan.domain;
 
-import cc.kertaskerja.realisasi_pemda_service.config.DataConfig;
+import cc.kertaskerja.config.DataConfig;
 import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

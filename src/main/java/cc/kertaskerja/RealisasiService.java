@@ -1,13 +1,13 @@
-package cc.kertaskerja.realisasi_pemda_service;
+package cc.kertaskerja;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RealisasiPemdaServiceApplication {
+public class RealisasiService {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RealisasiPemdaServiceApplication.class, args);
+		SpringApplication.run(RealisasiService.class, args);
 	}
 
 }
