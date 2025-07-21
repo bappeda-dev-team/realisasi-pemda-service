@@ -39,6 +39,10 @@ public class TujuanOpdService {
         return tujuanOpdRepository.findAllByTahunBetweenAndKodeOpd(tahunAwal, tahunAkhir, kodeOpd);
     }
 
+    public Flux<TujuanOpd> getRealisasiTujuanOpdByTahunAndTujuanId(String tahun, String tujuanId) {
+        return tujuanOpdRepository.findAllByTahunAndTujuanId(tahun, tujuanId);
+    }
+
     public Mono<TujuanOpd> getRealisasiTujuanOpdById(Long id) {
         return tujuanOpdRepository.findById(id);
     }
