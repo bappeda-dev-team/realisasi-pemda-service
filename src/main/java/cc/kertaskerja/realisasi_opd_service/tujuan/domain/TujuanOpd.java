@@ -1,7 +1,6 @@
 package cc.kertaskerja.realisasi_opd_service.tujuan.domain;
 
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
-import cc.kertaskerja.realisasi_pemda_service.tujuan.domain.TujuanStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -25,7 +24,7 @@ public record TujuanOpd(
         String tahun,
         JenisRealisasi jenisRealisasi,
         String kodeOpd,
-        TujuanStatus status,
+        TujuanOpdStatus status,
 
         @CreatedDate Instant createdDate,
         @LastModifiedDate Instant lastModifiedDate,
@@ -44,7 +43,7 @@ public record TujuanOpd(
             String tahun,
             JenisRealisasi jenisRealisasi,
             String kodeOpd,
-            TujuanStatus status
+            TujuanOpdStatus status
     ) {
         return new TujuanOpd(null,
                 tujuanId, tujuan, indikatorId, indikator,
