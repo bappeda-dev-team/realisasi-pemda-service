@@ -1,8 +1,6 @@
 package cc.kertaskerja.realisasi_opd_service.sasaran.domain;
 
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
-import cc.kertaskerja.realisasi_opd_service.tujuan.domain.TujuanOpd;
-import cc.kertaskerja.realisasi_opd_service.tujuan.domain.TujuanOpdStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

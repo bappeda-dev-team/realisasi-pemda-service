@@ -3,8 +3,6 @@ package cc.kertaskerja.realisasi_opd_service.tujuan.web;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_opd_service.tujuan.domain.TujuanOpd;
 import cc.kertaskerja.realisasi_opd_service.tujuan.domain.TujuanOpdService;
-import cc.kertaskerja.realisasi_opd_service.tujuan.web.TujuanOpdController;
-import cc.kertaskerja.realisasi_opd_service.tujuan.web.TujuanOpdRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
