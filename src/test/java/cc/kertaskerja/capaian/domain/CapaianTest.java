@@ -66,9 +66,7 @@ class CapaianTest {
 
     @Test
     void testHasilCapaian_TargetContainsInvalidValues_ShouldThrowException() {
-        assertThrows(NumberFormatException.class, () -> {
-            new Capaian(80.0, "100-abc", JenisRealisasi.NAIK).hasilCapaian();
-        });
+        assertThrows(NumberFormatException.class, () -> new Capaian(80.0, "100-abc", JenisRealisasi.NAIK).hasilCapaian());
     }
 
     @Test
