@@ -1,0 +1,102 @@
+package cc.kertaskerja.realisasi_opd_service.sasaran.domain;
+
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi_opd_service.tujuan.domain.TujuanOpd;
+import cc.kertaskerja.realisasi_opd_service.tujuan.domain.TujuanOpdStatus;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class SasaranOpdServiceTest {
+    @Mock
+    private SasaranOpdRepository sasaranOpdRepository;
+
+    @InjectMocks
+    private SasaranOpdService sasaranOpdService;
+
+    @Test
+    void submitRealisasiSasaranOpd_ShouldReturnSavedEntity_WhenValidInputProvided() {
+        // Arrange
+        String sasaranId = UUID.randomUUID().toString();
+        String indikatorId = UUID.randomUUID().toString();
+        String targetId = UUID.randomUUID().toString();
+        String target = "100";
+        Double realisasi = 80.0;
+        String satuan = "Unit";
+        String tahun = "2025";
+        JenisRealisasi jenisRealisasi = JenisRealisasi.NAIK;
+        String kodeOpd = "OPD001";
+
+        SasaranOpd expectedSasaranOpd = SasaranOpd.of(
+                sasaranId,
+                "Realisasi Sasaran Opd " + sasaranId,
+                indikatorId,
+                "Realisasi Indikator Opd " + indikatorId,
+                targetId,
+                target,
+                realisasi,
+                satuan,
+                tahun,
+                jenisRealisasi,
+                kodeOpd,
+                SasaranOpdStatus.UNCHECKED
+        );
+
+        when(sasaranOpdRepository.save(any(SasaranOpd.class))).thenReturn(Mono.just(expectedSasaranOpd));
+
+        // Act
+        Mono<SasaranOpd> result = sasaranOpdService.submitRealisasiSasaranOpd(
+                sasaranId, indikatorId, targetId, target, realisasi, satuan, tahun, jenisRealisasi, kodeOpd);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(sasaranOpd ->
+                        sasaranOpd.sasaranId().equals(expectedSasaranOpd.sasaranId()) &&
+                                sasaranOpd.indikatorId().equals(expectedSasaranOpd.indikatorId()) &&
+                                sasaranOpd.target().equals(expectedSasaranOpd.target()) &&
+                                sasaranOpd.realisasi().equals(expectedSasaranOpd.realisasi()) &&
+                                sasaranOpd.capaian().equals(expectedSasaranOpd.capaian()) &&
+                                sasaranOpd.satuan().equals(expectedSasaranOpd.satuan()) &&
+                                sasaranOpd.tahun().equals(expectedSasaranOpd.tahun()) &&
+                                sasaranOpd.jenisRealisasi() == expectedSasaranOpd.jenisRealisasi() &&
+                                sasaranOpd.kodeOpd().equals(expectedSasaranOpd.kodeOpd()) &&
+                                sasaranOpd.status() == SasaranOpdStatus.UNCHECKED)
+                .verifyComplete();
+    }
+
+    @Test
+    void submitRealisasiSasaranOpd_ShouldThrowError_WhenRepositoryFails() {
+        // Arrange
+        String sasaranId = UUID.randomUUID().toString();
+        String indikatorId = UUID.randomUUID().toString();
+        String targetId = UUID.randomUUID().toString();
+        String target = "100";
+        Double realisasi = 80.0;
+        String satuan = "Unit";
+        String tahun = "2025";
+        JenisRealisasi jenisRealisasi = JenisRealisasi.NAIK;
+        String kodeOpd = "OPD001";
+
+        when(sasaranOpdRepository.save(any(SasaranOpd.class))).thenReturn(Mono.error(new RuntimeException("Unexpected error")));
+
+        // Act
+        Mono<SasaranOpd> result = sasaranOpdService.submitRealisasiSasaranOpd(
+                sasaranId, indikatorId, targetId, target, realisasi, satuan, tahun, jenisRealisasi, kodeOpd);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectErrorMatches(throwable -> throwable instanceof RuntimeException &&
+                        throwable.getMessage().equals("Unexpected error"))
+                .verify();
+    }
+}

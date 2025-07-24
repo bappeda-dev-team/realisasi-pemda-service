@@ -2,7 +2,6 @@ package cc.kertaskerja.realisasi_opd_service.sasaran.domain;
 
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_opd_service.sasaran.web.SasaranOpdRequest;
-import cc.kertaskerja.realisasi_pemda_service.sasaran.domain.SasaranStatus;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

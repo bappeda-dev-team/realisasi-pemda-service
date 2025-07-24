@@ -1,6 +1,8 @@
-package cc.kertaskerja.realisasi_opd_service.tujuan.domain.web;
+package cc.kertaskerja.realisasi_opd_service.sasaran.web;
 
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpd;
+import cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpdService;
 import cc.kertaskerja.realisasi_opd_service.tujuan.domain.TujuanOpd;
 import cc.kertaskerja.realisasi_opd_service.tujuan.domain.TujuanOpdService;
 import cc.kertaskerja.realisasi_opd_service.tujuan.web.TujuanOpdController;
@@ -22,37 +24,37 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-@WebFluxTest(TujuanOpdController.class)
-public class TujuanOpdControllerWebFluxTests {
+@WebFluxTest(SasaranOpdController.class)
+public class SasaranOpdControllerWebFluxTests {
     @Autowired
     private WebTestClient webTestClient;
 
     @MockitoBean
-    private TujuanOpdService tujuanOpdService;
+    private SasaranOpdService sasaranOpdService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void whenBatchSubmit_thenReturnsSavedTujuans() throws Exception {
+    void whenBatchSubmit_thenReturnsSaveSasaranOpds() throws Exception {
         // prepare requests
-        TujuanOpdRequest r1 = new TujuanOpdRequest(null, "T1", "I1", "TAR-1", "100.0", 50.0, "unit1", "2025", JenisRealisasi.NAIK, "001");
-        TujuanOpdRequest r2 = new TujuanOpdRequest(null, "T2", "I2", "TAR-2", "200.0", 75.0, "unit2", "2026", JenisRealisasi.TURUN, "001");
+        SasaranOpdRequest r1 = new SasaranOpdRequest(null, "S1", "I1", "TAR-1", "100.0", 50.0, "unit1", "2025", JenisRealisasi.NAIK, "001");
+        SasaranOpdRequest r2 = new SasaranOpdRequest(null, "S2", "I2", "TAR-2", "200.0", 75.0, "unit2", "2026", JenisRealisasi.TURUN, "001");
 
         // prepare expected domain objects
-        TujuanOpd t1 = TujuanOpdService.buildUncheckedRealisasiTujuanOpd(
-                r1.tujuanId(), r1.indikatorId(), r1.targetId() ,r1.target(), r1.realisasi(),
+        SasaranOpd s1 = SasaranOpdService.buildUncheckedRealisasiSasaranOpd(
+                r1.sasaranId(), r1.indikatorId(), r1.targetId() ,r1.target(), r1.realisasi(),
                 r1.satuan(), r1.tahun(), r1.jenisRealisasi(),
                 r1.kodeOpd()
         );
-        TujuanOpd t2 = TujuanOpdService.buildUncheckedRealisasiTujuanOpd(
-                r2.tujuanId(), r2.indikatorId(), r2.targetId(), r2.target(), r2.realisasi(),
+        SasaranOpd s2 = SasaranOpdService.buildUncheckedRealisasiSasaranOpd(
+                r2.sasaranId(), r2.indikatorId(), r2.targetId(), r2.target(), r2.realisasi(),
                 r2.satuan(), r2.tahun(), r2.jenisRealisasi(),
                 r2.kodeOpd()
         );
 
-        when(tujuanOpdService.batchSubmitRealisasiTujuanOpd(anyList()))
-                .thenReturn(Flux.just(t1, t2));
+        when(sasaranOpdService.batchSubmitRealisasiSasaranOpd(anyList()))
+                .thenReturn(Flux.just(s1, s2));
 
         // execute POST /tujuans/batch
         webTestClient
@@ -60,19 +62,19 @@ public class TujuanOpdControllerWebFluxTests {
                 .mutateWith(SecurityMockServerConfigurers.mockJwt()
                         .authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                 .post()
-                .uri("/tujuan_opd/batch")
+                .uri("/sasaran_opd/batch")
                 .bodyValue(objectMapper.writeValueAsString(List.of(r1, r2)))
                 .header("Content-Type", "application/json")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBodyList(TujuanOpd.class)
+                .expectBodyList(SasaranOpd.class)
                 .consumeWith(response -> {
                     var body = response.getResponseBody();
                     Assertions.assertNotNull(body);
                     Assertions.assertEquals(2, body.size());
-                    Assertions.assertEquals(t1, body.get(0));
+                    Assertions.assertEquals(s1, body.get(0));
                     Assertions.assertEquals("50.00%", body.get(0).capaian());
-                    Assertions.assertEquals(t2, body.get(1));
+                    Assertions.assertEquals(s2, body.get(1));
                     Assertions.assertEquals("63.50%", body.get(1).capaian());
                 });
     }
