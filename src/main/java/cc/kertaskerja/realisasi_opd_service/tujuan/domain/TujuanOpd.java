@@ -1,6 +1,8 @@
 package cc.kertaskerja.realisasi_opd_service.tujuan.domain;
 
+import cc.kertaskerja.capaian.domain.Capaian;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -50,5 +52,15 @@ public record TujuanOpd(
                 targetId, target, realisasi, satuan, tahun,
                 jenisRealisasi, kodeOpd, status,
                 null, null, 0);
+    }
+
+    @JsonProperty("capaian")
+    public String capaian() {
+        return String.format("%.2f%%", capaianTujuanOpd());
+    }
+
+    public Double capaianTujuanOpd() {
+        Capaian capaian = new Capaian(realisasi, target, jenisRealisasi);
+        return capaian.hasilCapaian();
     }
 }

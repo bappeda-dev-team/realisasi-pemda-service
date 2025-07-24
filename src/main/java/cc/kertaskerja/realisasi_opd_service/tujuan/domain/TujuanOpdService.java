@@ -54,7 +54,7 @@ public class TujuanOpdService {
                 .flatMap(tujuanOpdRepository::save);
     }
 
-    private TujuanOpd buildUncheckedRealisasiTujuanOpd(String tujuanId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi, String kodeOpd) {
+    public static TujuanOpd buildUncheckedRealisasiTujuanOpd(String tujuanId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi, String kodeOpd) {
         return TujuanOpd.of(
                 tujuanId,
                 "Realisasi Tujuan Opd " + tujuanId,

@@ -1,14 +1,12 @@
 package cc.kertaskerja.realisasi_pemda_service.tujuan.domain;
 
+import cc.kertaskerja.capaian.domain.Capaian;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Table("tujuans")
 public record Tujuan(
@@ -56,33 +54,7 @@ public record Tujuan(
     }
 
     public Double capaianTujuan() {
-        var targets = handleTarget();
-        if (targets.isEmpty() || realisasi == 0.0) return 0.0;
-        if (targets.size() > 1) {
-            return handleMultiTarget(targets);
-        }
-        var singleTarget = targets.get(0);
-        return realisasi / singleTarget * 100;
+        Capaian capaian = new Capaian(realisasi, target, jenisRealisasi);
+        return capaian.hasilCapaian();
     }
-
-    private Double handleMultiTarget(List<Double> targets) {
-        var minTarget = targets.get(0);
-        return  realisasi / minTarget * 100;
-    }
-
-    private List<Double> handleTarget() {
-        var targets = parseTarget(target);
-        if (targets.isEmpty()) return List.of(0.0);
-        return targets;
-    }
-
-    private List<Double> parseTarget(String target) {
-        if (target == null || target.isBlank()) return List.of();
-        return Arrays.stream(target.split("-"))
-                .map(String::trim)
-                .map(s -> s.replace(",", "."))
-                .map(Double::parseDouble)
-                .collect(Collectors.toList());
-    }
-
 }

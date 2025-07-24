@@ -63,6 +63,7 @@ public class TujuanOpdServiceTest {
                                 tujuanOpd.indikatorId().equals(expectedTujuanOpd.indikatorId()) &&
                                 tujuanOpd.target().equals(expectedTujuanOpd.target()) &&
                                 tujuanOpd.realisasi().equals(expectedTujuanOpd.realisasi()) &&
+                                tujuanOpd.capaian().equals(expectedTujuanOpd.capaian()) &&
                                 tujuanOpd.satuan().equals(expectedTujuanOpd.satuan()) &&
                                 tujuanOpd.tahun().equals(expectedTujuanOpd.tahun()) &&
                                 tujuanOpd.jenisRealisasi() == expectedTujuanOpd.jenisRealisasi() &&
