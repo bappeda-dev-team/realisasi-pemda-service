@@ -1,6 +1,6 @@
 package cc.kertaskerja.realisasi_pemda_service.tujuan.web;
 
-import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_pemda_service.tujuan.domain.Tujuan;
 import cc.kertaskerja.realisasi_pemda_service.tujuan.domain.TujuanStatus;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package cc.kertaskerja.realisasi_pemda_service.sasaran.web;
 
-import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_pemda_service.sasaran.domain.Sasaran;
 import cc.kertaskerja.realisasi_pemda_service.sasaran.domain.SasaranService;
 import com.fasterxml.jackson.databind.ObjectMapper;

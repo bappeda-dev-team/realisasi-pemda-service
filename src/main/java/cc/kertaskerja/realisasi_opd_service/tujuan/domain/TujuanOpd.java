@@ -1,15 +1,18 @@
-package cc.kertaskerja.realisasi_pemda_service.tujuan.domain;
+package cc.kertaskerja.realisasi_opd_service.tujuan.domain;
 
 import cc.kertaskerja.capaian.domain.Capaian;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.data.annotation.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
 
-@Table("tujuans")
-public record Tujuan(
+@Table("tujuan_opd")
+public record TujuanOpd(
         @Id Long id,
 
         String tujuanId,
@@ -22,14 +25,15 @@ public record Tujuan(
         String satuan,
         String tahun,
         JenisRealisasi jenisRealisasi,
-        TujuanStatus status,
+        String kodeOpd,
+        TujuanOpdStatus status,
 
         @CreatedDate Instant createdDate,
         @LastModifiedDate Instant lastModifiedDate,
 
         @Version int version
 ) {
-    public static Tujuan of(
+    public static TujuanOpd of(
             String tujuanId,
             String tujuan,
             String indikatorId,
@@ -40,20 +44,22 @@ public record Tujuan(
             String satuan,
             String tahun,
             JenisRealisasi jenisRealisasi,
-            TujuanStatus status
+            String kodeOpd,
+            TujuanOpdStatus status
     ) {
-        return new Tujuan(null,
+        return new TujuanOpd(null,
                 tujuanId, tujuan, indikatorId, indikator,
-                targetId, target, realisasi, satuan, tahun, jenisRealisasi, status,
+                targetId, target, realisasi, satuan, tahun,
+                jenisRealisasi, kodeOpd, status,
                 null, null, 0);
     }
 
     @JsonProperty("capaian")
     public String capaian() {
-        return String.format("%.2f%%", capaianTujuan());
+        return String.format("%.2f%%", capaianTujuanOpd());
     }
 
-    public Double capaianTujuan() {
+    public Double capaianTujuanOpd() {
         Capaian capaian = new Capaian(realisasi, target, jenisRealisasi);
         return capaian.hasilCapaian();
     }

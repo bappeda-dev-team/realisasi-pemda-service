@@ -1,10 +1,12 @@
-package cc.kertaskerja.realisasi_pemda_service.sasaran.web;
+package cc.kertaskerja.realisasi_opd_service.sasaran.web;
 
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
-public record SasaranRequest(
+public record SasaranOpdRequest(
         @Nullable
         Long targetRealisasiId,
 
@@ -30,9 +32,15 @@ public record SasaranRequest(
         @NotEmpty(message = "Satuan tidak boleh kosong")
         String satuan,
 
+        @NotNull(message = "Tahun harus terdefinisi")
         @NotEmpty(message = "Tahun tidak boleh kosong")
         String tahun,
 
         @NotNull(message = "Pilih jenis NAIK atau TURUN")
-        JenisRealisasi jenisRealisasi
-) {}
+        JenisRealisasi jenisRealisasi,
+
+        @NotEmpty(message = "Kode opd tidak boleh kosong")
+        @NotNull(message = "Kode opd tidak boleh kosong")
+        String kodeOpd
+) {
+}

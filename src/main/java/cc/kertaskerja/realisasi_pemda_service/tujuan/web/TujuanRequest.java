@@ -1,6 +1,6 @@
 package cc.kertaskerja.realisasi_pemda_service.tujuan.web;
 
-import cc.kertaskerja.realisasi_pemda_service.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 
