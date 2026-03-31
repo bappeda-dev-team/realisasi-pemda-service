@@ -30,6 +30,10 @@ public class RekinService {
         return rekinRepository.findAllByRekinId(rekinId);
     }
 
+    public Flux<Rekin> getRealisasiRekinByIndikatorId(String indikatorId) {
+        return rekinRepository.findAllByIndikatorId(indikatorId);
+    }
+
     public Flux<Rekin> getRealisasiRekinByTahun(String tahun) {
         return rekinRepository.findAllByTahun(tahun);
     }
@@ -47,11 +51,12 @@ public class RekinService {
     }
 
     public Mono<Rekin> submitRealisasiRekin(String rekinId, String rekin,
+            String indikatorId, String indikator,
             String nip, String idSasaran, String sasaran,
             String targetId, String target, Integer realisasi,
             String satuan, String tahun, JenisRealisasi jenisRealisasi) {
         return Mono.just(buildUncheckedRealisasiRekin(
-                rekinId, rekin, nip, idSasaran, sasaran, targetId, target,
+                rekinId, rekin, indikatorId, indikator, nip, idSasaran, sasaran, targetId, target,
                 realisasi, satuan, tahun, jenisRealisasi))
                 .flatMap(rekinRepository::save);
     }
@@ -61,6 +66,7 @@ public class RekinService {
     }
 
     public static Rekin buildUncheckedRealisasiRekin(String rekinId, String rekin,
+            String indikatorId, String indikator,
             String nip, String idSasaran, String sasaran,
             String targetId, String target, Integer realisasi,
             String satuan, String tahun, JenisRealisasi jenisRealisasi) {
@@ -68,6 +74,8 @@ public class RekinService {
         return Rekin.of(
                 rekinId,
                 rekin,
+                indikatorId,
+                indikator,
                 nip,
                 idSasaran,
                 sasaran,
@@ -100,6 +108,8 @@ public class RekinService {
                                     Rekin baru = buildUncheckedRealisasiRekin(
                                             req.rekinId(),
                                             req.rekin(),
+                                            req.indikatorId(),
+                                            req.indikator(),
                                             req.nip(),
                                             req.idSasaran(),
                                             req.sasaran(),
@@ -122,6 +132,8 @@ public class RekinService {
                                 Rekin baru = buildUncheckedRealisasiRekin(
                                         req.rekinId(),
                                         req.rekin(),
+                                        req.indikatorId(),
+                                        req.indikator(),
                                         req.nip(),
                                         req.idSasaran(),
                                         req.sasaran(),
@@ -142,6 +154,8 @@ public class RekinService {
                 existing.id(),
                 existing.rekinId(),
                 existing.rekin(),
+                existing.indikatorId(),
+                existing.indikator(),
                 existing.nip(),
                 existing.idSasaran(),
                 existing.sasaran(),

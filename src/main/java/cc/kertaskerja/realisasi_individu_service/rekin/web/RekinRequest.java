@@ -38,6 +38,16 @@ public record RekinRequest(
         @Schema(description = "Nama sasaran", example = "Meningkatkan kualitas layanan")
         String sasaran,
 
+        @NotNull(message = "ID indikator tidak boleh kosong")
+        @NotEmpty(message = "ID indikator tidak boleh kosong")
+        @Schema(description = "ID indikator rekin", example = "IND-REK-123")
+        String indikatorId,
+
+        @NotNull(message = "Indikator tidak boleh kosong")
+        @NotEmpty(message = "Indikator tidak boleh kosong")
+        @Schema(description = "Nama indikator", example = "Persentase capaian rekin")
+        String indikator,
+
         @NotNull(message = "Target harus terdefinisi")
         @NotEmpty(message = "ID target tidak boleh kosong")
         @Schema(description = "ID target", example = "TAR-1")

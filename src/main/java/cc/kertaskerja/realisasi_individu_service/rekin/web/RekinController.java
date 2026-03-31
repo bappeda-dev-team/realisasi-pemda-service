@@ -67,6 +67,17 @@ public class RekinController {
         return rekinService.getRealisasiRekinByRekinId(rekinId);
     }
 
+    @GetMapping("/by-indikator/{indikatorId}")
+    @Operation(summary = "Cari realisasi rekin berdasarkan ID indikator", description = "Mengambil daftar realisasi rekin berdasarkan `indikatorId`.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Daftar realisasi rekin", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Rekin.class)))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
+    public Flux<Rekin> getRealisasiRekinByIndikatorId(
+            @Parameter(description = "ID indikator", example = "IND-REK-123") @PathVariable String indikatorId) {
+        return rekinService.getRealisasiRekinByIndikatorId(indikatorId);
+    }
+
     @GetMapping("/by-tahun/{tahun}")
     @Operation(summary = "Cari realisasi rekin per tahun", description = "Mengambil realisasi rekin berdasarkan tahun.")
     @ApiResponses(value = {
@@ -128,6 +139,8 @@ public class RekinController {
         return rekinService.submitRealisasiRekin(
                 rekinRequest.rekinId(),
                 rekinRequest.rekin(),
+                rekinRequest.indikatorId(),
+                rekinRequest.indikator(),
                 rekinRequest.nip(),
                 rekinRequest.idSasaran(),
                 rekinRequest.sasaran(),
@@ -168,6 +181,8 @@ public class RekinController {
                                     "    \"targetRealisasiId\": \"1\",\n" +
                                     "    \"rekinId\": \"REKIN-001\",\n" +
                                     "    \"rekin\": \"Rekin Peningkatan Infrastruktur\",\n" +
+                                    "    \"indikatorId\": \"IND-REK-123\",\n" +
+                                    "    \"indikator\": \"Persentase capaian rekin\",\n" +
                                     "    \"nip\": \"198012312005011001\",\n" +
                                     "    \"idSasaran\": \"SAS-001\",\n" +
                                     "    \"sasaran\": \"Meningkatkan kualitas layanan\",\n" +

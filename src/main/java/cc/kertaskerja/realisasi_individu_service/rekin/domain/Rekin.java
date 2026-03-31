@@ -22,6 +22,11 @@ public record Rekin(
         String rekinId,
         String rekin,
 
+        @Column("indikator_id")
+        String indikatorId,
+        @Column("indikator")
+        String indikator,
+
         @Column("nip")
         String nip,
         @Column("id_sasaran")
@@ -61,6 +66,8 @@ public record Rekin(
     public static Rekin of(
             String rekinId,
             String rekin,
+            String indikatorId,
+            String indikator,
             String nip,
             String idSasaran,
             String sasaran,
@@ -76,6 +83,8 @@ public record Rekin(
         return new Rekin(null,
                 rekinId,
                 rekin,
+                indikatorId,
+                indikator,
                 nip,
                 idSasaran,
                 sasaran,
