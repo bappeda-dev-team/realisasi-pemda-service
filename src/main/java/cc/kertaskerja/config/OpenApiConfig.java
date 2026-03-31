@@ -52,7 +52,7 @@ public class OpenApiConfig {
     GroupedOpenApi individuApiGroup() {
         return GroupedOpenApi.builder()
                 .group("individu")
-                .pathsToMatch("/rekin/**")
+                .pathsToMatch("/rekin/**", "/renja_pagu_individu/**")
                 .build();
     }
 }
