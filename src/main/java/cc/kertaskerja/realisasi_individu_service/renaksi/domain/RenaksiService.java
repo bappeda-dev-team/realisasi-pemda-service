@@ -1,6 +1,5 @@
 package cc.kertaskerja.realisasi_individu_service.renaksi.domain;
 
-import cc.kertaskerja.capaian.domain.Capaian;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_individu_service.renaksi.web.RenaksiRequest;
 import jakarta.validation.Valid;
@@ -100,7 +99,6 @@ public class RenaksiService {
             String bulan,
             String tahun,
             JenisRealisasi jenisRealisasi) {
-        String keteranganCapaian = buildKeteranganCapaian(realisasi, target, jenisRealisasi);
         return Renaksi.of(
                 renaksiId,
                 renaksi,
@@ -114,17 +112,7 @@ public class RenaksiService {
                 bulan,
                 tahun,
                 jenisRealisasi,
-                RenaksiStatus.UNCHECKED,
-                keteranganCapaian);
-    }
-
-    private static String buildKeteranganCapaian(Integer realisasi, String target, JenisRealisasi jenisRealisasi) {
-        if (realisasi == null) {
-            return null;
-        }
-
-        Capaian capaian = new Capaian(realisasi.doubleValue(), target, jenisRealisasi);
-        return capaian.hasilCapaian() > 100 ? "Peringatan: nilai capaian melebihi 100 %" : null;
+                RenaksiStatus.UNCHECKED);
     }
 
     public Flux<Renaksi> batchSubmitRealisasiRenaksi(@Valid List<RenaksiRequest> renaksiRequests) {
@@ -172,7 +160,6 @@ public class RenaksiService {
     }
 
     private static Renaksi buildUpdatedRealisasiRenaksi(Renaksi existing, RenaksiRequest req) {
-        String keteranganCapaian = buildKeteranganCapaian(req.realisasi(), existing.target(), req.jenisRealisasi());
         return new Renaksi(
                 existing.id(),
                 existing.renaksiId(),
@@ -188,7 +175,6 @@ public class RenaksiService {
                 req.tahun(),
                 req.jenisRealisasi(),
                 RenaksiStatus.UNCHECKED,
-                keteranganCapaian,
                 existing.createdBy(),
                 existing.lastModifiedBy(),
                 existing.createdDate(),

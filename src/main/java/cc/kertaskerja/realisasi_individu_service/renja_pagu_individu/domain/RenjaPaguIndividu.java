@@ -42,9 +42,6 @@ public record RenjaPaguIndividu(
         JenisRealisasi jenisRealisasi,
         RenjaPaguIndividuStatus status,
 
-        @Column("keterangan_capaian")
-        String keteranganCapaian,
-
         @CreatedBy
         @Column("created_by")
         String createdBy,
@@ -73,8 +70,7 @@ public record RenjaPaguIndividu(
             String satuan,
             String tahun,
             JenisRealisasi jenisRealisasi,
-            RenjaPaguIndividuStatus status,
-            String keteranganCapaian
+            RenjaPaguIndividuStatus status
     ) {
         return new RenjaPaguIndividu(
                 null,
@@ -91,7 +87,6 @@ public record RenjaPaguIndividu(
                 tahun,
                 jenisRealisasi,
                 status,
-                keteranganCapaian,
                 null,
                 null,
                 null,
@@ -103,6 +98,11 @@ public record RenjaPaguIndividu(
     @JsonProperty("capaian")
     public String capaian() {
         return String.format("%.2f%%", capaianRenjaPaguIndividu());
+    }
+
+    @JsonProperty("keteranganCapaian")
+    public String keteranganCapaian() {
+        return capaianRenjaPaguIndividu() > 100 ? "nilai capaian lebih dari 100%" : null;
     }
 
     public Double capaianRenjaPaguIndividu() {

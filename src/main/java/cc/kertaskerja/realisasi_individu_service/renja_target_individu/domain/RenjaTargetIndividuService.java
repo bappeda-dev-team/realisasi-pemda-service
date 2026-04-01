@@ -106,7 +106,6 @@ public class RenjaTargetIndividuService {
             String satuan,
             String tahun,
             JenisRealisasi jenisRealisasi) {
-        String keteranganCapaian = buildKeteranganCapaian(target, realisasi, jenisRealisasi);
         return RenjaTargetIndividu.of(
                 renjaId,
                 renja,
@@ -121,8 +120,7 @@ public class RenjaTargetIndividuService {
                 satuan,
                 tahun,
                 jenisRealisasi,
-                RenjaTargetIndividuStatus.UNCHECKED,
-                keteranganCapaian
+                RenjaTargetIndividuStatus.UNCHECKED
         );
     }
 
@@ -175,7 +173,6 @@ public class RenjaTargetIndividuService {
     }
 
     private static RenjaTargetIndividu buildUpdatedRealisasiRenjaTargetIndividu(RenjaTargetIndividu existing, RenjaTargetIndividuRequest req) {
-        String keteranganCapaian = buildKeteranganCapaian(req.target(), req.realisasi(), req.jenisRealisasi());
         return new RenjaTargetIndividu(
                 existing.id(),
                 existing.renjaId(),
@@ -192,20 +189,10 @@ public class RenjaTargetIndividuService {
                 req.tahun(),
                 req.jenisRealisasi(),
                 RenjaTargetIndividuStatus.UNCHECKED,
-                keteranganCapaian,
                 existing.createdBy(),
                 existing.lastModifiedBy(),
                 existing.createdDate(),
                 existing.lastModifiedDate()
         );
-    }
-
-    private static String buildKeteranganCapaian(String target, Integer realisasi, JenisRealisasi jenisRealisasi) {
-        if (realisasi == null || target == null || target.isBlank() || jenisRealisasi == null) {
-            return null;
-        }
-
-        double capaian = new cc.kertaskerja.capaian.domain.Capaian(realisasi.doubleValue(), target, jenisRealisasi).hasilCapaian();
-        return capaian > 100 ? "Peringatan: nilai capaian melebihi 100 %" : null;
     }
 }

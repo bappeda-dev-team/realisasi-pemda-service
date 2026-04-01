@@ -97,7 +97,6 @@ public class RenjaPaguIndividuService {
             String satuan,
             String tahun,
             JenisRealisasi jenisRealisasi) {
-        String keteranganCapaian = buildKeteranganCapaian(pagu, realisasi);
         return RenjaPaguIndividu.of(
                 renjaId,
                 renja,
@@ -111,8 +110,7 @@ public class RenjaPaguIndividuService {
                 satuan,
                 tahun,
                 jenisRealisasi,
-                RenjaPaguIndividuStatus.UNCHECKED,
-                keteranganCapaian
+                RenjaPaguIndividuStatus.UNCHECKED
         );
     }
 
@@ -163,7 +161,6 @@ public class RenjaPaguIndividuService {
     }
 
     private static RenjaPaguIndividu buildUpdatedRealisasiRenjaPaguIndividu(RenjaPaguIndividu existing, RenjaPaguIndividuRequest req) {
-        String keteranganCapaian = buildKeteranganCapaian(req.pagu(), req.realisasi());
         return new RenjaPaguIndividu(
                 existing.id(),
                 existing.renjaId(),
@@ -179,7 +176,6 @@ public class RenjaPaguIndividuService {
                 req.tahun(),
                 req.jenisRealisasi(),
                 RenjaPaguIndividuStatus.UNCHECKED,
-                keteranganCapaian,
                 existing.createdBy(),
                 existing.lastModifiedBy(),
                 existing.createdDate(),
@@ -188,12 +184,4 @@ public class RenjaPaguIndividuService {
         );
     }
 
-    private static String buildKeteranganCapaian(Integer pagu, Integer realisasi) {
-        if (pagu == null || pagu == 0 || realisasi == null) {
-            return null;
-        }
-
-        double capaian = (realisasi.doubleValue() / pagu.doubleValue()) * 100;
-        return capaian > 100 ? "Peringatan: nilai capaian melebihi 100 %" : null;
-    }
 }

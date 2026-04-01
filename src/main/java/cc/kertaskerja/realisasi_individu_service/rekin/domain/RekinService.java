@@ -1,6 +1,5 @@
 package cc.kertaskerja.realisasi_individu_service.rekin.domain;
 
-import cc.kertaskerja.capaian.domain.Capaian;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.RekinRequest;
 import jakarta.validation.Valid;
@@ -70,7 +69,6 @@ public class RekinService {
             String nip, String idSasaran, String sasaran,
             String targetId, String target, Integer realisasi,
             String satuan, String tahun, JenisRealisasi jenisRealisasi) {
-        String keteranganCapaian = buildKeteranganCapaian(realisasi, target, jenisRealisasi);
         return Rekin.of(
                 rekinId,
                 rekin,
@@ -85,17 +83,7 @@ public class RekinService {
                 satuan,
                 tahun,
                 jenisRealisasi,
-                RekinStatus.UNCHECKED,
-                keteranganCapaian);
-    }
-
-    private static String buildKeteranganCapaian(Integer realisasi, String target, JenisRealisasi jenisRealisasi) {
-        if (realisasi == null) {
-            return null;
-        }
-
-        Capaian capaian = new Capaian(realisasi.doubleValue(), target, jenisRealisasi);
-        return capaian.hasilCapaian() > 100 ? "Peringatan: nilai capaian melebihi 100 %" : null;
+                RekinStatus.UNCHECKED);
     }
 
     public Flux<Rekin> batchSubmitRealisasiRekin(@Valid List<RekinRequest> rekinRequests) {
@@ -149,7 +137,6 @@ public class RekinService {
     }
 
     private static Rekin buildUpdatedRealisasiRekin(Rekin existing, RekinRequest req) {
-        String keteranganCapaian = buildKeteranganCapaian(req.realisasi(), existing.target(), req.jenisRealisasi());
         return new Rekin(
                 existing.id(),
                 existing.rekinId(),
@@ -166,7 +153,6 @@ public class RekinService {
                 req.tahun(),
                 req.jenisRealisasi(),
                 RekinStatus.UNCHECKED,
-                keteranganCapaian,
                 existing.createdBy(),
                 existing.lastModifiedBy(),
                 existing.createdDate(),

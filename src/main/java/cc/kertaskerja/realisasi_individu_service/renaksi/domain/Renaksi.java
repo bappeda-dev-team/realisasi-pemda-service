@@ -42,9 +42,6 @@ public record Renaksi(
         JenisRealisasi jenisRealisasi,
         RenaksiStatus status,
 
-        @Column("keterangan_capaian")
-        String keteranganCapaian,
-
         @CreatedBy
         @Column("created_by")
         String createdBy,
@@ -73,8 +70,7 @@ public record Renaksi(
             String bulan,
             String tahun,
             JenisRealisasi jenisRealisasi,
-            RenaksiStatus status,
-            String keteranganCapaian
+            RenaksiStatus status
     ) {
         return new Renaksi(
                 null,
@@ -91,7 +87,6 @@ public record Renaksi(
                 tahun,
                 jenisRealisasi,
                 status,
-                keteranganCapaian,
                 null,
                 null,
                 null,
@@ -103,6 +98,11 @@ public record Renaksi(
     @JsonProperty("capaian")
     public String capaian() {
         return String.format("%.2f%%", capaianRenaksi());
+    }
+
+    @JsonProperty("keteranganCapaian")
+    public String keteranganCapaian() {
+        return capaianRenaksi() > 100 ? "nilai capaian lebih dari 100%" : null;
     }
 
     public Double capaianRenaksi() {
