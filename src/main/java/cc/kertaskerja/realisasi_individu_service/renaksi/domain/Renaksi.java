@@ -1,7 +1,8 @@
-package cc.kertaskerja.realisasi_individu_service.renja_pagu_individu.domain;
+package cc.kertaskerja.realisasi_individu_service.renaksi.domain;
 
-import java.time.Instant;
-
+import cc.kertaskerja.capaian.domain.Capaian;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -11,36 +12,35 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import cc.kertaskerja.realisasi.domain.JenisRealisasi;
-import cc.kertaskerja.renja.domain.JenisRenja;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 
-@Table("renja_pagu_individu")
-public record RenjaPaguIndividu(
+@Table("renaksi")
+public record Renaksi(
         @Id Long id,
 
-        @Column("renja_id")
-        String renjaId,
-        String renja,
-        @Column("kode_renja")
-        String kodeRenja,
-        @Column("jenis_renja")
-        JenisRenja jenisRenja,
+        @Column("renaksi_id")
+        String renaksiId,
+        String renaksi,
 
         @Column("nip")
         String nip,
-        @Column("id_indikator")
-        String idIndikator,
-        String indikator,
 
-        Integer pagu,
+        @Column("rekin_id")
+        String rekinId,
+        @Column("rekin")
+        String rekin,
+
+        @Column("target_id")
+        String targetId,
+        String target,
         Integer realisasi,
         String satuan,
+        String bulan,
         String tahun,
 
         @Column("jenis_realisasi")
         JenisRealisasi jenisRealisasi,
-        RenjaPaguIndividuStatus status,
+        RenaksiStatus status,
 
         @CreatedBy
         @Column("created_by")
@@ -57,33 +57,33 @@ public record RenjaPaguIndividu(
 
         @Version int version
 ) {
-    public static RenjaPaguIndividu of(
-            String renjaId,
-            String renja,
-            String kodeRenja,
-            JenisRenja jenisRenja,
+    public static Renaksi of(
+            String renaksiId,
+            String renaksi,
             String nip,
-            String idIndikator,
-            String indikator,
-            Integer pagu,
+            String rekin_id,
+            String rekin,
+            String targetId,
+            String target,
             Integer realisasi,
             String satuan,
+            String bulan,
             String tahun,
             JenisRealisasi jenisRealisasi,
-            RenjaPaguIndividuStatus status
+            RenaksiStatus status
     ) {
-        return new RenjaPaguIndividu(
+        return new Renaksi(
                 null,
-                renjaId,
-                renja,
-                kodeRenja,
-                jenisRenja,
+                renaksiId,
+                renaksi,
                 nip,
-                idIndikator,
-                indikator,
-                pagu,
+                rekin_id,
+                rekin,
+                targetId,
+                target,
                 realisasi,
                 satuan,
+                bulan,
                 tahun,
                 jenisRealisasi,
                 status,
@@ -97,21 +97,20 @@ public record RenjaPaguIndividu(
 
     @JsonProperty("capaian")
     public String capaian() {
-        return String.format("%.2f%%", capaianRenjaPaguIndividu());
+        return String.format("%.2f%%", capaianRenaksi());
     }
 
     @JsonProperty("keteranganCapaian")
     public String keteranganCapaian() {
-        return capaianRenjaPaguIndividu() > 100 ? "nilai capaian lebih dari 100%" : null;
+        return capaianRenaksi() > 100 ? "nilai capaian lebih dari 100%" : null;
     }
 
-    public Double capaianRenjaPaguIndividu() {
-        if (pagu == null || pagu == 0 || realisasi == null) {
+    public Double capaianRenaksi() {
+        if (realisasi == null) {
             return 0.0;
         }
 
-        double paguValue = pagu.doubleValue();
-        double realisasiValue = realisasi.doubleValue();
-        return (realisasiValue / paguValue) * 100;
+        Capaian capaian = new Capaian(realisasi.doubleValue(), target, jenisRealisasi);
+        return capaian.hasilCapaian();
     }
 }

@@ -45,9 +45,6 @@ public record Rekin(
         JenisRealisasi jenisRealisasi,
         RekinStatus status,
 
-        @Column("keterangan_capaian")
-        String keteranganCapaian,
-
         @CreatedBy
         @Column("created_by")
         String createdBy,
@@ -77,8 +74,7 @@ public record Rekin(
             String satuan,
             String tahun,
             JenisRealisasi jenisRealisasi,
-            RekinStatus status,
-            String keteranganCapaian
+            RekinStatus status
     ) {
         return new Rekin(null,
                 rekinId,
@@ -95,13 +91,17 @@ public record Rekin(
                 tahun,
                 jenisRealisasi,
                 status,
-                keteranganCapaian,
                 null, null, null, null, 0);
     }
 
     @JsonProperty("capaian")
     public String capaian() {
         return String.format("%.2f%%", capaianRekin());
+    }
+
+    @JsonProperty("keteranganCapaian")
+    public String keteranganCapaian() {
+        return capaianRekin() > 100 ? "nilai capaian lebih dari 100%" : null;
     }
 
     public Double capaianRekin() {

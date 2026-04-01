@@ -1,22 +1,21 @@
-package cc.kertaskerja.realisasi_individu_service.renja_pagu_individu.domain;
+package cc.kertaskerja.realisasi_individu_service.renja_target_individu.domain;
 
-import java.time.Instant;
-
+import cc.kertaskerja.capaian.domain.Capaian;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.renja.domain.JenisRenja;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import cc.kertaskerja.realisasi.domain.JenisRealisasi;
-import cc.kertaskerja.renja.domain.JenisRenja;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 
-@Table("renja_pagu_individu")
-public record RenjaPaguIndividu(
+@Table("renja_target_individu")
+public record RenjaTargetIndividu(
         @Id Long id,
 
         @Column("renja_id")
@@ -33,14 +32,16 @@ public record RenjaPaguIndividu(
         String idIndikator,
         String indikator,
 
-        Integer pagu,
+        @Column("target_id")
+        String targetId,
+        String target,
         Integer realisasi,
         String satuan,
         String tahun,
 
         @Column("jenis_realisasi")
         JenisRealisasi jenisRealisasi,
-        RenjaPaguIndividuStatus status,
+        RenjaTargetIndividuStatus status,
 
         @CreatedBy
         @Column("created_by")
@@ -53,11 +54,9 @@ public record RenjaPaguIndividu(
         Instant createdDate,
         @LastModifiedDate
         @Column("last_modified_date")
-        Instant lastModifiedDate,
-
-        @Version int version
+        Instant lastModifiedDate
 ) {
-    public static RenjaPaguIndividu of(
+    public static RenjaTargetIndividu of(
             String renjaId,
             String renja,
             String kodeRenja,
@@ -65,14 +64,15 @@ public record RenjaPaguIndividu(
             String nip,
             String idIndikator,
             String indikator,
-            Integer pagu,
+            String targetId,
+            String target,
             Integer realisasi,
             String satuan,
             String tahun,
             JenisRealisasi jenisRealisasi,
-            RenjaPaguIndividuStatus status
+            RenjaTargetIndividuStatus status
     ) {
-        return new RenjaPaguIndividu(
+        return new RenjaTargetIndividu(
                 null,
                 renjaId,
                 renja,
@@ -81,7 +81,8 @@ public record RenjaPaguIndividu(
                 nip,
                 idIndikator,
                 indikator,
-                pagu,
+                targetId,
+                target,
                 realisasi,
                 satuan,
                 tahun,
@@ -90,28 +91,26 @@ public record RenjaPaguIndividu(
                 null,
                 null,
                 null,
-                null,
-                0
+                null
         );
     }
 
     @JsonProperty("capaian")
     public String capaian() {
-        return String.format("%.2f%%", capaianRenjaPaguIndividu());
+        return String.format("%.2f%%", capaianRenjaTargetIndividu());
     }
 
     @JsonProperty("keteranganCapaian")
     public String keteranganCapaian() {
-        return capaianRenjaPaguIndividu() > 100 ? "nilai capaian lebih dari 100%" : null;
+        return capaianRenjaTargetIndividu() > 100 ? "nilai capaian lebih dari 100%" : null;
     }
 
-    public Double capaianRenjaPaguIndividu() {
-        if (pagu == null || pagu == 0 || realisasi == null) {
+    public Double capaianRenjaTargetIndividu() {
+        if (realisasi == null) {
             return 0.0;
         }
 
-        double paguValue = pagu.doubleValue();
-        double realisasiValue = realisasi.doubleValue();
-        return (realisasiValue / paguValue) * 100;
+        Capaian capaian = new Capaian(realisasi.doubleValue(), target, jenisRealisasi);
+        return capaian.hasilCapaian();
     }
 }
