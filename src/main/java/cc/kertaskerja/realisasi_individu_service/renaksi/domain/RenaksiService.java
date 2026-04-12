@@ -21,36 +21,8 @@ public class RenaksiService {
         return renaksiRepository.findAll();
     }
 
-    public Mono<Renaksi> getRealisasiRenaksiById(Long id) {
-        return renaksiRepository.findById(id);
-    }
-
-    public Flux<Renaksi> getRealisasiRenaksiByRenaksiId(String renaksiId) {
-        return renaksiRepository.findAllByRenaksiId(renaksiId);
-    }
-
-    public Flux<Renaksi> getRealisasiRenaksiByRekinId(String rekinId) {
-        return renaksiRepository.findAllByRekinId(rekinId);
-    }
-
-    public Flux<Renaksi> getRealisasiRenaksiByTahun(String tahun) {
-        return renaksiRepository.findAllByTahun(tahun);
-    }
-
-    public Flux<Renaksi> getRealisasiRenaksiByNip(String nip) {
-        return renaksiRepository.findAllByNip(nip);
-    }
-
-    public Flux<Renaksi> getRealisasiRenaksiByPeriodeRpjmd(String tahunAwal, String tahunAkhir) {
-        return renaksiRepository.findAllByTahunBetween(tahunAwal, tahunAkhir);
-    }
-
-    public Flux<Renaksi> getRealisasiRenaksiByBulanAndTahunAndRenaksiIdAndTargetId(
-            String bulan,
-            String tahun,
-            String renaksiId,
-            String targetId) {
-        return renaksiRepository.findAllByBulanAndTahunAndRenaksiIdAndTargetId(bulan, tahun, renaksiId, targetId);
+    public Mono<Renaksi> getRealisasiRenaksiByNipBulanRekin(String nip, String bulan, String rekinId, String renaksiId) {
+        return renaksiRepository.findFirstByNipAndBulanAndRekinIdAndRenaksiId(nip, bulan, rekinId, renaksiId);
     }
 
     public Mono<Renaksi> submitRealisasiRenaksi(
@@ -137,10 +109,11 @@ public class RenaksiService {
                                 ))));
                     }
 
-                    return renaksiRepository.findFirstByNipAndBulanAndRekinId(
+                    return renaksiRepository.findFirstByNipAndBulanAndRekinIdAndRenaksiId(
                                     req.nip(),
                                     req.bulan(),
-                                    req.rekinId())
+                                    req.rekinId(),
+                                    req.renaksiId())
                             .flatMap(existing -> renaksiRepository.save(buildUpdatedRealisasiRenaksi(existing, req)))
                             .switchIfEmpty(Mono.defer(() -> renaksiRepository.save(buildUncheckedRealisasiRenaksi(
                                     req.renaksiId(),

@@ -46,95 +46,25 @@ public class RenaksiController {
         return renaksiService.getAllRealisasiRenaksi();
     }
 
-    @GetMapping("/find/{id}")
-    @Operation(summary = "Ambil realisasi renaksi berdasarkan ID", description = "Mengambil satu data realisasi renaksi berdasarkan ID internal.")
+    @GetMapping("/by-bulan/{bulan}/by-nip/{nip}/by-rekin/{rekinId}/by-renaksi/{renaksiId}")
+    @Operation(summary = "Cari realisasi renaksi berdasarkan NIP, bulan, rekin, dan renaksi", description = "Mengambil satu data realisasi renaksi berdasarkan `nip`, `bulan`, `rekinId`, dan `renaksiId`.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Data realisasi renaksi ditemukan", content = @Content(schema = @Schema(implementation = Renaksi.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Data tidak ditemukan", content = @Content)
-    })
-    public Mono<Renaksi> getRealisasiRenaksi(
-            @Parameter(description = "ID internal realisasi renaksi", example = "1") @PathVariable("id") Long id) {
-        return renaksiService.getRealisasiRenaksiById(id);
-    }
-
-    @GetMapping("/by-renaksi/{renaksiId}")
-    @Operation(summary = "Cari realisasi renaksi berdasarkan ID renaksi", description = "Mengambil daftar realisasi renaksi berdasarkan `renaksiId`.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renaksi", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Renaksi.class)))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<Renaksi> getRealisasiRenaksiByRenaksiId(
-            @Parameter(description = "ID renaksi", example = "RENAKSI-001") @PathVariable String renaksiId) {
-        return renaksiService.getRealisasiRenaksiByRenaksiId(renaksiId);
-    }
-
-    @GetMapping("/by-rekin/{rekinId}")
-    @Operation(summary = "Cari realisasi renaksi berdasarkan ID rekin", description = "Mengambil daftar realisasi renaksi berdasarkan `rekinId`.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renaksi", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Renaksi.class)))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<Renaksi> getRealisasiRenaksiByRekinId(
-            @Parameter(description = "ID rekin", example = "REKIN-001") @PathVariable String rekinId) {
-        return renaksiService.getRealisasiRenaksiByRekinId(rekinId);
-    }
-
-    @GetMapping("/by-tahun/{tahun}")
-    @Operation(summary = "Cari realisasi renaksi per tahun", description = "Mengambil realisasi renaksi berdasarkan tahun.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renaksi", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Renaksi.class)))),
             @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
-    public Flux<Renaksi> getRealisasiRenaksiByTahun(
-            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun) {
-        return renaksiService.getRealisasiRenaksiByTahun(tahun);
-    }
-
-    @GetMapping("/{renaksiId}/target/{targetId}/by-bulan/{bulan}/by-tahun/{tahun}")
-    @Operation(summary = "Cari realisasi renaksi per bulan dan tahun", description = "Mengambil realisasi renaksi berdasarkan ID renaksi, ID target, bulan, dan tahun tertentu.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renaksi", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Renaksi.class)))),
-            @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<Renaksi> getRealisasiRenaksiByBulanAndTahun(
-            @Parameter(description = "ID renaksi", example = "RENAKSI-001") @PathVariable String renaksiId,
-            @Parameter(description = "ID target", example = "TAR-1") @PathVariable String targetId,
+    public Mono<Renaksi> getRealisasiRenaksiByNipBulanRekin(
             @Parameter(description = "Bulan realisasi", example = "Januari") @PathVariable String bulan,
-            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun) {
-        if (bulan == null || bulan.isBlank()
-                || tahun == null || tahun.isBlank()
-                || renaksiId == null || renaksiId.isBlank()
-                || targetId == null || targetId.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter bulan, tahun, renaksiId, dan targetId tidak boleh kosong");
+            @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
+            @Parameter(description = "ID rekin", example = "REKIN-001") @PathVariable String rekinId,
+            @Parameter(description = "ID renaksi", example = "RENAKSI-001") @PathVariable String renaksiId) {
+        if (nip == null || nip.isBlank()
+                || bulan == null || bulan.isBlank()
+                || rekinId == null || rekinId.isBlank()
+                || renaksiId == null || renaksiId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter nip, bulan, rekinId, dan renaksiId tidak boleh kosong");
         }
-        return renaksiService.getRealisasiRenaksiByBulanAndTahunAndRenaksiIdAndTargetId(bulan, tahun, renaksiId, targetId);
-    }
-
-    @GetMapping("/by-periode/{tahunAwal}/{tahunAkhir}/rpjmd")
-    @Operation(summary = "Cari realisasi renaksi periode RPJMD", description = "Mengambil realisasi renaksi pada rentang tahun RPJMD.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renaksi periode RPJMD", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Renaksi.class)))),
-            @ApiResponse(responseCode = "400", description = "Parameter periode tidak valid", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<Renaksi> getRealisasiRenaksiByPeriodeRpjmd(
-            @Parameter(description = "Tahun awal periode", example = "2025") @PathVariable String tahunAwal,
-            @Parameter(description = "Tahun akhir periode", example = "2030") @PathVariable String tahunAkhir) {
-        return renaksiService.getRealisasiRenaksiByPeriodeRpjmd(tahunAwal, tahunAkhir);
-    }
-
-    @GetMapping("/by-nip/{nip}")
-    @Operation(summary = "Cari realisasi renaksi berdasarkan NIP", description = "Mengambil realisasi renaksi berdasarkan `nip`.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renaksi", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Renaksi.class)))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<Renaksi> getRealisasiRenaksiByNip(
-            @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip) {
-        return renaksiService.getRealisasiRenaksiByNip(nip);
+        return renaksiService.getRealisasiRenaksiByNipBulanRekin(nip, bulan, rekinId, renaksiId);
     }
 
     @PostMapping
