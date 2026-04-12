@@ -46,49 +46,25 @@ public class RenaksiController {
         return renaksiService.getAllRealisasiRenaksi();
     }
 
-    @GetMapping("/by-periode/{tahunAwal}/{tahunAkhir}/rpjmd")
-    @Operation(summary = "Cari realisasi renaksi periode RPJMD", description = "Mengambil realisasi renaksi pada rentang tahun RPJMD.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renaksi periode RPJMD", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Renaksi.class)))),
-            @ApiResponse(responseCode = "400", description = "Parameter periode tidak valid", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<Renaksi> getRealisasiRenaksiByPeriodeRpjmd(
-            @Parameter(description = "Tahun awal periode", example = "2025") @PathVariable String tahunAwal,
-            @Parameter(description = "Tahun akhir periode", example = "2030") @PathVariable String tahunAkhir) {
-        return renaksiService.getRealisasiRenaksiByPeriodeRpjmd(tahunAwal, tahunAkhir);
-    }
-
-    @GetMapping("/by-tahun/{tahun}")
-    @Operation(summary = "Cari realisasi renaksi per tahun", description = "Mengambil realisasi renaksi berdasarkan tahun.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renaksi", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Renaksi.class)))),
-            @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<Renaksi> getRealisasiRenaksiByTahun(
-            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun) {
-        if (tahun == null || tahun.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter tahun tidak boleh kosong");
-        }
-        return renaksiService.getRealisasiRenaksiByTahun(tahun);
-    }
-
-    @GetMapping("/by-nip/{nip}/by-bulan/{bulan}/by-rekin/{rekinId}")
-    @Operation(summary = "Cari realisasi renaksi berdasarkan NIP, bulan, dan rekin", description = "Mengambil satu data realisasi renaksi berdasarkan `nip`, `bulan`, dan `rekinId`.")
+    @GetMapping("/by-bulan/{bulan}/by-nip/{nip}/by-rekin/{rekinId}/by-renaksi/{renaksiId}")
+    @Operation(summary = "Cari realisasi renaksi berdasarkan NIP, bulan, rekin, dan renaksi", description = "Mengambil satu data realisasi renaksi berdasarkan `nip`, `bulan`, `rekinId`, dan `renaksiId`.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Data realisasi renaksi ditemukan", content = @Content(schema = @Schema(implementation = Renaksi.class))),
             @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
     public Mono<Renaksi> getRealisasiRenaksiByNipBulanRekin(
-            @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
             @Parameter(description = "Bulan realisasi", example = "Januari") @PathVariable String bulan,
-            @Parameter(description = "ID rekin", example = "REKIN-001") @PathVariable String rekinId) {
-        if (nip == null || nip.isBlank() || bulan == null || bulan.isBlank() || rekinId == null || rekinId.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter nip, bulan, dan rekinId tidak boleh kosong");
+            @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
+            @Parameter(description = "ID rekin", example = "REKIN-001") @PathVariable String rekinId,
+            @Parameter(description = "ID renaksi", example = "RENAKSI-001") @PathVariable String renaksiId) {
+        if (nip == null || nip.isBlank()
+                || bulan == null || bulan.isBlank()
+                || rekinId == null || rekinId.isBlank()
+                || renaksiId == null || renaksiId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter nip, bulan, rekinId, dan renaksiId tidak boleh kosong");
         }
-        return renaksiService.getRealisasiRenaksiByNipBulanRekin(nip, bulan, rekinId);
+        return renaksiService.getRealisasiRenaksiByNipBulanRekin(nip, bulan, rekinId, renaksiId);
     }
 
     @PostMapping

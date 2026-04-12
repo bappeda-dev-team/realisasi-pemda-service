@@ -5,11 +5,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface RenaksiRepository extends ReactiveCrudRepository<Renaksi, Long> {
-    Flux<Renaksi> findAllByTahun(String tahun);
-
-    Flux<Renaksi> findAllByTahunBetween(String tahunAwal, String tahunAkhir);
-
     Mono<Renaksi> findFirstByNipAndRenaksiIdAndTahun(String nip, String renaksiId, String tahun);
 
-    Mono<Renaksi> findFirstByNipAndBulanAndRekinId(String nip, String bulan, String rekinId);
+    Mono<Renaksi> findFirstByNipAndBulanAndRekinIdAndRenaksiId(String nip, String bulan, String rekinId, String renaksiId);
 }

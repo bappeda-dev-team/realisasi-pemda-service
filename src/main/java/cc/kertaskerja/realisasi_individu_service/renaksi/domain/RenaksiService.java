@@ -21,16 +21,8 @@ public class RenaksiService {
         return renaksiRepository.findAll();
     }
 
-    public Flux<Renaksi> getRealisasiRenaksiByPeriodeRpjmd(String tahunAwal, String tahunAkhir) {
-        return renaksiRepository.findAllByTahunBetween(tahunAwal, tahunAkhir);
-    }
-
-    public Flux<Renaksi> getRealisasiRenaksiByTahun(String tahun) {
-        return renaksiRepository.findAllByTahun(tahun);
-    }
-
-    public Mono<Renaksi> getRealisasiRenaksiByNipBulanRekin(String nip, String bulan, String rekinId) {
-        return renaksiRepository.findFirstByNipAndBulanAndRekinId(nip, bulan, rekinId);
+    public Mono<Renaksi> getRealisasiRenaksiByNipBulanRekin(String nip, String bulan, String rekinId, String renaksiId) {
+        return renaksiRepository.findFirstByNipAndBulanAndRekinIdAndRenaksiId(nip, bulan, rekinId, renaksiId);
     }
 
     public Mono<Renaksi> submitRealisasiRenaksi(
@@ -117,10 +109,11 @@ public class RenaksiService {
                                 ))));
                     }
 
-                    return renaksiRepository.findFirstByNipAndBulanAndRekinId(
+                    return renaksiRepository.findFirstByNipAndBulanAndRekinIdAndRenaksiId(
                                     req.nip(),
                                     req.bulan(),
-                                    req.rekinId())
+                                    req.rekinId(),
+                                    req.renaksiId())
                             .flatMap(existing -> renaksiRepository.save(buildUpdatedRealisasiRenaksi(existing, req)))
                             .switchIfEmpty(Mono.defer(() -> renaksiRepository.save(buildUncheckedRealisasiRenaksi(
                                     req.renaksiId(),
