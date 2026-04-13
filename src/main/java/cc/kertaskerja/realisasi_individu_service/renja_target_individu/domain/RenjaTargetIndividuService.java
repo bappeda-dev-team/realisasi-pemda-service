@@ -26,39 +26,14 @@ public class RenjaTargetIndividuService {
         return renjaTargetIndividuRepository.findAllByTahunAndNip(tahun, nip);
     }
 
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByNip(String nip) {
-        return renjaTargetIndividuRepository.findAllByNip(nip);
+    public Mono<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByTahunNipJenisRenjaKodeRenjaRenjaId(String tahun, String nip, JenisRenja jenisRenja, String kodeRenja, String renjaId) {
+        return renjaTargetIndividuRepository.findFirstByTahunAndNipAndJenisRenjaAndKodeRenjaAndRenjaId(tahun, nip, jenisRenja, kodeRenja, renjaId);
     }
 
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByRenjaId(String renjaId) {
-        return renjaTargetIndividuRepository.findAllByRenjaId(renjaId);
-    }
-
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByPeriodeRpjmd(String tahunAwal, String tahunAkhir, String nip) {
-        return renjaTargetIndividuRepository.findAllByTahunBetweenAndNip(tahunAwal, tahunAkhir, nip);
-    }
-
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByTahunAndRenjaIdAndNip(String tahun, String renjaId, String nip) {
-        return renjaTargetIndividuRepository.findAllByTahunAndRenjaIdAndNip(tahun, renjaId, nip);
-    }
-
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByTahunAndJenisRenjaAndKodeRenjaAndNip(
-            String tahun,
-            JenisRenja jenisRenja,
-            String kodeRenja,
-            String nip) {
-        return renjaTargetIndividuRepository.findAllByTahunAndJenisRenjaAndKodeRenjaAndNip(tahun, jenisRenja, kodeRenja, nip);
-    }
-
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByJenisRenjaAndKodeRenjaAndNip(
-            JenisRenja jenisRenja,
-            String kodeRenja,
-            String nip) {
-        return renjaTargetIndividuRepository.findAllByJenisRenjaAndKodeRenjaAndNip(jenisRenja, kodeRenja, nip);
-    }
-
-    public Mono<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuById(Long id) {
-        return renjaTargetIndividuRepository.findById(id);
+    public Mono<Void> deleteRealisasiRenjaTargetIndividuByRenjaId(String renjaId) {
+        return renjaTargetIndividuRepository.findAllByRenjaId(renjaId)
+                .flatMap(renjaTargetIndividuRepository::delete)
+                .then();
     }
 
     public Mono<RenjaTargetIndividu> submitRealisasiRenjaTargetIndividu(

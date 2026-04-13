@@ -13,13 +13,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -45,42 +47,8 @@ public class RenjaTargetIndividuController {
         return renjaTargetIndividuService.getAllRealisasiRenjaTargetIndividu();
     }
 
-    @GetMapping("/find/{id}")
-    @Operation(summary = "Ambil realisasi renja target individu berdasarkan ID", description = "Mengambil satu data realisasi renja target individu berdasarkan ID internal.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Data realisasi renja target individu ditemukan", content = @Content(schema = @Schema(implementation = RenjaTargetIndividu.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Data tidak ditemukan", content = @Content)
-    })
-    public Mono<RenjaTargetIndividu> getRealisasiRenjaTargetIndividu(
-            @Parameter(description = "ID internal realisasi renja target individu", example = "1") @PathVariable Long id) {
-        return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuById(id);
-    }
-
-    @GetMapping("/by-renja/{renjaId}")
-    @Operation(summary = "Cari realisasi renja target individu berdasarkan ID renja", description = "Mengambil daftar realisasi renja target individu berdasarkan `renjaId`.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja target individu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaTargetIndividu.class)))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByRenjaId(
-            @Parameter(description = "ID renja", example = "RENJA-001") @PathVariable String renjaId) {
-        return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByRenjaId(renjaId);
-    }
-
-    @GetMapping("/by-nip/{nip}")
-    @Operation(summary = "Cari realisasi renja target individu berdasarkan NIP", description = "Mengambil seluruh realisasi renja target untuk satu NIP.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja target individu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaTargetIndividu.class)))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByNip(
-            @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip) {
-        return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByNip(nip);
-    }
-
-    @GetMapping("/{nip}/by-tahun/{tahun}")
-    @Operation(summary = "Cari realisasi renja target individu per tahun", description = "Mengambil realisasi renja target individu berdasarkan NIP dan tahun, dapat difilter dengan `renjaId` atau `jenisRenja` + `kodeRenja`.")
+    @GetMapping("/by-nip/{nip}/by-tahun/{tahun}")
+    @Operation(summary = "Cari realisasi renja target individu berdasarkan NIP dan tahun", description = "Mengambil realisasi renja target individu berdasarkan NIP dan tahun.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Daftar realisasi renja target individu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaTargetIndividu.class)))),
             @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
@@ -88,45 +56,28 @@ public class RenjaTargetIndividuController {
     })
     public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByTahunAndNip(
             @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
-            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
-            @Parameter(description = "Filter opsional ID renja", example = "RENJA-001") @RequestParam(required = false) String renjaId,
-            @Parameter(description = "Filter opsional jenis renja", example = "PROGRAM") @RequestParam(required = false) JenisRenja jenisRenja,
-            @Parameter(description = "Filter opsional kode renja", example = "1.02.01") @RequestParam(required = false) String kodeRenja) {
-        if (renjaId != null && !renjaId.isBlank()) {
-            return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByTahunAndRenjaIdAndNip(tahun, renjaId, nip);
-        }
-        if (jenisRenja != null && kodeRenja != null && !kodeRenja.isBlank()) {
-            return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByTahunAndJenisRenjaAndKodeRenjaAndNip(tahun, jenisRenja, kodeRenja, nip);
-        }
+            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun) {
         return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByTahunAndNip(tahun, nip);
     }
 
-    @GetMapping("/by-nip/{nip}/by-kode")
-    @Operation(summary = "Cari realisasi renja target individu berdasarkan kode renja", description = "Mengambil realisasi renja target individu berdasarkan NIP, jenis renja, dan kode renja.")
+    @GetMapping("/by-tahun/{tahun}/by-nip/{nip}/by-jenis-renja/{jenisRenja}/by-kode-renja/{kodeRenja}/by-renja-id/{renjaId}")
+    @Operation(summary = "Cari realisasi renja target individu berdasarkan tahun, NIP, jenis renja, kode renja, dan renjaId", description = "Mengambil satu data realisasi renja target individu berdasarkan `tahun`, `nip`, `jenisRenja`, `kodeRenja`, dan `renjaId`.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja target individu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaTargetIndividu.class)))),
+            @ApiResponse(responseCode = "200", description = "Data realisasi renja target individu ditemukan", content = @Content(schema = @Schema(implementation = RenjaTargetIndividu.class))),
             @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByJenisRenjaAndKodeRenjaAndNip(
+    public Mono<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByTahunNipJenisRenjaKodeRenjaRenjaId(
+            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
             @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
-            @Parameter(description = "Jenis level renja", example = "PROGRAM") @RequestParam JenisRenja jenisRenja,
-            @Parameter(description = "Kode renja sesuai jenis", example = "1.02.01") @RequestParam String kodeRenja) {
-        return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByJenisRenjaAndKodeRenjaAndNip(jenisRenja, kodeRenja, nip);
-    }
-
-    @GetMapping("/{nip}/by-periode/{tahunAwal}/{tahunAkhir}/rpjmd")
-    @Operation(summary = "Cari realisasi renja target individu periode RPJMD", description = "Mengambil realisasi renja target individu pada rentang tahun RPJMD.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja target individu periode RPJMD", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaTargetIndividu.class)))),
-            @ApiResponse(responseCode = "400", description = "Parameter periode tidak valid", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByPeriodeRpjmd(
-            @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
-            @Parameter(description = "Tahun awal periode", example = "2025") @PathVariable String tahunAwal,
-            @Parameter(description = "Tahun akhir periode", example = "2030") @PathVariable String tahunAkhir) {
-        return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByPeriodeRpjmd(tahunAwal, tahunAkhir, nip);
+            @Parameter(description = "Jenis renja", example = "PROGRAM") @PathVariable JenisRenja jenisRenja,
+            @Parameter(description = "Kode renja sesuai jenis renja", example = "1.1") @PathVariable String kodeRenja,
+            @Parameter(description = "ID renja", example = "RENJA-001") @PathVariable String renjaId) {
+        if (tahun == null || tahun.isBlank() || nip == null || nip.isBlank() 
+                || kodeRenja == null || kodeRenja.isBlank() || renjaId == null || renjaId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter tahun, nip, jenisRenja, kodeRenja, dan renjaId tidak boleh kosong");
+        }
+        return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByTahunNipJenisRenjaKodeRenjaRenjaId(tahun, nip, jenisRenja, kodeRenja, renjaId);
     }
 
     @PostMapping
@@ -188,5 +139,21 @@ public class RenjaTargetIndividuController {
                                     "]")))
             @RequestBody @Valid List<RenjaTargetIndividuRequest> renjaTargetIndividuRequests) {
         return renjaTargetIndividuService.batchSubmitRealisasiRenjaTargetIndividu(renjaTargetIndividuRequests);
+    }
+
+    @DeleteMapping("/by-renja-id/{renjaId}")
+    @Operation(summary = "Hapus realisasi renja target individu", description = "Menghapus data realisasi renja target individu berdasarkan `renjaId`.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Data realisasi renja target individu terhapus", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Data tidak ditemukan", content = @Content)
+    })
+    public Mono<Void> deleteRealisasiRenjaTargetIndividu(
+            @Parameter(description = "ID renja", example = "RENJA-001") @PathVariable String renjaId) {
+        if (renjaId == null || renjaId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter renjaId tidak boleh kosong");
+        }
+        return renjaTargetIndividuService.deleteRealisasiRenjaTargetIndividuByRenjaId(renjaId);
     }
 }
