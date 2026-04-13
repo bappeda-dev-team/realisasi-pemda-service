@@ -21,4 +21,6 @@ public interface RenjaTargetIndividuRepository extends ReactiveCrudRepository<Re
     Flux<RenjaTargetIndividu> findAllByJenisRenjaAndKodeRenjaAndNip(JenisRenja jenisRenja, String kodeRenja, String nip);
 
     Mono<RenjaTargetIndividu> findFirstByNipAndTahunAndKodeRenjaAndJenisRenja(String nip, String tahun, String kodeRenja, JenisRenja jenisRenja);
+
+    Mono<RenjaTargetIndividu> findFirstByTahunAndNipAndJenisRenjaAndKodeRenjaAndRenjaId(String tahun, String nip, JenisRenja jenisRenja, String kodeRenja, String renjaId);
 }

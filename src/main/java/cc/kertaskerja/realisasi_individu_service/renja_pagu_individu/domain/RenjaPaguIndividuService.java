@@ -23,36 +23,18 @@ public class RenjaPaguIndividuService {
         return renjaPaguIndividuRepository.findAll();
     }
 
-    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByTahunAndNip(String tahun, String nip) {
-        return renjaPaguIndividuRepository.findAllByTahunAndNip(tahun, nip);
+    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByNipAndTahun(String nip, String tahun) {
+        return renjaPaguIndividuRepository.findAllByNipAndTahun(nip, tahun);
     }
 
-    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByNip(String nip) {
-        return renjaPaguIndividuRepository.findAllByNip(nip);
+    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByFilters(
+            String tahun, String nip, JenisRenja jenisRenja, String kodeRenja, String renjaId) {
+        return renjaPaguIndividuRepository.findAllByTahunAndNipAndJenisRenjaAndKodeRenjaAndRenjaId(
+                tahun, nip, jenisRenja, kodeRenja, renjaId);
     }
 
-    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByRenjaId(String renjaId) {
-        return renjaPaguIndividuRepository.findAllByRenjaId(renjaId);
-    }
-
-    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByPeriodeRpjmd(String tahunAwal, String tahunAkhir, String nip) {
-        return renjaPaguIndividuRepository.findAllByTahunBetweenAndNip(tahunAwal, tahunAkhir, nip);
-    }
-
-    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByTahunAndRenjaIdAndNip(String tahun, String renjaId, String nip) {
-        return renjaPaguIndividuRepository.findAllByTahunAndRenjaIdAndNip(tahun, renjaId, nip);
-    }
-
-    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByTahunAndJenisRenjaAndKodeRenjaAndNip(String tahun, JenisRenja jenisRenja, String kodeRenja, String nip) {
-        return renjaPaguIndividuRepository.findAllByTahunAndJenisRenjaAndKodeRenjaAndNip(tahun, jenisRenja, kodeRenja, nip);
-    }
-
-    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByJenisRenjaAndKodeRenjaAndNip(JenisRenja jenisRenja, String kodeRenja, String nip) {
-        return renjaPaguIndividuRepository.findAllByJenisRenjaAndKodeRenjaAndNip(jenisRenja, kodeRenja, nip);
-    }
-
-    public Mono<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuById(Long id) {
-        return renjaPaguIndividuRepository.findById(id);
+    public Mono<Void> deleteRealisasiRenjaPaguIndividuByRenjaId(String renjaId) {
+        return renjaPaguIndividuRepository.deleteByRenjaId(renjaId);
     }
 
     public Mono<RenjaPaguIndividu> submitRealisasiRenjaPaguIndividu(
