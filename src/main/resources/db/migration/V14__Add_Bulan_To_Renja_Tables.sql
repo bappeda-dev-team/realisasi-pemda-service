@@ -1,0 +1,2 @@
+ALTER TABLE renja_target ADD COLUMN bulan VARCHAR(10);
+ALTER TABLE renja_pagu ADD COLUMN bulan VARCHAR(10);

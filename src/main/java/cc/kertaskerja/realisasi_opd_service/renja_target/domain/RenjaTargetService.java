@@ -22,45 +22,15 @@ public class RenjaTargetService {
         return renjaTargetRepository.findAll();
     }
 
-    public Flux<RenjaTarget> getRealisasiRenjaTargetByTahunAndKodeOpd(String tahun, String kodeOpd) {
-        return renjaTargetRepository.findAllByTahunAndKodeOpd(tahun, kodeOpd);
-    }
-
-    public Flux<RenjaTarget> getRealisasiRenjaTargetByKodeOpd(String kodeOpd) {
-        return renjaTargetRepository.findAllByKodeOpd(kodeOpd);
-    }
-
-    public Flux<RenjaTarget> getRealisasiRenjaTargetByRenjaId(String renjaTargetId) {
-        return renjaTargetRepository.findAllByRenjaTargetId(renjaTargetId);
-    }
-
-    public Flux<RenjaTarget> getRealisasiRenjaTargetByIndikatorId(String indikatorId) {
-        return renjaTargetRepository.findAllByIndikatorId(indikatorId);
-    }
-
-    public Flux<RenjaTarget> getRealisasiRenjaTargetByPeriodeRpjmd(String tahunAwal, String tahunAkhir,
-            String kodeOpd) {
-        return renjaTargetRepository.findAllByTahunBetweenAndKodeOpd(tahunAwal, tahunAkhir, kodeOpd);
-    }
-
-    public Flux<RenjaTarget> getRealisasiRenjaTargetByTahunAndRenjaTargetIdAndKodeOpd(String tahun,
-            String renjaTargetId, String kodeOpd) {
-        return renjaTargetRepository.findAllByTahunAndRenjaTargetIdAndKodeOpd(tahun, renjaTargetId, kodeOpd);
-    }
-
-    public Mono<RenjaTarget> getRealisasiRenjaTargetById(Long id) {
-        return renjaTargetRepository.findById(id);
-    }
-
-    public Mono<RenjaTarget> submitRealisasiRenjaTarget(String renjaTargetId, String renjaTarget,
+public Mono<RenjaTarget> submitRealisasiRenjaTarget(String renjaTargetId, String renjaTarget,
             JenisRenja jenisRenjaTarget,
             String indikatorId, String indikator,
             String targetId, String target, Integer realisasi,
-            String satuan, String tahun, JenisRealisasi jenisRealisasi,
-            String kodeOpd) {
+            String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi,
+            String kodeOpd, String kodeRenja) {
         return Mono.just(buildUncheckedRealisasiRenjaTarget(
                 renjaTargetId, renjaTarget, jenisRenjaTarget, indikatorId, indikator, targetId, target,
-                realisasi, satuan, tahun, jenisRealisasi, kodeOpd))
+                realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, kodeRenja))
                 .flatMap(renjaTargetRepository::save);
     }
 
@@ -68,8 +38,8 @@ public class RenjaTargetService {
             JenisRenja jenisRenjaTarget,
             String indikatorId, String indikator,
             String targetId, String target, Integer realisasi,
-            String satuan, String tahun, JenisRealisasi jenisRealisasi,
-            String kodeOpd) {
+            String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi,
+            String kodeOpd, String kodeRenja) {
         return RenjaTarget.of(
                 renjaTargetId,
                 renjaTarget,
@@ -81,9 +51,15 @@ public class RenjaTargetService {
                 realisasi,
                 satuan,
                 tahun,
+                bulan,
                 jenisRealisasi,
                 kodeOpd,
+                kodeRenja,
                 RenjaTargetStatus.UNCHECKED);
+    }
+
+public Flux<RenjaTarget> getRealisasiRenjaTargetByFilters(String kodeOpd, String tahun, String bulan) {
+        return renjaTargetRepository.findAllByTahunAndBulanAndKodeOpd(tahun, bulan, kodeOpd);
     }
 
     public Flux<RenjaTarget> batchSubmitRealisasiRenjaTarget(@Valid List<RenjaTargetRequest> renjaTargetRequests) {
@@ -104,8 +80,10 @@ public class RenjaTargetService {
                                             req.realisasi(),
                                             req.satuan(),
                                             req.tahun(),
+                                            req.bulan(),
                                             req.jenisRealisasi(),
                                             existing.kodeOpd(),
+                                            existing.kodeRenja(),
                                             RenjaTargetStatus.UNCHECKED,
                                             existing.createdBy(),
                                             existing.createdDate(),
@@ -126,8 +104,10 @@ public class RenjaTargetService {
                                             req.realisasi(),
                                             req.satuan(),
                                             req.tahun(),
+                                            req.bulan(),
                                             req.jenisRealisasi(),
-                                            req.kodeOpd());
+                                            req.kodeOpd(),
+                                            req.kodeRenja());
                                     return renjaTargetRepository.save(baru);
                                 }));
                     } else {
@@ -142,10 +122,23 @@ public class RenjaTargetService {
                                 req.realisasi(),
                                 req.satuan(),
                                 req.tahun(),
+                                req.bulan(),
                                 req.jenisRealisasi(),
-                                req.kodeOpd());
+                                req.kodeOpd(),
+                                req.kodeRenja());
                         return renjaTargetRepository.save(baru);
                     }
                 });
+    }
+
+    public Mono<Void> deleteRealisasiRenjaTarget(String renjaId) {
+        return renjaTargetRepository.deleteByRenjaTargetId(renjaId);
+    }
+
+    public Mono<RenjaTarget> getRealisasiRenjaTargetByFilters(
+            String kodeOpd, String tahun, String bulan, 
+            JenisRenja jenisRenja, String kodeRenja, String renjaId) {
+        return renjaTargetRepository.findFirstByKodeOpdAndTahunAndBulanAndJenisRenjaTargetAndKodeRenjaAndRenjaTargetId(
+                kodeOpd, tahun, bulan, jenisRenja, kodeRenja, renjaId);
     }
 }

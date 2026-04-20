@@ -14,12 +14,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,71 +44,6 @@ public class RenjaPaguController {
         return renjaPaguService.getAllRealisasiRenjaPagu();
     }
 
-    @GetMapping("/find/{id}")
-    @Operation(summary = "Ambil realisasi renja pagu berdasarkan ID", description = "Mengambil satu data realisasi renja pagu berdasarkan ID internal.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Data realisasi renja pagu ditemukan", content = @Content(schema = @Schema(implementation = RenjaPagu.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Data tidak ditemukan", content = @Content)
-    })
-    public Mono<RenjaPagu> getRealisasiRenjaPagu(
-            @Parameter(description = "ID internal realisasi renja pagu", example = "1") @PathVariable Long id) {
-        return renjaPaguService.getRealisasiRenjaPaguById(id);
-    }
-
-    @GetMapping("/by-renjaPagu/{renjaPaguId}")
-    @Operation(summary = "Cari realisasi renja pagu berdasarkan ID renja pagu", description = "Mengambil daftar realisasi renja pagu berdasarkan `renjaPaguId`.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja pagu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaPagu.class)))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<RenjaPagu> getRealisasiRenjaPaguByRenjaPaguId(
-            @Parameter(description = "ID renja pagu", example = "RENPAGU-001") @PathVariable String renjaPaguId) {
-        return renjaPaguService.getRealisasiRenjaPaguByRenjaPaguId(renjaPaguId);
-    }
-
-    @GetMapping("/{kodeOpd}")
-    @Operation(summary = "Cari realisasi renja pagu berdasarkan kode OPD", description = "Mengambil seluruh realisasi renja pagu untuk satu OPD.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja pagu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaPagu.class)))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<RenjaPagu> getRealisasiRencanaPaguByKodeOpd(
-            @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000") @PathVariable String kodeOpd) {
-        return renjaPaguService.getRealisasiRenjaPaguByKodeOpd(kodeOpd);
-    }
-
-    @GetMapping("/{kodeOpd}/by-tahun/{tahun}")
-    @Operation(summary = "Cari realisasi renja pagu per tahun", description = "Mengambil realisasi renja pagu berdasarkan kode OPD dan tahun, dapat difilter lagi dengan `renjaPaguId`.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja pagu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaPagu.class)))),
-            @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<RenjaPagu> getRealisasiRenjaPaguByTahunAndKodeOpd(
-            @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
-            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
-            @Parameter(description = "Filter opsional ID renja pagu", example = "RENPAGU-001") @RequestParam(required = false) String renjaPaguId) {
-        if (renjaPaguId != null && !renjaPaguId.isBlank()) {
-            return renjaPaguService.getRealisasiRenjaPaguByTahunAndRenjaPaguIdAndKodeOpd(tahun, renjaPaguId, kodeOpd);
-        }
-        return renjaPaguService.getRealisasiRenjaPaguByTahunAndKodeOpd(tahun, kodeOpd);
-    }
-
-    @GetMapping("/{kodeOpd}/by-periode/{tahunAwal}/{tahunAkhir}/rpjmd")
-    @Operation(summary = "Cari realisasi renja pagu periode RPJMD", description = "Mengambil realisasi renja pagu pada rentang tahun RPJMD.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja pagu periode RPJMD", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaPagu.class)))),
-            @ApiResponse(responseCode = "400", description = "Parameter periode tidak valid", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Flux<RenjaPagu> getRealisasiRenjaPaguByPeriodeRpjmd(
-            @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
-            @Parameter(description = "Tahun awal periode", example = "2025") @PathVariable String tahunAwal,
-            @Parameter(description = "Tahun akhir periode", example = "2030") @PathVariable String tahunAkhir) {
-        return renjaPaguService.getRealisasiRenjaPaguByPeriodeRpjmd(tahunAwal, tahunAkhir, kodeOpd);
-    }
-
     @PostMapping
     @Operation(summary = "Simpan realisasi renja pagu", description = "Menyimpan satu data realisasi renja pagu OPD.")
     @ApiResponses(value = {
@@ -128,9 +63,41 @@ public class RenjaPaguController {
                 renjaPaguRequest.realisasi(),
                 renjaPaguRequest.satuan(),
                 renjaPaguRequest.tahun(),
+                renjaPaguRequest.bulan(),
                 renjaPaguRequest.jenisRealisasi(),
-                renjaPaguRequest.kodeOpd()
+                renjaPaguRequest.kodeOpd(),
+                renjaPaguRequest.kodeRenja()
         );
+    }
+
+    @GetMapping("/kodeOpd/{kodeOpd}/tahun/{tahun}/bulan/{bulan}")
+    @Operation(summary = "Ambil realisasi renja pagu berdasarkan OPD, tahun, dan bulan", description = "Mengambil data realisasi renja pagu berdasarkan kode OPD, tahun, dan bulan.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja pagu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaPagu.class)))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
+    public Flux<RenjaPagu> getRealisasiRenjaPaguByKodeOpdAndTahunAndBulan(
+            @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
+            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
+            @Parameter(description = "Bulan realisasi", example = "01") @PathVariable String bulan) {
+        return renjaPaguService.getRealisasiRenjaPaguByTahunAndBulanAndKodeOpd(tahun, bulan, kodeOpd);
+    }
+
+    @GetMapping("/kodeOpd/{kodeOpd}/by-tahun/{tahun}/by-bulan/{bulan}/by-jenis-renja/{jenisRenja}/by-kode-renja/{kodeRenja}/by-renja-id/{renjaId}")
+    @Operation(summary = "Ambil realisasi renja pagu berdasarkan filter lengkap", description = "Mengambil data realisasi renja pagu berdasarkan kode OPD, tahun, bulan, jenis renja, kode renja, dan renja ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja pagu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaPagu.class)))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
+    public Flux<RenjaPagu> getRealisasiRenjaPaguByFilterLengkap(
+            @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
+            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
+            @Parameter(description = "Bulan realisasi", example = "01") @PathVariable String bulan,
+            @Parameter(description = "Jenis renja", example = "PROGRAM") @PathVariable String jenisRenja,
+            @Parameter(description = "Kode renja", example = "001") @PathVariable String kodeRenja,
+            @Parameter(description = "Renja ID", example = "RENJA-001") @PathVariable String renjaId) {
+        return renjaPaguService.getRealisasiRenjaPaguByKodeOpdAndTahunAndBulanAndJenisRenjaAndKodeRenjaAndRenjaId(
+                kodeOpd, tahun, bulan, jenisRenja, kodeRenja, renjaId);
     }
 
     @PostMapping("/batch")
@@ -160,5 +127,16 @@ public class RenjaPaguController {
                                     "]")))
             @RequestBody @Valid List<RenjaPaguRequest> renjaPaguRequests) {
         return renjaPaguService.batchSubmitRealisasiRenjaPagu(renjaPaguRequests);
+    }
+
+    @DeleteMapping("/{renjaId}")
+    @Operation(summary = "Hapus realisasi renja pagu berdasarkan renja ID", description = "Menghapus data realisasi renja pagu berdasarkan renja ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Data berhasil dihapus", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
+    public Mono<Void> deleteRealisasiRenjaPaguByRenjaId(
+            @Parameter(description = "Renja ID", example = "RENJA-001") @PathVariable String renjaId) {
+        return renjaPaguService.deleteRealisasiRenjaPaguByRenjaId(renjaId);
     }
 }

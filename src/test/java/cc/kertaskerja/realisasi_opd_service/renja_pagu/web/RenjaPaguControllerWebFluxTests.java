@@ -14,6 +14,7 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -36,11 +37,11 @@ public class RenjaPaguControllerWebFluxTests {
     void whenBatchSubmit_thenReturnsSavedRenjaPagus() throws Exception {
         RenjaPaguRequest r1 = new RenjaPaguRequest(
                 null, "RENJA-1", "Program A", JenisRenja.PROGRAM, 100, 50,
-                "rupiah", "2025", JenisRealisasi.NAIK, "001"
+                "rupiah", "2025", "01", JenisRealisasi.NAIK, "001", "001"
         );
         RenjaPaguRequest r2 = new RenjaPaguRequest(
-                null, "RENJA-2", "Kegiatan B", JenisRenja.KEGIATAN, 200, 75,
-                "rupiah", "2026", JenisRealisasi.NAIK, "001"
+                null, "RENJA-2", "Program B", JenisRenja.KEGIATAN, 200, 75,
+                "rupiah", "2026", "02", JenisRealisasi.NAIK, "001", "002"
         );
 
         RenjaPagu p1 = RenjaPaguService.buildUncheckedRealisasiRenjaPagu(
@@ -51,8 +52,10 @@ public class RenjaPaguControllerWebFluxTests {
                 r1.realisasi(),
                 r1.satuan(),
                 r1.tahun(),
+                r1.bulan(),
                 r1.jenisRealisasi(),
-                r1.kodeOpd()
+                r1.kodeOpd(),
+                r1.kodeRenja()
         );
         RenjaPagu p2 = RenjaPaguService.buildUncheckedRealisasiRenjaPagu(
                 r2.renjaPaguId(),
@@ -62,8 +65,10 @@ public class RenjaPaguControllerWebFluxTests {
                 r2.realisasi(),
                 r2.satuan(),
                 r2.tahun(),
+                r2.bulan(),
                 r2.jenisRealisasi(),
-                r2.kodeOpd()
+                r2.kodeOpd(),
+                r2.kodeRenja()
         );
 
         when(renjaPaguService.batchSubmitRealisasiRenjaPagu(anyList()))
@@ -89,5 +94,50 @@ public class RenjaPaguControllerWebFluxTests {
                     Assertions.assertEquals(p2, body.get(1));
                     Assertions.assertEquals("37.50%", body.get(1).capaian());
                 });
+    }
+
+    @Test
+    void whenGetByFilterLengkap_thenReturnsFilteredRenjaPagus() throws Exception {
+        RenjaPagu p1 = RenjaPaguService.buildUncheckedRealisasiRenjaPagu(
+                "RENJA-1", "Program A", JenisRenja.PROGRAM, 100, 50,
+                "rupiah", "2025", "01", JenisRealisasi.NAIK, "001", "001"
+        );
+
+        when(renjaPaguService.getRealisasiRenjaPaguByKodeOpdAndTahunAndBulanAndJenisRenjaAndKodeRenjaAndRenjaId(
+                "001", "2025", "01", "PROGRAM", "001", "RENJA-1"))
+                .thenReturn(Flux.just(p1));
+
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt()
+                        .authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
+                .get()
+                .uri("/renja_pagu/kodeOpd/001/by-tahun/2025/by-bulan/01/by-jenis-renja/PROGRAM/by-kode-renja/001/by-renja-id/RENJA-1")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBodyList(RenjaPagu.class)
+                .consumeWith(response -> {
+                    var body = response.getResponseBody();
+                    Assertions.assertNotNull(body);
+                    Assertions.assertEquals(1, body.size());
+                    Assertions.assertEquals("RENJA-1", body.get(0).renjaPaguId());
+                    Assertions.assertEquals("001", body.get(0).kodeOpd());
+                    Assertions.assertEquals("2025", body.get(0).tahun());
+                    Assertions.assertEquals("01", body.get(0).bulan());
+                });
+    }
+
+    @Test
+    void whenDeleteByRenjaId_thenReturnsNoContent() {
+        when(renjaPaguService.deleteRealisasiRenjaPaguByRenjaId("RENJA-1"))
+                .thenReturn(Mono.empty());
+
+        webTestClient
+                .mutateWith(csrf())
+                .mutateWith(SecurityMockServerConfigurers.mockJwt()
+                        .authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
+                .delete()
+                .uri("/renja_pagu/RENJA-1")
+                .exchange()
+                .expectStatus().isOk();
     }
 }

@@ -32,17 +32,17 @@ public class RenjaTargetControllerWebFluxTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
+@Test
     void whenBatchSubmit_thenReturnsSavedRenjaTargets() throws Exception {
         RenjaTargetRequest r1 = new RenjaTargetRequest(
                 null, "RENJA-1", "Program A", JenisRenja.PROGRAM,
                 "IND-1", "Indikator A", "T-1", "100", 50,
-                "unit", "2025", JenisRealisasi.NAIK, "001"
+                "unit", "2025", "01", JenisRealisasi.NAIK, "001", "001"
         );
         RenjaTargetRequest r2 = new RenjaTargetRequest(
-                null, "RENJA-2", "Kegiatan B", JenisRenja.KEGIATAN,
+                null, "RENJA-2", " Kegiatan B", JenisRenja.KEGIATAN,
                 "IND-2", "Indikator B", "T-2", "200", 75,
-                "unit", "2026", JenisRealisasi.NAIK, "001"
+                "unit", "2026", "02", JenisRealisasi.NAIK, "001", "002"
         );
 
         RenjaTarget p1 = RenjaTargetService.buildUncheckedRealisasiRenjaTarget(
@@ -56,8 +56,10 @@ public class RenjaTargetControllerWebFluxTests {
                 r1.realisasi(),
                 r1.satuan(),
                 r1.tahun(),
+                r1.bulan(),
                 r1.jenisRealisasi(),
-                r1.kodeOpd()
+                r1.kodeOpd(),
+                r1.kodeRenja()
         );
         RenjaTarget p2 = RenjaTargetService.buildUncheckedRealisasiRenjaTarget(
                 r2.renjaTargetId(),
@@ -70,8 +72,10 @@ public class RenjaTargetControllerWebFluxTests {
                 r2.realisasi(),
                 r2.satuan(),
                 r2.tahun(),
+                r2.bulan(),
                 r2.jenisRealisasi(),
-                r2.kodeOpd()
+                r2.kodeOpd(),
+                r2.kodeRenja()
         );
 
         when(renjaTargetService.batchSubmitRealisasiRenjaTarget(anyList()))
