@@ -1,7 +1,9 @@
 package cc.kertaskerja.realisasi_opd_service.renja_target.domain;
 
+import cc.kertaskerja.renja.domain.JenisRenja;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface RenjaTargetRepository extends ReactiveCrudRepository<RenjaTarget, Long> {
     Flux<RenjaTarget> findAllByRenjaTargetId(String renjaTargetId);
@@ -15,4 +17,11 @@ public interface RenjaTargetRepository extends ReactiveCrudRepository<RenjaTarge
     Flux<RenjaTarget> findAllByKodeOpd(String kodeOpd);
 
     Flux<RenjaTarget> findAllByTahunAndRenjaTargetIdAndKodeOpd(String tahun, String renjaTargetId, String kodeOpd);
+
+    Flux<RenjaTarget> findAllByTahunAndBulanAndKodeOpd(String tahun, String bulan, String kodeOpd);
+
+    Mono<RenjaTarget> findFirstByKodeOpdAndTahunAndBulanAndJenisRenjaTargetAndKodeRenjaAndRenjaTargetId(
+            String kodeOpd, String tahun, String bulan, JenisRenja jenisRenja, String kodeRenja, String renjaId);
+
+    Mono<Void> deleteByRenjaTargetId(String renjaTargetId);
 }

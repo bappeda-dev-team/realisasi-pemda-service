@@ -24,41 +24,31 @@ public class RenjaPaguService {
         return renjaPaguRepository.findAll();
     }
 
-    public Flux<RenjaPagu> getRealisasiRenjaPaguByTahunAndKodeOpd(String tahun, String kodeOpd) {
-        return renjaPaguRepository.findAllByTahunAndKodeOpd(tahun, kodeOpd);
+    public Flux<RenjaPagu> getRealisasiRenjaPaguByTahunAndBulanAndKodeOpd(String tahun, String bulan, String kodeOpd) {
+        return renjaPaguRepository.findAllByTahunAndBulanAndKodeOpd(tahun, bulan, kodeOpd);
     }
 
-    public Flux<RenjaPagu> getRealisasiRenjaPaguByKodeOpd(String kodeOpd) {
-        return renjaPaguRepository.findAllByKodeOpd(kodeOpd);
+    public Flux<RenjaPagu> getRealisasiRenjaPaguByKodeOpdAndTahunAndBulanAndJenisRenjaAndKodeRenjaAndRenjaId(
+            String kodeOpd, String tahun, String bulan, String jenisRenja, String kodeRenja, String renjaId) {
+        return renjaPaguRepository.findAllByKodeOpdAndTahunAndBulanAndJenisRenjaPaguAndKodeRenjaAndRenjaPaguId(
+                kodeOpd, tahun, bulan, jenisRenja, kodeRenja, renjaId);
     }
 
-    public Flux<RenjaPagu> getRealisasiRenjaPaguByRenjaPaguId(String renjaPaguId) {
-        return renjaPaguRepository.findAllByRenjaPaguId(renjaPaguId);
+    public Mono<Void> deleteRealisasiRenjaPaguByRenjaId(String renjaId) {
+        return renjaPaguRepository.deleteByRenjaPaguId(renjaId);
     }
 
-    public Flux<RenjaPagu> getRealisasiRenjaPaguByPeriodeRpjmd(String tahunAwal, String tahunAkhir, String kodeOpd) {
-        return renjaPaguRepository.findAllByTahunBetweenAndKodeOpd(tahunAwal, tahunAkhir, kodeOpd);
-    }
-
-    public Flux<RenjaPagu> getRealisasiRenjaPaguByTahunAndRenjaPaguIdAndKodeOpd(String tahun, String renjaPaguId, String kodeOpd) {
-        return renjaPaguRepository.findAllByTahunAndRenjaPaguIdAndKodeOpd(tahun, renjaPaguId, kodeOpd);
-    }
-
-    public Mono<RenjaPagu> getRealisasiRenjaPaguById(Long id) {
-        return renjaPaguRepository.findById(id);
-    }
-
-    public Mono<RenjaPagu> submitRealisasiRenjaPagu(String renjaPaguId, String renjaPagu, JenisRenja jenisRenja, Integer pagu, Integer realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi, String kodeOpd) {
-        return Mono.just(buildUncheckedRealisasiRenjaPagu(renjaPaguId, renjaPagu, jenisRenja, pagu, realisasi, satuan, tahun, jenisRealisasi, kodeOpd))
+    public Mono<RenjaPagu> submitRealisasiRenjaPagu(String renjaPaguId, String renjaPagu, JenisRenja jenisRenja, Integer pagu, Integer realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String kodeRenja) {
+        return Mono.just(buildUncheckedRealisasiRenjaPagu(renjaPaguId, renjaPagu, jenisRenja, pagu, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, kodeRenja))
                 .flatMap(renjaPaguRepository::save);
     }
 
-    public static RenjaPagu buildUncheckedRealisasiRenjaPagu(String renjaPaguId, String renjaPagu, JenisRenja jenisRenjaPagu, Integer pagu, Integer realisasi, String satuan, String tahun, JenisRealisasi jenisRealisasi, String kodeOpd) {
+    public static RenjaPagu buildUncheckedRealisasiRenjaPagu(String renjaPaguId, String renjaPagu, JenisRenja jenisRenjaPagu, Integer pagu, Integer realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String kodeRenja) {
         return RenjaPagu.of(
                 renjaPaguId,
                 "Renja Pagu " + renjaPaguId,
-                jenisRenjaPagu, pagu, realisasi, satuan, tahun,
-                jenisRealisasi, kodeOpd,
+                jenisRenjaPagu, pagu, realisasi, satuan, tahun, bulan,
+                jenisRealisasi, kodeOpd, kodeRenja,
                 RenjaPaguStatus.UNCHECKED
         );
     }
@@ -78,8 +68,10 @@ public class RenjaPaguService {
                                             req.realisasi(),
                                             req.satuan(),
                                             req.tahun(),
+                                            req.bulan(),
                                             req.jenisRealisasi(),
                                             existing.kodeOpd(),
+                                            existing.kodeRenja(),
                                             RenjaPaguStatus.UNCHECKED,
                                             existing.createdBy(),
                                             existing.createdDate(),
@@ -98,8 +90,10 @@ public class RenjaPaguService {
                                             req.realisasi(),
                                             req.satuan(),
                                             req.tahun(),
+                                            req.bulan(),
                                             req.jenisRealisasi(),
-                                            req.kodeOpd()
+                                            req.kodeOpd(),
+                                            req.kodeRenja()
                                     );
                                     return renjaPaguRepository.save(baru);
                                 }));
@@ -113,8 +107,10 @@ public class RenjaPaguService {
                                 req.realisasi(),
                                 req.satuan(),
                                 req.tahun(),
+                                req.bulan(),
                                 req.jenisRealisasi(),
-                                req.kodeOpd()
+                                req.kodeOpd(),
+                                req.kodeRenja()
                         );
                         return renjaPaguRepository.save(baru);
                     }

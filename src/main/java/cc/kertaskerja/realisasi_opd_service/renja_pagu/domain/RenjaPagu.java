@@ -29,10 +29,13 @@ public record RenjaPagu(
         Integer realisasi,
         String satuan,
         String tahun,
+        String bulan,
         @Column("jenis_realisasi")
         JenisRealisasi jenisRealisasi,
         @Column("kode_opd")
         String kodeOpd,
+        @Column("kode_renja")
+        String kodeRenja,
         RenjaPaguStatus status,
 
         // sementara override nilai kolom created_by di DataConfig.java
@@ -59,13 +62,15 @@ public record RenjaPagu(
             Integer realisasi,
             String satuan,
             String tahun,
+            String bulan,
             JenisRealisasi jenisRealisasi,
             String kodeOpd,
+            String kodeRenja,
             RenjaPaguStatus status
     ) {
-        return new RenjaPagu(null, 
-                renjaPaguId, renjaPagu, jenisRenjaPagu, pagu, realisasi, satuan, 
-                tahun, jenisRealisasi, kodeOpd, status, 
+        return new RenjaPagu(null,
+                renjaPaguId, renjaPagu, jenisRenjaPagu, pagu, realisasi, satuan,
+                tahun, bulan, jenisRealisasi, kodeOpd, kodeRenja, status,
                 null, null, null, null, 0);
     }
 

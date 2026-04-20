@@ -39,19 +39,27 @@ public record RenjaPaguRequest(
         @Schema(description = "Satuan nilai", example = "Rupiah")
         String satuan,
 
-        @NotNull(message = "Tahun harus terdefinisi")
+@NotNull(message = "Tahun harus terdefinisi")
         @NotEmpty(message = "Tahun tidak boleh kosong")
         @Schema(description = "Tahun realisasi", example = "2025")
         String tahun,
+
+        @Nullable
+        @Schema(description = "Bulan realisasi", example = "01")
+        String bulan,
 
         @NotNull(message = "Pilih jenis NAIK atau TURUN")
         @Schema(description = "Jenis perhitungan capaian", example = "NAIK", allowableValues = {"NAIK", "TURUN"})
         JenisRealisasi jenisRealisasi,
 
-        @NotEmpty(message = "Kode opd tidak boleh kosong")
+@NotEmpty(message = "Kode opd tidak boleh kosong")
         @NotNull(message = "Kode opd tidak boleh kosong")
         @Schema(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000")
-        String kodeOpd
+        String kodeOpd,
+
+        @Nullable
+        @Schema(description = "Kode renja", example = "001")
+        String kodeRenja
 ) {
 
 }

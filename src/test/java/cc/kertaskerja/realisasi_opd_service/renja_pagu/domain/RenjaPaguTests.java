@@ -19,7 +19,9 @@ public class RenjaPaguTests {
                 50,
                 "rupiah",
                 "2025",
+                "01",
                 JenisRealisasi.NAIK,
+                "001",
                 "001",
                 RenjaPaguStatus.UNCHECKED,
                 "system",
@@ -43,8 +45,10 @@ public class RenjaPaguTests {
                 75,
                 "rupiah",
                 "2025",
+                "02",
                 JenisRealisasi.NAIK,
                 "001",
+                "002",
                 RenjaPaguStatus.UNCHECKED,
                 "system",
                 Instant.now(),
@@ -67,8 +71,10 @@ public class RenjaPaguTests {
                 75,
                 "rupiah",
                 "2025",
+                "03",
                 JenisRealisasi.NAIK,
                 "001",
+                "003",
                 RenjaPaguStatus.UNCHECKED,
                 "system",
                 Instant.now(),
@@ -91,8 +97,10 @@ public class RenjaPaguTests {
                 150,
                 "rupiah",
                 "2025",
+                "04",
                 JenisRealisasi.NAIK,
                 "001",
+                "004",
                 RenjaPaguStatus.UNCHECKED,
                 "system",
                 Instant.now(),
@@ -102,5 +110,57 @@ public class RenjaPaguTests {
         );
 
         Assertions.assertEquals("150.00%", renjaPagu.capaian());
+    }
+
+    @Test
+    void testCapaianRealisasiEqualPagu() {
+        RenjaPagu renjaPagu = new RenjaPagu(
+                5L,
+                "RENJA-5",
+                "Program E",
+                JenisRenja.KEGIATAN,
+                100,
+                100,
+                "rupiah",
+                "2025",
+                "05",
+                JenisRealisasi.NAIK,
+                "001",
+                "005",
+                RenjaPaguStatus.UNCHECKED,
+                "system",
+                Instant.now(),
+                Instant.now(),
+                "system",
+                1
+        );
+
+        Assertions.assertEquals("100.00%", renjaPagu.capaian());
+    }
+
+    @Test
+    void testCapaianRealisasiNolDanPaguNol() {
+        RenjaPagu renjaPagu = new RenjaPagu(
+                6L,
+                "RENJA-6",
+                "Program F",
+                JenisRenja.SUBKEGIATAN,
+                0,
+                0,
+                "rupiah",
+                "2025",
+                "06",
+                JenisRealisasi.NAIK,
+                "001",
+                "006",
+                RenjaPaguStatus.UNCHECKED,
+                "system",
+                Instant.now(),
+                Instant.now(),
+                "system",
+                1
+        );
+
+        Assertions.assertEquals("0.00%", renjaPagu.capaian());
     }
 }
