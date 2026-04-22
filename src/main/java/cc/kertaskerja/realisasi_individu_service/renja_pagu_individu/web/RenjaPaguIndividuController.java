@@ -45,7 +45,7 @@ public class RenjaPaguIndividuController {
         return renjaPaguIndividuService.getAllRealisasiRenjaPaguIndividu();
     }
 
-    @GetMapping("/nip/{nip}/by-tahun/{tahun}")
+@GetMapping("/nip/{nip}/by-tahun/{tahun}")
     @Operation(summary = "Cari realisasi renja pagu individu berdasarkan NIP dan tahun", description = "Mengambil daftar realisasi renja pagu individu berdasarkan NIP dan tahun.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Daftar realisasi renja pagu individu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaPaguIndividu.class)))),
@@ -55,6 +55,19 @@ public class RenjaPaguIndividuController {
             @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
             @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun) {
         return renjaPaguIndividuService.getRealisasiRenjaPaguIndividuByNipAndTahun(nip, tahun);
+    }
+
+    @GetMapping("/by-nip/{nip}/by-tahun/{tahun}/by-bulan/{bulan}")
+    @Operation(summary = "Cari realisasi renja pagu individu berdasarkan NIP, tahun, dan bulan", description = "Mengambil daftar realisasi renja pagu individu berdasarkan NIP, tahun, dan bulan.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja pagu individu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaPaguIndividu.class)))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
+    public Flux<RenjaPaguIndividu> getRealisasiRenjaPaguIndividuByNipAndTahunAndBulan(
+            @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
+            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
+            @Parameter(description = "Bulan realisasi", example = "Januari") @PathVariable String bulan) {
+        return renjaPaguIndividuService.getRealisasiRenjaPaguIndividuByNipAndTahunAndBulan(nip, tahun, bulan);
     }
 
     @GetMapping("/by-tahun/{tahun}/by-nip/{nip}/by-jenis-renja/{jenisRenja}/by-kode-renja/{kodeRenja}/by-renja-id/{renjaId}")
@@ -95,6 +108,7 @@ public class RenjaPaguIndividuController {
                 renjaPaguIndividuRequest.realisasi(),
                 renjaPaguIndividuRequest.satuan(),
                 renjaPaguIndividuRequest.tahun(),
+                renjaPaguIndividuRequest.bulan(),
                 renjaPaguIndividuRequest.jenisRealisasi()
         );
     }
@@ -124,6 +138,7 @@ public class RenjaPaguIndividuController {
                                     "    \"realisasi\": 70000000,\n" +
                                     "    \"satuan\": \"Rp\",\n" +
                                     "    \"tahun\": \"2026\",\n" +
+                                    "    \"bulan\": \"Januari\",\n" +
                                     "    \"jenisRealisasi\": \"NAIK\"\n" +
                                     "  }\n" +
                                     "]")))

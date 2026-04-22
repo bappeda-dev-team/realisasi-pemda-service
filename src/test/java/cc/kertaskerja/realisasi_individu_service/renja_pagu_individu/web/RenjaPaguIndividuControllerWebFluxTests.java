@@ -34,7 +34,7 @@ public class RenjaPaguIndividuControllerWebFluxTests {
 
     @Test
     void whenBatchSubmit_thenReturnsSavedRenjaPaguIndividus() throws Exception {
-        RenjaPaguIndividuRequest r1 = new RenjaPaguIndividuRequest(
+RenjaPaguIndividuRequest r1 = new RenjaPaguIndividuRequest(
                 null,
                 "RENJA-1",
                 "Program A",
@@ -47,12 +47,13 @@ public class RenjaPaguIndividuControllerWebFluxTests {
                 50,
                 "rupiah",
                 "2025",
+                "Januari",
                 JenisRealisasi.NAIK
         );
         RenjaPaguIndividuRequest r2 = new RenjaPaguIndividuRequest(
                 null,
                 "RENJA-2",
-                "Kegiatan B",
+                " Kegiatan B",
                 "1.02.02",
                 JenisRenja.KEGIATAN,
                 "198012312005011001",
@@ -62,6 +63,7 @@ public class RenjaPaguIndividuControllerWebFluxTests {
                 75,
                 "rupiah",
                 "2026",
+                "Februari",
                 JenisRealisasi.NAIK
         );
 
@@ -77,6 +79,7 @@ public class RenjaPaguIndividuControllerWebFluxTests {
                 r1.realisasi(),
                 r1.satuan(),
                 r1.tahun(),
+                r1.bulan(),
                 r1.jenisRealisasi()
         );
         RenjaPaguIndividu p2 = RenjaPaguIndividuService.buildUncheckedRealisasiRenjaPaguIndividu(
@@ -91,6 +94,7 @@ public class RenjaPaguIndividuControllerWebFluxTests {
                 r2.realisasi(),
                 r2.satuan(),
                 r2.tahun(),
+                r2.bulan(),
                 r2.jenisRealisasi()
         );
 

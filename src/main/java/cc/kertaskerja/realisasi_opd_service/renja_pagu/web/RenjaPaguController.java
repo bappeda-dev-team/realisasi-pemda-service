@@ -121,6 +121,7 @@ public class RenjaPaguController {
                                     "    \"realisasi\": 70000000,\n" +
                                     "    \"satuan\": \"Rp\",\n" +
                                     "    \"tahun\": \"2026\",\n" +
+                                    "    \"bulan\": \"01\",\n" +
                                     "    \"jenisRealisasi\": \"NAIK\",\n" +
                                     "    \"kodeOpd\": \"OPD-001\"\n" +
                                     "  }\n" +

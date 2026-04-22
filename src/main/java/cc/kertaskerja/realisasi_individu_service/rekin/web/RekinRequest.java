@@ -71,6 +71,11 @@ public record RekinRequest(
         @Schema(description = "Tahun realisasi", example = "2025")
         String tahun,
 
+        @NotNull(message = "Bulan harus terdefinisi")
+        @NotEmpty(message = "Bulan tidak boleh kosong")
+        @Schema(description = "Bulan realisasi", example = "01")
+        String bulan,
+
         @NotNull(message = "Pilih jenis NAIK atau TURUN")
         @Schema(description = "Jenis perhitungan capaian", example = "NAIK", allowableValues = {"NAIK", "TURUN"})
         JenisRealisasi jenisRealisasi

@@ -40,7 +40,8 @@ public class RenaksiControllerWebFluxTests {
                 "%",
                 bulan,
                 "2026",
-                JenisRealisasi.NAIK
+                JenisRealisasi.NAIK,
+                "4.01.01."
         );
         Renaksi r2 = RenaksiService.buildUncheckedRealisasiRenaksi(
                 "RENAKSI-2",
@@ -54,7 +55,8 @@ public class RenaksiControllerWebFluxTests {
                 "%",
                 bulan,
                 "2026",
-                JenisRealisasi.NAIK
+                JenisRealisasi.NAIK,
+                "4.01.01."
         );
 
         when(renaksiService.getRealisasiRenaksiByNipAndBulan(nip, bulan))

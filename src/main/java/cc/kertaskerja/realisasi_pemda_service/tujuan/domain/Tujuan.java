@@ -53,6 +53,11 @@ public record Tujuan(
         return String.format("%.2f%%", capaianTujuan());
     }
 
+    @JsonProperty("keteranganCapaian")
+    public String keteranganCapaian() {
+        return capaianTujuan() > 100 ? "nilai capaian lebih dari 100%" : null;
+    }
+
     public Double capaianTujuan() {
         Capaian capaian = new Capaian(realisasi, target, jenisRealisasi);
         return capaian.hasilCapaian();

@@ -10,4 +10,6 @@ public interface RenaksiRepository extends ReactiveCrudRepository<Renaksi, Long>
     Mono<Renaksi> findFirstByNipAndBulanAndRekinIdAndRenaksiId(String nip, String bulan, String rekinId, String renaksiId);
 
     Flux<Renaksi> findAllByNipAndBulan(String nip, String bulan);
+
+    Flux<Renaksi> findAllByKodeOpdAndBulan(String kodeOpd, String bulan);
 }

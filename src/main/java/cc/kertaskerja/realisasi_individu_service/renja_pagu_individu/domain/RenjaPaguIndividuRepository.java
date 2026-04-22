@@ -9,6 +9,8 @@ import reactor.core.publisher.Mono;
 public interface RenjaPaguIndividuRepository extends ReactiveCrudRepository<RenjaPaguIndividu, Long> {
     Flux<RenjaPaguIndividu> findAllByNipAndTahun(String nip, String tahun);
 
+    Flux<RenjaPaguIndividu> findAllByNipAndTahunAndBulan(String nip, String tahun, String bulan);
+
     Flux<RenjaPaguIndividu> findAllByTahunAndNipAndJenisRenjaAndKodeRenjaAndRenjaId(
             String tahun, String nip, JenisRenja jenisRenja, String kodeRenja, String renjaId);
 

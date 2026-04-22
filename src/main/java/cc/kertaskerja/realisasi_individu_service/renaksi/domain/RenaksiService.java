@@ -29,6 +29,10 @@ public class RenaksiService {
         return renaksiRepository.findAllByNipAndBulan(nip, bulan);
     }
 
+    public Flux<Renaksi> getRealisasiRenaksiByKodeOpdAndBulan(String kodeOpd, String bulan) {
+        return renaksiRepository.findAllByKodeOpdAndBulan(kodeOpd, bulan);
+    }
+
     public Mono<Renaksi> submitRealisasiRenaksi(
             String renaksiId,
             String renaksi,
@@ -41,7 +45,8 @@ public class RenaksiService {
             String satuan,
             String bulan,
             String tahun,
-            JenisRealisasi jenisRealisasi) {
+            JenisRealisasi jenisRealisasi,
+            String kodeOpd) {
         return Mono.just(buildUncheckedRealisasiRenaksi(
                         renaksiId,
                         renaksi,
@@ -54,7 +59,8 @@ public class RenaksiService {
                         satuan,
                         bulan,
                         tahun,
-                        jenisRealisasi))
+                        jenisRealisasi,
+                        kodeOpd))
                 .flatMap(renaksiRepository::save);
     }
 
@@ -74,7 +80,8 @@ public class RenaksiService {
             String satuan,
             String bulan,
             String tahun,
-            JenisRealisasi jenisRealisasi) {
+            JenisRealisasi jenisRealisasi,
+            String kodeOpd) {
         return Renaksi.of(
                 renaksiId,
                 renaksi,
@@ -88,6 +95,7 @@ public class RenaksiService {
                 bulan,
                 tahun,
                 jenisRealisasi,
+                kodeOpd,
                 RenaksiStatus.UNCHECKED);
     }
 
@@ -109,7 +117,8 @@ public class RenaksiService {
                                         req.satuan(),
                                         req.bulan(),
                                         req.tahun(),
-                                        req.jenisRealisasi()
+                                        req.jenisRealisasi(),
+                                        req.kodeOpd()
                                 ))));
                     }
 
@@ -131,7 +140,8 @@ public class RenaksiService {
                                     req.satuan(),
                                     req.bulan(),
                                     req.tahun(),
-                                    req.jenisRealisasi()
+                                    req.jenisRealisasi(),
+                                    req.kodeOpd()
                             ))));
                 });
     }
@@ -151,6 +161,7 @@ public class RenaksiService {
                 req.bulan(),
                 req.tahun(),
                 req.jenisRealisasi(),
+                req.kodeOpd(),
                 RenaksiStatus.UNCHECKED,
                 existing.createdBy(),
                 existing.lastModifiedBy(),

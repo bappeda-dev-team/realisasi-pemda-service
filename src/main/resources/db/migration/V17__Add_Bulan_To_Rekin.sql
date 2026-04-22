@@ -1,0 +1,3 @@
+ALTER TABLE rekin ADD COLUMN bulan VARCHAR(255);
+UPDATE rekin SET bulan = '' WHERE bulan IS NULL;
+ALTER TABLE rekin ALTER COLUMN bulan SET NOT NULL;

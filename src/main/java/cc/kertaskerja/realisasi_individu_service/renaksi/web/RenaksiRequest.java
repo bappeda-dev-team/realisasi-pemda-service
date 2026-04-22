@@ -68,6 +68,10 @@ public record RenaksiRequest(
 
         @NotNull(message = "Pilih jenis NAIK atau TURUN")
         @Schema(description = "Jenis perhitungan capaian", example = "NAIK", allowableValues = {"NAIK", "TURUN"})
-        JenisRealisasi jenisRealisasi
+        JenisRealisasi jenisRealisasi,
+
+        @Nullable
+        @Schema(description = "Kode OPD", example = "4.01.01.", nullable = true)
+        String kodeOpd
 ) {
 }

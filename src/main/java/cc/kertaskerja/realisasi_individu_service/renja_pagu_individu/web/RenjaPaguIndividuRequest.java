@@ -64,6 +64,11 @@ public record RenjaPaguIndividuRequest(
         @Schema(description = "Tahun realisasi", example = "2025")
         String tahun,
 
+        @NotNull(message = "Bulan tidak boleh kosong")
+        @NotEmpty(message = "Bulan tidak boleh kosong")
+        @Schema(description = "Bulan realisasi", example = "Januari")
+        String bulan,
+
         @NotNull(message = "Pilih jenis NAIK atau TURUN")
         @Schema(description = "Jenis perhitungan capaian", example = "NAIK", allowableValues = {"NAIK", "TURUN"})
         JenisRealisasi jenisRealisasi
