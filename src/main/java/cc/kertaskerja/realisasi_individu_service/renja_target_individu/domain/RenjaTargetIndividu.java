@@ -39,6 +39,9 @@ public record RenjaTargetIndividu(
         String satuan,
         String tahun,
 
+        @Column("bulan")
+        String bulan,
+
         @Column("jenis_realisasi")
         JenisRealisasi jenisRealisasi,
         RenjaTargetIndividuStatus status,
@@ -56,7 +59,7 @@ public record RenjaTargetIndividu(
         @Column("last_modified_date")
         Instant lastModifiedDate
 ) {
-    public static RenjaTargetIndividu of(
+public static RenjaTargetIndividu of(
             String renjaId,
             String renja,
             String kodeRenja,
@@ -69,6 +72,7 @@ public record RenjaTargetIndividu(
             Integer realisasi,
             String satuan,
             String tahun,
+            String bulan,
             JenisRealisasi jenisRealisasi,
             RenjaTargetIndividuStatus status
     ) {
@@ -86,6 +90,7 @@ public record RenjaTargetIndividu(
                 realisasi,
                 satuan,
                 tahun,
+                bulan,
                 jenisRealisasi,
                 status,
                 null,

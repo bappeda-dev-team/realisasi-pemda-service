@@ -1,0 +1,1 @@
+ALTER TABLE renja_target_individu ALTER COLUMN bulan SET NOT NULL;

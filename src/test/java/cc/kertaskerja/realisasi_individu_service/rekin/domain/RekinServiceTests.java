@@ -40,6 +40,7 @@ public class RekinServiceTests {
                 55,
                 "%",
                 "2026",
+                "Januari",
                 JenisRealisasi.NAIK
         );
 
@@ -57,6 +58,7 @@ public class RekinServiceTests {
                 10,
                 "old",
                 "2026",
+                "Desember",
                 JenisRealisasi.NAIK,
                 RekinStatus.UNCHECKED,
                 null,
@@ -103,6 +105,7 @@ public class RekinServiceTests {
                 70,
                 "%",
                 "2026",
+                "Februari",
                 JenisRealisasi.NAIK
         );
 
@@ -144,6 +147,7 @@ public class RekinServiceTests {
                 80,
                 "%",
                 "2026",
+                "Maret",
                 JenisRealisasi.NAIK
         );
 
@@ -161,6 +165,7 @@ public class RekinServiceTests {
                 10,
                 "old",
                 "2026",
+                "Januari",
                 JenisRealisasi.NAIK,
                 RekinStatus.UNCHECKED,
                 null,

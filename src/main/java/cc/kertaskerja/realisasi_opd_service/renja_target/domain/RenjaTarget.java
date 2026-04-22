@@ -89,6 +89,11 @@ public record RenjaTarget(
         return String.format("%.2f%%", capaianRenjaTarget());
     }
 
+    @JsonProperty("keteranganCapaian")
+    public String keteranganCapaian() {
+        return capaianRenjaTarget() > 100 ? "nilai capaian lebih dari 100%" : null;
+    }
+
     public Double capaianRenjaTarget() {
         if (realisasi == null) {
             return 0.0;

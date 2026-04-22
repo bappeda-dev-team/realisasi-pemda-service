@@ -1,0 +1,1 @@
+ALTER TABLE renja_target_individu ADD COLUMN bulan VARCHAR(255);

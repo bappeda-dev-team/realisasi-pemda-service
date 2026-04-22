@@ -71,6 +71,11 @@ public record RenjaTargetIndividuRequest(
         @Schema(description = "Tahun realisasi", example = "2025")
         String tahun,
 
+        @NotNull(message = "Bulan tidak boleh kosong")
+        @NotEmpty(message = "Bulan tidak boleh kosong")
+        @Schema(description = "Bulan realisasi", example = "Januari", allowableValues = {"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"})
+        String bulan,
+
         @NotNull(message = "Pilih jenis NAIK atau TURUN")
         @Schema(description = "Jenis perhitungan capaian", example = "NAIK", allowableValues = {"NAIK", "TURUN"})
         JenisRealisasi jenisRealisasi

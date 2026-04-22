@@ -40,6 +40,10 @@ public record Renaksi(
 
         @Column("jenis_realisasi")
         JenisRealisasi jenisRealisasi,
+
+        @Column("kode_opd")
+        String kodeOpd,
+
         RenaksiStatus status,
 
         @CreatedBy
@@ -70,6 +74,7 @@ public record Renaksi(
             String bulan,
             String tahun,
             JenisRealisasi jenisRealisasi,
+            String kodeOpd,
             RenaksiStatus status
     ) {
         return new Renaksi(
@@ -86,6 +91,7 @@ public record Renaksi(
                 bulan,
                 tahun,
                 jenisRealisasi,
+                kodeOpd,
                 status,
                 null,
                 null,

@@ -56,6 +56,11 @@ public record Sasaran(
         return String.format("%.2f%%", capaianSasaran());
     }
 
+    @JsonProperty("keteranganCapaian")
+    public String keteranganCapaian() {
+        return capaianSasaran() > 100 ? "nilai capaian lebih dari 100%" : null;
+    }
+
     public Double capaianSasaran() {
         Capaian capaian = new Capaian(realisasi, target, jenisRealisasi);
         return capaian.hasilCapaian();

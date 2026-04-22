@@ -62,6 +62,23 @@ public class RekinController {
         return rekinService.getRealisasiRekinByNipAndTahun(nip, tahun);
     }
 
+    @GetMapping("/by-nip/{nip}/by-tahun/{tahun}/by-bulan/{bulan}")
+    @Operation(summary = "Cari realisasi rekin berdasarkan NIP, tahun, dan bulan", description = "Mengambil daftar data realisasi rekin berdasarkan `nip`, `tahun`, dan `bulan`.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Daftar realisasi rekin", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Rekin.class)))),
+            @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
+    public Flux<Rekin> getRealisasiRekinByNipAndTahunAndBulan(
+            @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
+            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
+            @Parameter(description = "Bulan realisasi", example = "01") @PathVariable String bulan) {
+        if (nip == null || nip.isBlank() || tahun == null || tahun.isBlank() || bulan == null || bulan.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter nip, tahun, dan bulan tidak boleh kosong");
+        }
+        return rekinService.getRealisasiRekinByNipAndTahunAndBulan(nip, tahun, bulan);
+    }
+
     @GetMapping("/by-tahun/{tahun}/by-nip/{nip}/by-id-sasaran/{idSasaran}/rekin/{rekinId}")
     @Operation(summary = "Cari realisasi rekin berdasarkan tahun, NIP, ID sasaran, dan rekin", description = "Mengambil satu data realisasi rekin berdasarkan `tahun`, `nip`, `idSasaran`, dan `rekinId`.")
     @ApiResponses(value = {
@@ -107,6 +124,7 @@ public class RekinController {
                 rekinRequest.realisasi(),
                 rekinRequest.satuan(),
                 rekinRequest.tahun(),
+                rekinRequest.bulan(),
                 rekinRequest.jenisRealisasi()
         );
     }
@@ -149,6 +167,7 @@ public class RekinController {
                                     "    \"realisasi\": 85,\n" +
                                     "    \"satuan\": \"%\",\n" +
                                     "    \"tahun\": \"2026\",\n" +
+                                    "    \"bulan\": \"01\",\n" +
                                     "    \"jenisRealisasi\": \"NAIK\"\n" +
                                     "  }\n" +
                                     "]")))

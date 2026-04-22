@@ -26,6 +26,10 @@ public class RenjaTargetIndividuService {
         return renjaTargetIndividuRepository.findAllByTahunAndNip(tahun, nip);
     }
 
+    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByTahunNipAndBulan(String tahun, String nip, String bulan) {
+        return renjaTargetIndividuRepository.findAllByTahunAndNipAndBulan(tahun, nip, bulan);
+    }
+
     public Mono<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByTahunNipJenisRenjaKodeRenjaRenjaId(String tahun, String nip, JenisRenja jenisRenja, String kodeRenja, String renjaId) {
         return renjaTargetIndividuRepository.findFirstByTahunAndNipAndJenisRenjaAndKodeRenjaAndRenjaId(tahun, nip, jenisRenja, kodeRenja, renjaId);
     }
@@ -49,6 +53,7 @@ public class RenjaTargetIndividuService {
             Integer realisasi,
             String satuan,
             String tahun,
+            String bulan,
             JenisRealisasi jenisRealisasi) {
         return Mono.just(buildUncheckedRealisasiRenjaTargetIndividu(
                         renjaId,
@@ -63,11 +68,12 @@ public class RenjaTargetIndividuService {
                         realisasi,
                         satuan,
                         tahun,
+                        bulan,
                         jenisRealisasi))
                 .flatMap(renjaTargetIndividuRepository::save);
     }
 
-    public static RenjaTargetIndividu buildUncheckedRealisasiRenjaTargetIndividu(
+public static RenjaTargetIndividu buildUncheckedRealisasiRenjaTargetIndividu(
             String renjaId,
             String renja,
             String kodeRenja,
@@ -80,6 +86,7 @@ public class RenjaTargetIndividuService {
             Integer realisasi,
             String satuan,
             String tahun,
+            String bulan,
             JenisRealisasi jenisRealisasi) {
         return RenjaTargetIndividu.of(
                 renjaId,
@@ -94,6 +101,7 @@ public class RenjaTargetIndividuService {
                 realisasi,
                 satuan,
                 tahun,
+                bulan,
                 jenisRealisasi,
                 RenjaTargetIndividuStatus.UNCHECKED
         );
@@ -118,6 +126,7 @@ public class RenjaTargetIndividuService {
                                         req.realisasi(),
                                         req.satuan(),
                                         req.tahun(),
+                                        req.bulan(),
                                         req.jenisRealisasi()
                                 ))));
                     }
@@ -142,6 +151,7 @@ public class RenjaTargetIndividuService {
                                     req.realisasi(),
                                     req.satuan(),
                                     req.tahun(),
+                                    req.bulan(),
                                     req.jenisRealisasi()
                             ))));
                 });
@@ -162,6 +172,7 @@ public class RenjaTargetIndividuService {
                 req.realisasi(),
                 req.satuan(),
                 req.tahun(),
+                req.bulan() != null ? req.bulan() : existing.bulan(),
                 req.jenisRealisasi(),
                 RenjaTargetIndividuStatus.UNCHECKED,
                 existing.createdBy(),

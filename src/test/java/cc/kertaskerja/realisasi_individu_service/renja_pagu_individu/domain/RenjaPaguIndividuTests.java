@@ -21,6 +21,7 @@ public class RenjaPaguIndividuTests {
                 50,
                 "rupiah",
                 "2025",
+                "Januari",
                 JenisRealisasi.NAIK,
                 RenjaPaguIndividuStatus.UNCHECKED
         );
@@ -42,6 +43,7 @@ public class RenjaPaguIndividuTests {
                 75,
                 "rupiah",
                 "2025",
+                "Februari",
                 JenisRealisasi.NAIK,
                 RenjaPaguIndividuStatus.UNCHECKED
         );
@@ -63,6 +65,7 @@ public class RenjaPaguIndividuTests {
                 75,
                 "rupiah",
                 "2025",
+                "Maret",
                 JenisRealisasi.NAIK,
                 RenjaPaguIndividuStatus.UNCHECKED
         );
@@ -84,6 +87,7 @@ public class RenjaPaguIndividuTests {
                 150,
                 "rupiah",
                 "2025",
+                "April",
                 JenisRealisasi.NAIK,
                 RenjaPaguIndividuStatus.UNCHECKED
         );

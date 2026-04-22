@@ -40,6 +40,7 @@ public record Rekin(
         Integer realisasi,
         String satuan,
         String tahun,
+        String bulan,
 
         @Column("jenis_realisasi")
         JenisRealisasi jenisRealisasi,
@@ -73,6 +74,7 @@ public record Rekin(
             Integer realisasi,
             String satuan,
             String tahun,
+            String bulan,
             JenisRealisasi jenisRealisasi,
             RekinStatus status
     ) {
@@ -89,6 +91,7 @@ public record Rekin(
                 realisasi,
                 satuan,
                 tahun,
+                bulan,
                 jenisRealisasi,
                 status,
                 null, null, null, null, 0);

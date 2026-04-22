@@ -38,6 +38,9 @@ public record RenjaPaguIndividu(
         String satuan,
         String tahun,
 
+        @Column("bulan")
+        String bulan,
+
         @Column("jenis_realisasi")
         JenisRealisasi jenisRealisasi,
         RenjaPaguIndividuStatus status,
@@ -69,6 +72,7 @@ public record RenjaPaguIndividu(
             Integer realisasi,
             String satuan,
             String tahun,
+            String bulan,
             JenisRealisasi jenisRealisasi,
             RenjaPaguIndividuStatus status
     ) {
@@ -85,6 +89,7 @@ public record RenjaPaguIndividu(
                 realisasi,
                 satuan,
                 tahun,
+                bulan,
                 jenisRealisasi,
                 status,
                 null,

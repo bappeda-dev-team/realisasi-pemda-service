@@ -58,6 +58,20 @@ public class RenjaTargetIndividuController {
             @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
             @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun) {
         return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByTahunAndNip(tahun, nip);
+    }   
+
+    @GetMapping("/by-nip/{nip}/by-tahun/{tahun}/by-bulan/{bulan}")
+    @Operation(summary = "Cari realisasi renja target individu berdasarkan NIP, tahun, dan bulan", description = "Mengambil realisasi renja target individu berdasarkan NIP, tahun, dan bulan.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Daftar realisasi renja target individu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaTargetIndividu.class)))),
+            @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
+    public Flux<RenjaTargetIndividu> getRealisasiRenjaTargetIndividuByTahunAndNipAndBulan(
+            @Parameter(description = "NIP pelaksana", example = "198012312005011001") @PathVariable String nip,
+            @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
+            @Parameter(description = "Bulan realisasi", example = "Januari") @PathVariable String bulan) {
+        return renjaTargetIndividuService.getRealisasiRenjaTargetIndividuByTahunNipAndBulan(tahun, nip, bulan);
     }
 
     @GetMapping("/by-tahun/{tahun}/by-nip/{nip}/by-jenis-renja/{jenisRenja}/by-kode-renja/{kodeRenja}/by-renja-id/{renjaId}")
@@ -104,6 +118,7 @@ public class RenjaTargetIndividuController {
                 renjaTargetIndividuRequest.realisasi(),
                 renjaTargetIndividuRequest.satuan(),
                 renjaTargetIndividuRequest.tahun(),
+                renjaTargetIndividuRequest.bulan(),
                 renjaTargetIndividuRequest.jenisRealisasi()
         );
     }
@@ -134,6 +149,7 @@ public class RenjaTargetIndividuController {
                                     "    \"realisasi\": 85,\n" +
                                     "    \"satuan\": \"%\",\n" +
                                     "    \"tahun\": \"2026\",\n" +
+                                    "    \"bulan\": \"Januari\",\n" +
                                     "    \"jenisRealisasi\": \"NAIK\"\n" +
                                     "  }\n" +
                                     "]")))

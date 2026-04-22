@@ -1,0 +1,2 @@
+ALTER TABLE renaksi
+ADD COLUMN kode_opd VARCHAR(255) NULL;
