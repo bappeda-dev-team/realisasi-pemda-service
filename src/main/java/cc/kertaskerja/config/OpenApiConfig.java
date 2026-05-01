@@ -43,6 +43,7 @@ public class OpenApiConfig {
                         "/tujuan_opd/**",
                         "/sasaran_opd/**",
                         "/iku_opd/**",
+                        "/renaksi_opd/**",
                         "/renja_target/**",
                         "/renja_pagu/**")
                 .build();

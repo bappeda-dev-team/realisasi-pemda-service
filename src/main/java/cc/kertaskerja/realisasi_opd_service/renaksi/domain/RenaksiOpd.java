@@ -1,0 +1,57 @@
+package cc.kertaskerja.realisasi_opd_service.renaksi.domain;
+
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.Instant;
+
+@Table("renaksi_opd")
+public record RenaksiOpd(
+        @Id Long id,
+        @Column("renaksi_id") String renaksiId,
+        String renaksi,
+        String nip,
+        @Column("rekin_id") String rekinId,
+        String rekin,
+        @Column("target_id") String targetId,
+        String target,
+        Integer realisasi,
+        String satuan,
+        String bulan,
+        String tahun,
+        @Column("jenis_realisasi") JenisRealisasi jenisRealisasi,
+        @Column("kode_opd") String kodeOpd,
+        RenaksiOpdStatus status,
+        @CreatedBy @Column("created_by") String createdBy,
+        @LastModifiedBy @Column("last_modified_by") String lastModifiedBy,
+        @CreatedDate @Column("created_date") Instant createdDate,
+        @LastModifiedDate @Column("last_modified_date") Instant lastModifiedDate,
+        @Version int version
+) {
+    public static RenaksiOpd of(
+            String renaksiId,
+            String renaksi,
+            String nip,
+            String rekinId,
+            String rekin,
+            String targetId,
+            String target,
+            Integer realisasi,
+            String satuan,
+            String bulan,
+            String tahun,
+            JenisRealisasi jenisRealisasi,
+            String kodeOpd,
+            RenaksiOpdStatus status
+    ) {
+        return new RenaksiOpd(null, renaksiId, renaksi, nip, rekinId, rekin, targetId, target, realisasi, satuan,
+                bulan, tahun, jenisRealisasi, kodeOpd, status, null, null, null, null, 0);
+    }
+}
