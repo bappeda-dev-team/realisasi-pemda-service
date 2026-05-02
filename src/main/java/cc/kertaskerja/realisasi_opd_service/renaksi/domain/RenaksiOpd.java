@@ -17,7 +17,6 @@ public record RenaksiOpd(
         @Id Long id,
         @Column("renaksi_id") String renaksiId,
         String renaksi,
-        String nip,
         @Column("rekin_id") String rekinId,
         String rekin,
         @Column("target_id") String targetId,
@@ -38,7 +37,6 @@ public record RenaksiOpd(
     public static RenaksiOpd of(
             String renaksiId,
             String renaksi,
-            String nip,
             String rekinId,
             String rekin,
             String targetId,
@@ -51,7 +49,7 @@ public record RenaksiOpd(
             String kodeOpd,
             RenaksiOpdStatus status
     ) {
-        return new RenaksiOpd(null, renaksiId, renaksi, nip, rekinId, rekin, targetId, target, realisasi, satuan,
+        return new RenaksiOpd(null, renaksiId, renaksi, rekinId, rekin, targetId, target, realisasi, satuan,
                 bulan, tahun, jenisRealisasi, kodeOpd, status, null, null, null, null, 0);
     }
 }

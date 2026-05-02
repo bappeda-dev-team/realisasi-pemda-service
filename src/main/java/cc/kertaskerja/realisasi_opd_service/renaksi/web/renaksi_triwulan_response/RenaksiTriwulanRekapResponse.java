@@ -6,7 +6,6 @@ public record RenaksiTriwulanRekapResponse(
         String rekinId,
         String rekin,
         String targetId,
-        String nip,
         TriwulanDetailResponse tw1,
         TriwulanDetailResponse tw2,
         TriwulanDetailResponse tw3,

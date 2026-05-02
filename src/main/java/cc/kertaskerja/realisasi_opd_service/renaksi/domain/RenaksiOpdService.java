@@ -42,7 +42,7 @@ public class RenaksiOpdService {
                     }
 
                     return renaksiOpdRepository
-                            .findFirstByNipAndBulanAndRekinIdAndRenaksiId(req.nip(), req.bulan(), req.rekinId(), req.renaksiId())
+                            .findFirstByKodeOpdAndBulanAndRekinIdAndRenaksiId(req.kodeOpd(), req.bulan(), req.rekinId(), req.renaksiId())
                             .flatMap(existing -> renaksiOpdRepository.save(buildUpdated(existing, req)))
                             .switchIfEmpty(Mono.defer(() -> renaksiOpdRepository.save(buildUncheckedRealisasiRenaksi(req))));
                 });
@@ -52,13 +52,13 @@ public class RenaksiOpdService {
         return renaksiOpdRepository.deleteById(id);
     }
 
-    public Flux<RenaksiTriwulanRekapResponse> getRekapTriwulanByNipAndTahun(String kodeOpd, String nip, String tahun) {
-        return renaksiOpdRepository.findAllByKodeOpdAndNipAndTahun(kodeOpd, nip, tahun)
+    public Flux<RenaksiTriwulanRekapResponse> getRekapTriwulanByTahun(String kodeOpd, String tahun) {
+        return renaksiOpdRepository.findAllByKodeOpdAndTahun(kodeOpd, tahun)
                 .collectList()
                 .flatMapMany(list -> {
                     Map<GroupKey, List<RenaksiOpd>> grouped = new LinkedHashMap<>();
                     for (RenaksiOpd item : list) {
-                        GroupKey key = new GroupKey(item.renaksiId(), item.renaksi(), item.rekinId(), item.rekin(), item.targetId(), item.nip());
+                        GroupKey key = new GroupKey(item.renaksiId(), item.renaksi(), item.rekinId(), item.rekin(), item.targetId());
                         grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(item);
                     }
 
@@ -68,7 +68,6 @@ public class RenaksiOpdService {
 
     public Mono<RenaksiOpdDetailBulananResponse> getDetailBulanan(
             String kodeOpd,
-            String nip,
             String tahun,
             String triwulan,
             String renaksiId,
@@ -82,7 +81,7 @@ public class RenaksiOpdService {
         List<String> months = monthsByTriwulan(tw);
 
         return renaksiOpdRepository
-                .findAllByKodeOpdAndNipAndTahunAndRenaksiIdAndTargetId(kodeOpd, nip, tahun, renaksiId, targetId)
+                .findAllByKodeOpdAndTahunAndRenaksiIdAndTargetId(kodeOpd, tahun, renaksiId, targetId)
                 .collectList()
                 .map(items -> {
                     Map<String, Integer> sumByMonth = items.stream()
@@ -98,17 +97,17 @@ public class RenaksiOpdService {
                             .map(m -> new RenaksiOpdDetailBulananRow(renaksiId, targetId, m, sumByMonth.getOrDefault(m, 0)))
                             .toList();
 
-                    return new RenaksiOpdDetailBulananResponse(nip, kodeOpd, tahun, rows);
+                    return new RenaksiOpdDetailBulananResponse(kodeOpd, tahun, rows);
                 });
     }
 
     private RenaksiOpd buildUncheckedRealisasiRenaksi(RenaksiOpdRequest req) {
-        return RenaksiOpd.of(req.renaksiId(), req.renaksi(), req.nip(), req.rekinId(), req.rekin(), req.targetId(), req.target(),
+        return RenaksiOpd.of(req.renaksiId(), req.renaksi(), req.rekinId(), req.rekin(), req.targetId(), req.target(),
                 req.realisasi(), req.satuan(), req.bulan(), req.tahun(), req.jenisRealisasi(), req.kodeOpd(), RenaksiOpdStatus.UNCHECKED);
     }
 
     private RenaksiOpd buildUpdated(RenaksiOpd existing, RenaksiOpdRequest req) {
-        return new RenaksiOpd(existing.id(), existing.renaksiId(), existing.renaksi(), existing.nip(), existing.rekinId(), existing.rekin(),
+        return new RenaksiOpd(existing.id(), existing.renaksiId(), existing.renaksi(), existing.rekinId(), existing.rekin(),
                 existing.targetId(), existing.target(), req.realisasi(), req.satuan(), req.bulan(), req.tahun(), req.jenisRealisasi(),
                 req.kodeOpd(), RenaksiOpdStatus.UNCHECKED, existing.createdBy(), existing.lastModifiedBy(), existing.createdDate(),
                 existing.lastModifiedDate(), existing.version());
@@ -122,7 +121,7 @@ public class RenaksiOpdService {
         }
 
         return new RenaksiTriwulanRekapResponse(
-                key.renaksiId(), key.renaksi(), key.rekinId(), key.rekin(), key.targetId(), key.nip(),
+                key.renaksiId(), key.renaksi(), key.rekinId(), key.rekin(), key.targetId(),
                 buildTriwulanDetail(triwulan.get(1), items),
                 buildTriwulanDetail(triwulan.get(2), items),
                 buildTriwulanDetail(triwulan.get(3), items),
@@ -185,6 +184,6 @@ public class RenaksiOpdService {
         }
     }
 
-    private record GroupKey(String renaksiId, String renaksi, String rekinId, String rekin, String targetId, String nip) {
+    private record GroupKey(String renaksiId, String renaksi, String rekinId, String rekin, String targetId) {
     }
 }

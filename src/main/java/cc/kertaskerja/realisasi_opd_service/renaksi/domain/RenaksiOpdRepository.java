@@ -5,15 +5,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface RenaksiOpdRepository extends ReactiveCrudRepository<RenaksiOpd, Long> {
-    Flux<RenaksiOpd> findAllByKodeOpdAndNipAndTahun(String kodeOpd, String nip, String tahun);
+    Flux<RenaksiOpd> findAllByKodeOpdAndTahun(String kodeOpd, String tahun);
 
-    Flux<RenaksiOpd> findAllByKodeOpdAndNipAndTahunAndRenaksiIdAndTargetId(
+    Flux<RenaksiOpd> findAllByKodeOpdAndTahunAndRenaksiIdAndTargetId(
             String kodeOpd,
-            String nip,
             String tahun,
             String renaksiId,
             String targetId
     );
 
-    Mono<RenaksiOpd> findFirstByNipAndBulanAndRekinIdAndRenaksiId(String nip, String bulan, String rekinId, String renaksiId);
+    Mono<RenaksiOpd> findFirstByKodeOpdAndBulanAndRekinIdAndRenaksiId(String kodeOpd, String bulan, String rekinId, String renaksiId);
 }

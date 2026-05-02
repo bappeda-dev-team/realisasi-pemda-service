@@ -10,7 +10,6 @@ public record RenaksiOpdRequest(
         @Nullable Long targetRealisasiId,
         @NotNull @NotEmpty String renaksiId,
         @NotNull @NotEmpty String renaksi,
-        @NotNull @NotEmpty String nip,
         @NotNull @NotEmpty String rekinId,
         @NotNull @NotEmpty String rekin,
         @NotNull @NotEmpty String targetId,
