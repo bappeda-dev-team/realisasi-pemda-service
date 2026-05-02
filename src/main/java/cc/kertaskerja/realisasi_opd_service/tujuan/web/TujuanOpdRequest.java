@@ -58,6 +58,16 @@ public record TujuanOpdRequest(
         @NotEmpty(message = "Kode opd tidak boleh kosong")
         @NotNull(message = "Kode opd tidak boleh kosong")
         @Schema(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000")
-        String kodeOpd
+        String kodeOpd,
+
+        @NotEmpty(message = "Rumus perhitungan tidak boleh kosong")
+        @NotNull(message = "Rumus perhitungan tidak boleh kosong")
+        @Schema(description = "Rumus perhitungan indikator", example = "(realisasi/target)*100")
+        String rumusPerhitungan,
+
+        @NotEmpty(message = "Sumber data tidak boleh kosong")
+        @NotNull(message = "Sumber data tidak boleh kosong")
+        @Schema(description = "Sumber data realisasi", example = "BPS")
+        String sumberData
 ) {
 }

@@ -48,7 +48,7 @@ public record SasaranOpdRequest(
 
         @NotNull(message = "Bulan harus terdefinisi")
         @NotEmpty(message = "Bulan tidak boleh kosong")
-        @Schema(description = "Bulan realisasi", example = "JANUARI")
+        @Schema(description = "Bulan realisasi", example = "1", allowableValues = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"})
         String bulan,
 
         @NotNull(message = "Pilih jenis NAIK atau TURUN")
@@ -58,6 +58,16 @@ public record SasaranOpdRequest(
         @NotEmpty(message = "Kode opd tidak boleh kosong")
         @NotNull(message = "Kode opd tidak boleh kosong")
         @Schema(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000")
-        String kodeOpd
+        String kodeOpd,
+
+        @NotEmpty(message = "Rumus perhitungan tidak boleh kosong")
+        @NotNull(message = "Rumus perhitungan tidak boleh kosong")
+        @Schema(description = "Rumus perhitungan indikator", example = "(realisasi/target)*100")
+        String rumusPerhitungan,
+
+        @NotEmpty(message = "Sumber data tidak boleh kosong")
+        @NotNull(message = "Sumber data tidak boleh kosong")
+        @Schema(description = "Sumber data realisasi", example = "SIMDA")
+        String sumberData
 ) {
 }

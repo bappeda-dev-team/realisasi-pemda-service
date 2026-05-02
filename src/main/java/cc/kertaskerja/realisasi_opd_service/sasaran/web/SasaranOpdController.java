@@ -98,7 +98,7 @@ public class SasaranOpdController {
     public Flux<SasaranOpd> getRealisasiSasaranOpdByTahunAndBulanAndKodeOpd(
             @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
             @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
-            @Parameter(description = "Bulan realizations", example = "JANUARI") @PathVariable String bulan) {
+            @Parameter(description = "Bulan realisasi", example = "1") @PathVariable String bulan) {
         return sasaranOpdService.getRealisasiSasaranOpdByTahunAndBulanAndKodeOpd(tahun, bulan, kodeOpd);
     }
 
@@ -148,7 +148,9 @@ return sasaranOpdService.submitRealisasiSasaranOpd(
                 sasaranOpdRequest.tahun(),
                 sasaranOpdRequest.bulan(),
                 sasaranOpdRequest.jenisRealisasi(),
-                sasaranOpdRequest.kodeOpd()
+                sasaranOpdRequest.kodeOpd(),
+                sasaranOpdRequest.rumusPerhitungan(),
+                sasaranOpdRequest.sumberData()
         );
     }
 
