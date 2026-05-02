@@ -27,6 +27,8 @@ public record SasaranOpd(
         String bulan,
         JenisRealisasi jenisRealisasi,
         String kodeOpd,
+        String rumusPerhitungan,
+        String sumberData,
         SasaranOpdStatus status,
 
         @CreatedDate Instant createdDate,
@@ -47,12 +49,14 @@ public record SasaranOpd(
             String bulan,
             JenisRealisasi jenisRealisasi,
             String kodeOpd,
+            String rumusPerhitungan,
+            String sumberData,
             SasaranOpdStatus status
     ) {
         return new SasaranOpd(null,
                 sasaranId, sasaran, indikatorId, indikator,
                 targetId, target, realisasi, satuan, tahun,
-                bulan, jenisRealisasi, kodeOpd, status,
+                bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, status,
                 null, null, 0);
     }
 

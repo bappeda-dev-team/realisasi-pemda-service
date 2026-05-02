@@ -148,7 +148,9 @@ return tujuanOpdService.submitRealisasiTujuanOpd(
                 tujuanOpdRequest.tahun(),
                 tujuanOpdRequest.bulan(),
                 tujuanOpdRequest.jenisRealisasi(),
-                tujuanOpdRequest.kodeOpd()
+                tujuanOpdRequest.kodeOpd(),
+                tujuanOpdRequest.rumusPerhitungan(),
+                tujuanOpdRequest.sumberData()
         );
     }
 

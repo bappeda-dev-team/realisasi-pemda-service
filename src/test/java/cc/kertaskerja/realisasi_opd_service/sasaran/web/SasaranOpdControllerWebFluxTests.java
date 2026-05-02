@@ -34,19 +34,19 @@ public class SasaranOpdControllerWebFluxTests {
     @Test
     void whenBatchSubmit_thenReturnsSaveSasaranOpds() throws Exception {
         // prepare requests
-        SasaranOpdRequest r1 = new SasaranOpdRequest(null, "S1", "I1", "TAR-1", "100.0", 50.0, "unit1", "2025", "JANUARI", JenisRealisasi.NAIK, "001");
-        SasaranOpdRequest r2 = new SasaranOpdRequest(null, "S2", "I2", "TAR-2", "200.0", 75.0, "unit2", "2026", "FEBRUARI", JenisRealisasi.TURUN, "001");
+        SasaranOpdRequest r1 = new SasaranOpdRequest(null, "S1", "I1", "TAR-1", "100.0", 50.0, "unit1", "2025", "JANUARI", JenisRealisasi.NAIK, "001", "(realisasi/target)*100", "SIMDA");
+        SasaranOpdRequest r2 = new SasaranOpdRequest(null, "S2", "I2", "TAR-2", "200.0", 75.0, "unit2", "2026", "FEBRUARI", JenisRealisasi.TURUN, "001", "(realisasi/target)*100", "SAKIP");
 
         // prepare expected domain objects
         SasaranOpd s1 = SasaranOpdService.buildUncheckedRealisasiSasaranOpd(
                 r1.sasaranId(), r1.indikatorId(), r1.targetId() ,r1.target(), r1.realisasi(),
                 r1.satuan(), r1.tahun(), r1.bulan(), r1.jenisRealisasi(),
-                r1.kodeOpd()
+                r1.kodeOpd(), r1.rumusPerhitungan(), r1.sumberData()
         );
         SasaranOpd s2 = SasaranOpdService.buildUncheckedRealisasiSasaranOpd(
                 r2.sasaranId(), r2.indikatorId(), r2.targetId(), r2.target(), r2.realisasi(),
                 r2.satuan(), r2.tahun(), r2.bulan(), r2.jenisRealisasi(),
-                r2.kodeOpd()
+                r2.kodeOpd(), r2.rumusPerhitungan(), r2.sumberData()
         );
 
         when(sasaranOpdService.batchSubmitRealisasiSasaranOpd(anyList()))
