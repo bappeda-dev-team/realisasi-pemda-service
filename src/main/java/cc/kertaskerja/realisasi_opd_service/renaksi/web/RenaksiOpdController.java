@@ -37,24 +37,23 @@ public class RenaksiOpdController {
         this.renaksiOpdService = renaksiOpdService;
     }
 
-    @GetMapping("/by-kode-opd/{kodeOpd}/by-nip/{nip}/by-tahun/{tahun}/rekap-triwulan")
+    @GetMapping("/by-kode-opd/{kodeOpd}/by-tahun/{tahun}/rekap-triwulan")
     @Operation(summary = "Rekap realisasi renaksi OPD per triwulan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Daftar rekap per triwulan", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenaksiTriwulanRekapResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
-    public Flux<RenaksiTriwulanRekapResponse> getRekapTriwulanByNipAndTahun(
+    public Flux<RenaksiTriwulanRekapResponse> getRekapTriwulanByTahun(
             @Parameter(description = "Kode OPD") @PathVariable String kodeOpd,
-            @Parameter(description = "NIP pelaksana") @PathVariable String nip,
             @Parameter(description = "Tahun realisasi") @PathVariable String tahun) {
-        if (kodeOpd == null || kodeOpd.isBlank() || nip == null || nip.isBlank() || tahun == null || tahun.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter kodeOpd, nip dan tahun tidak boleh kosong");
+        if (kodeOpd == null || kodeOpd.isBlank() || tahun == null || tahun.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter kodeOpd dan tahun tidak boleh kosong");
         }
-        return renaksiOpdService.getRekapTriwulanByNipAndTahun(kodeOpd, nip, tahun);
+        return renaksiOpdService.getRekapTriwulanByTahun(kodeOpd, tahun);
     }
 
-    @GetMapping("/by-kode-opd/{kodeOpd}/by-nip/{nip}/by-tahun/{tahun}/by-triwulan/{triwulan}/by-renaksi-id/{renaksiId}/by-target-id/{targetId}/detail-bulanan")
+    @GetMapping("/by-kode-opd/{kodeOpd}/by-tahun/{tahun}/by-triwulan/{triwulan}/by-renaksi-id/{renaksiId}/by-target-id/{targetId}/detail-bulanan")
     @Operation(summary = "Detail realisasi renaksi OPD per bulan (per triwulan)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detail bulanan", content = @Content(schema = @Schema(implementation = RenaksiOpdDetailBulananResponse.class))),
@@ -63,23 +62,21 @@ public class RenaksiOpdController {
     })
     public Mono<RenaksiOpdDetailBulananResponse> getDetailBulanan(
             @Parameter(description = "Kode OPD") @PathVariable String kodeOpd,
-            @Parameter(description = "NIP pelaksana") @PathVariable String nip,
             @Parameter(description = "Tahun realisasi") @PathVariable String tahun,
             @Parameter(description = "Triwulan (1-4)") @PathVariable String triwulan,
             @Parameter(description = "ID renaksi") @PathVariable String renaksiId,
             @Parameter(description = "ID target") @PathVariable String targetId
     ) {
         if (kodeOpd == null || kodeOpd.isBlank()
-                || nip == null || nip.isBlank()
                 || tahun == null || tahun.isBlank()
                 || triwulan == null || triwulan.isBlank()
                 || renaksiId == null || renaksiId.isBlank()
                 || targetId == null || targetId.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Parameter kodeOpd, nip, tahun, triwulan, renaksiId, dan targetId tidak boleh kosong");
+                    "Parameter kodeOpd, tahun, triwulan, renaksiId, dan targetId tidak boleh kosong");
         }
 
-        return renaksiOpdService.getDetailBulanan(kodeOpd, nip, tahun, triwulan, renaksiId, targetId)
+        return renaksiOpdService.getDetailBulanan(kodeOpd, tahun, triwulan, renaksiId, targetId)
                 .onErrorMap(IllegalArgumentException.class,
                         ex -> new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
