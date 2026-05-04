@@ -13,19 +13,14 @@ public record RenjaPaguRequest(
         @Schema(description = "ID internal data realisasi. Kosongkan saat create.", example = "1", nullable = true)
         Long targetRealisasiId,
 
-        @NotNull(message = "ID renja pagu tidak boleh kosong")
-        @NotEmpty(message = "ID renja pagu tidak boleh kosong")
-        @Schema(description = "ID renja pagu", example = "RENPAGU-001")
-        String renjaPaguId,
-
-        @NotNull(message = "Renja pagu tidak boleh kosong")
-        @NotEmpty(message = "Renja pagu tidak boleh kosong")
-        @Schema(description = "Nama renja pagu", example = "Program Pembangunan Jalan")
-        String renjaPagu,
+        @NotNull(message = "ID jenis renja tidak boleh kosong")
+        @NotEmpty(message = "ID jenis renja tidak boleh kosong")
+        @Schema(description = "ID jenis renja", example = "RENPAGU-001")
+        String jenisRenjaId,
 
         @NotNull(message = "Pilih jenis renja pagu PROGRAM, KEGIATAN, SUBKEGIATAN")
         @Schema(description = "Jenis level renja", example = "PROGRAM", allowableValues = {"PROGRAM", "KEGIATAN", "SUBKEGIATAN"})
-        JenisRenja jenisRenjaPagu,
+        JenisRenja jenisRenja,
 
         @NotNull(message = "Nilai pagu harus terdefinisi")
         @Schema(description = "Nilai pagu anggaran", example = "100000000")

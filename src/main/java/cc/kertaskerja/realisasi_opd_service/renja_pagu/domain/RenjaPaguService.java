@@ -29,24 +29,23 @@ public class RenjaPaguService {
     }
 
     public Flux<RenjaPagu> getRealisasiRenjaPaguByKodeOpdAndTahunAndBulanAndJenisRenjaAndKodeRenjaAndRenjaId(
-            String kodeOpd, String tahun, String bulan, String jenisRenja, String kodeRenja, String renjaId) {
-        return renjaPaguRepository.findAllByKodeOpdAndTahunAndBulanAndJenisRenjaPaguAndKodeRenjaAndRenjaPaguId(
-                kodeOpd, tahun, bulan, jenisRenja, kodeRenja, renjaId);
+            String kodeOpd, String tahun, String bulan, String jenisRenja, String kodeRenja, String jenisRenjaId) {
+        return renjaPaguRepository.findAllByKodeOpdAndTahunAndBulanAndJenisRenjaPaguAndKodeRenjaAndJenisRenjaId(
+                kodeOpd, tahun, bulan, jenisRenja, kodeRenja, jenisRenjaId);
     }
 
-    public Mono<Void> deleteRealisasiRenjaPaguByRenjaId(String renjaId) {
-        return renjaPaguRepository.deleteByRenjaPaguId(renjaId);
+    public Mono<Void> deleteRealisasiRenjaPaguByRenjaId(String jenisRenjaId) {
+        return renjaPaguRepository.deleteByJenisRenjaId(jenisRenjaId);
     }
 
-    public Mono<RenjaPagu> submitRealisasiRenjaPagu(String renjaPaguId, String renjaPagu, JenisRenja jenisRenja, Integer pagu, Integer realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String kodeRenja) {
-        return Mono.just(buildUncheckedRealisasiRenjaPagu(renjaPaguId, renjaPagu, jenisRenja, pagu, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, kodeRenja))
+    public Mono<RenjaPagu> submitRealisasiRenjaPagu(String jenisRenjaId, JenisRenja jenisRenja, Integer pagu, Integer realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String kodeRenja) {
+        return Mono.just(buildUncheckedRealisasiRenjaPagu(jenisRenjaId, jenisRenja, pagu, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, kodeRenja))
                 .flatMap(renjaPaguRepository::save);
     }
 
-    public static RenjaPagu buildUncheckedRealisasiRenjaPagu(String renjaPaguId, String renjaPagu, JenisRenja jenisRenjaPagu, Integer pagu, Integer realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String kodeRenja) {
+    public static RenjaPagu buildUncheckedRealisasiRenjaPagu(String jenisRenjaId, JenisRenja jenisRenjaPagu, Integer pagu, Integer realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String kodeRenja) {
         return RenjaPagu.of(
-                renjaPaguId,
-                "Renja Pagu " + renjaPaguId,
+                jenisRenjaId,
                 jenisRenjaPagu, pagu, realisasi, satuan, tahun, bulan,
                 jenisRealisasi, kodeOpd, kodeRenja,
                 RenjaPaguStatus.UNCHECKED
@@ -61,8 +60,7 @@ public class RenjaPaguService {
                                 .flatMap(existing -> {
                                     RenjaPagu updated = new RenjaPagu(
                                             existing.id(),
-                                            existing.renjaPaguId(),
-                                            existing.renjaPagu(),
+                                            existing.jenisRenjaId(),
                                             existing.jenisRenjaPagu(),
                                             req.pagu(),
                                             req.realisasi(),
@@ -83,9 +81,8 @@ public class RenjaPaguService {
                                 })
                                 .switchIfEmpty(Mono.defer(() -> {
                                     RenjaPagu baru = buildUncheckedRealisasiRenjaPagu(
-                                            req.renjaPaguId(),
-                                            req.renjaPagu(),
-                                            req.jenisRenjaPagu(),
+                                            req.jenisRenjaId(),
+                                            req.jenisRenja(),
                                             req.pagu(),
                                             req.realisasi(),
                                             req.satuan(),
@@ -100,9 +97,8 @@ public class RenjaPaguService {
                     }
                     else {
                         RenjaPagu baru = buildUncheckedRealisasiRenjaPagu(
-                                req.renjaPaguId(),
-                                req.renjaPagu(),
-                                req.jenisRenjaPagu(),
+                                req.jenisRenjaId(),
+                                req.jenisRenja(),
                                 req.pagu(),
                                 req.realisasi(),
                                 req.satuan(),

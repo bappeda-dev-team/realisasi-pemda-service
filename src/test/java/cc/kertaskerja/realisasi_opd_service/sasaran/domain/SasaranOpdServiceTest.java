@@ -65,7 +65,7 @@ public class SasaranOpdServiceTest {
         // Assert
         StepVerifier.create(result)
                 .expectNextMatches(sasaranOpd ->
-                        sasaranOpd.sasaranId().equals(expectedSasaranOpd.sasaranId()) &&
+                        sasaranOpd.renjaId().equals(expectedSasaranOpd.renjaId()) &&
                                 sasaranOpd.indikatorId().equals(expectedSasaranOpd.indikatorId()) &&
                                 sasaranOpd.target().equals(expectedSasaranOpd.target()) &&
                                 sasaranOpd.realisasi().equals(expectedSasaranOpd.realisasi()) &&

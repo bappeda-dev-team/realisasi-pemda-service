@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface RenjaPaguRepository extends ReactiveCrudRepository<RenjaPagu, Long> {
-    Flux<RenjaPagu> findAllByRenjaPaguId(String renjaPaguId);
+    Flux<RenjaPagu> findAllByJenisRenjaId(String jenisRenjaId);
 
     Flux<RenjaPagu> findAllByTahunAndKodeOpd(String tahun, String kodeOpd);
 
@@ -16,10 +16,10 @@ public interface RenjaPaguRepository extends ReactiveCrudRepository<RenjaPagu, L
 
     Flux<RenjaPagu> findAllByKodeOpd(String kodeOpd);
 
-    Flux<RenjaPagu> findAllByTahunAndRenjaPaguIdAndKodeOpd(String tahun, String renjaPaguId, String kodeOpd);
+    Flux<RenjaPagu> findAllByTahunAndJenisRenjaIdAndKodeOpd(String tahun, String jenisRenjaId, String kodeOpd);
 
-    Flux<RenjaPagu> findAllByKodeOpdAndTahunAndBulanAndJenisRenjaPaguAndKodeRenjaAndRenjaPaguId(
-            String kodeOpd, String tahun, String bulan, String jenisRenja, String kodeRenja, String renjaId);
+    Flux<RenjaPagu> findAllByKodeOpdAndTahunAndBulanAndJenisRenjaPaguAndKodeRenjaAndJenisRenjaId(
+            String kodeOpd, String tahun, String bulan, String jenisRenja, String kodeRenja, String jenisRenjaId);
 
-    Mono<Void> deleteByRenjaPaguId(String renjaPaguId);
+    Mono<Void> deleteByJenisRenjaId(String jenisRenjaId);
 }

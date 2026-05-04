@@ -13,7 +13,6 @@ public class RenjaPaguTests {
         RenjaPagu renjaPagu = new RenjaPagu(
                 1L,
                 "RENJA-1",
-                "Program A",
                 JenisRenja.PROGRAM,
                 100,
                 50,
@@ -39,7 +38,6 @@ public class RenjaPaguTests {
         RenjaPagu renjaPagu = new RenjaPagu(
                 2L,
                 "RENJA-2",
-                "Program B",
                 JenisRenja.KEGIATAN,
                 200,
                 75,
@@ -65,7 +63,6 @@ public class RenjaPaguTests {
         RenjaPagu renjaPagu = new RenjaPagu(
                 3L,
                 "RENJA-3",
-                "Program C",
                 JenisRenja.SUBKEGIATAN,
                 0,
                 75,
@@ -91,7 +88,6 @@ public class RenjaPaguTests {
         RenjaPagu renjaPagu = new RenjaPagu(
                 4L,
                 "RENJA-4",
-                "Program D",
                 JenisRenja.PROGRAM,
                 100,
                 150,
@@ -117,7 +113,6 @@ public class RenjaPaguTests {
         RenjaPagu renjaPagu = new RenjaPagu(
                 5L,
                 "RENJA-5",
-                "Program E",
                 JenisRenja.KEGIATAN,
                 100,
                 100,
@@ -143,7 +138,6 @@ public class RenjaPaguTests {
         RenjaPagu renjaPagu = new RenjaPagu(
                 6L,
                 "RENJA-6",
-                "Program F",
                 JenisRenja.SUBKEGIATAN,
                 0,
                 0,

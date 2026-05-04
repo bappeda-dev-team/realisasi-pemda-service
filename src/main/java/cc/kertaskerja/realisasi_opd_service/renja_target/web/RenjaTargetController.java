@@ -53,7 +53,7 @@ public class RenjaTargetController {
         return renjaTargetService.getRealisasiRenjaTargetByFilters(kodeOpd, tahun, bulan);
     }
 
-    @GetMapping("/kodeOpd/{kodeOpd}/by-tahun/{tahun}/by-bulan/{bulan}/by-jenis-renja/{jenisRenja}/by-kode-renja/{kodeRenja}/by-renja-id/{renjaId}")
+    @GetMapping("/kodeOpd/{kodeOpd}/by-tahun/{tahun}/by-bulan/{bulan}/by-jenis-renja/{jenisRenja}/by-kode-renja/{kodeRenja}/by-jenis-renja-id/{jenisRenjaId}")
     @Operation(summary = "Ambil realisasi renja target berdasarkan filter lengkap")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Data realizations renja target", content = @Content(schema = @Schema(implementation = RenjaTarget.class))),
@@ -66,9 +66,9 @@ public class RenjaTargetController {
             @Parameter(description = "Bulan") @PathVariable String bulan,
             @Parameter(description = "Jenis renja") @PathVariable JenisRenja jenisRenja,
             @Parameter(description = "Kode renja") @PathVariable String kodeRenja,
-            @Parameter(description = "ID renja") @PathVariable String renjaId
+            @Parameter(description = "ID jenis renja") @PathVariable String jenisRenjaId
     ) {
-        return renjaTargetService.getRealisasiRenjaTargetByFilters(kodeOpd, tahun, bulan, jenisRenja, kodeRenja, renjaId);
+        return renjaTargetService.getRealisasiRenjaTargetByFilters(kodeOpd, tahun, bulan, jenisRenja, kodeRenja, jenisRenjaId);
     }
 
     @PostMapping
@@ -83,9 +83,8 @@ public class RenjaTargetController {
                     content = @Content(schema = @Schema(implementation = RenjaTargetRequest.class)))
             @RequestBody @Valid RenjaTargetRequest renjaTargetRequest) {
         return renjaTargetService.submitRealisasiRenjaTarget(
-                renjaTargetRequest.renjaTargetId(),
-                renjaTargetRequest.renjaTarget(),
-                renjaTargetRequest.jenisRenjaTarget(),
+                renjaTargetRequest.jenisRenjaId(),
+                renjaTargetRequest.jenisRenja(),
                 renjaTargetRequest.indikatorId(),
                 renjaTargetRequest.indikator(),
                 renjaTargetRequest.targetId(),
@@ -114,9 +113,8 @@ public class RenjaTargetController {
                             examples = @ExampleObject(name = "ArrayRequest", value = "[\n" +
                                     "  {\n" +
                                     "    \"targetRealisasiId\": 10,\n" +
-                                    "    \"renjaTargetId\": \"REN-001\",\n" +
-                                    "    \"renjaTarget\": \"Program Peningkatan Infrastruktur\",\n" +
-                                    "    \"jenisRenjaTarget\": \"PROGRAM\",\n" +
+                                    "    \"jenisRenjaId\": \"REN-001\",\n" +
+                                    "    \"jenisRenja\": \"PROGRAM\",\n" +
                                     "    \"indikatorId\": \"IND-REN-123\",\n" +
                                     "    \"indikator\": \"Persentase capaian program\",\n" +
                                     "    \"targetId\": \"TAR-1\",\n" +
@@ -124,6 +122,7 @@ public class RenjaTargetController {
                                     "    \"realisasi\": 85,\n" +
                                     "    \"satuan\": \"%\",\n" +
                                     "    \"tahun\": \"2026\",\n" +
+                                    "    \"bulan\": \"1\",\n" +
                                     "    \"jenisRealisasi\": \"NAIK\",\n" +
                                     "    \"kodeOpd\": \"OPD-001\"\n" +
                                     "  }\n" +
@@ -132,7 +131,7 @@ public class RenjaTargetController {
         return renjaTargetService.batchSubmitRealisasiRenjaTarget(renjaTargetRequests);
     }
 
-@DeleteMapping("/{renjaId}")
+@DeleteMapping("/{jenisRenjaId}")
     @Operation(summary = "Hapus realizations renja target", description = "Menghapus satu data realizations renja target berdasarkan ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Data realizations renja target terhapus", content = @Content),
@@ -140,7 +139,7 @@ public class RenjaTargetController {
             @ApiResponse(responseCode = "404", description = "Data tidak ditemukan", content = @Content)
     })
     public Mono<Void> deleteRealisasiRenjaTarget(
-            @Parameter(description = "ID renja target", example = "1") @PathVariable String renjaId) {
-        return renjaTargetService.deleteRealisasiRenjaTarget(renjaId);
+            @Parameter(description = "ID jenis renja", example = "REN-001") @PathVariable String jenisRenjaId) {
+        return renjaTargetService.deleteRealisasiRenjaTarget(jenisRenjaId);
     }
 }

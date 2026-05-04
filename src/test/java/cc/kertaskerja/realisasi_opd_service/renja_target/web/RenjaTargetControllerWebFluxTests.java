@@ -35,20 +35,19 @@ public class RenjaTargetControllerWebFluxTests {
 @Test
     void whenBatchSubmit_thenReturnsSavedRenjaTargets() throws Exception {
         RenjaTargetRequest r1 = new RenjaTargetRequest(
-                null, "RENJA-1", "Program A", JenisRenja.PROGRAM,
+                null, "RENJA-1", JenisRenja.PROGRAM,
                 "IND-1", "Indikator A", "T-1", "100", 50,
                 "unit", "2025", "01", JenisRealisasi.NAIK, "001", "001"
         );
         RenjaTargetRequest r2 = new RenjaTargetRequest(
-                null, "RENJA-2", " Kegiatan B", JenisRenja.KEGIATAN,
+                null, "RENJA-2", JenisRenja.KEGIATAN,
                 "IND-2", "Indikator B", "T-2", "200", 75,
                 "unit", "2026", "02", JenisRealisasi.NAIK, "001", "002"
         );
 
         RenjaTarget p1 = RenjaTargetService.buildUncheckedRealisasiRenjaTarget(
-                r1.renjaTargetId(),
-                r1.renjaTarget(),
-                r1.jenisRenjaTarget(),
+                r1.jenisRenjaId(),
+                r1.jenisRenja(),
                 r1.indikatorId(),
                 r1.indikator(),
                 r1.targetId(),
@@ -62,9 +61,8 @@ public class RenjaTargetControllerWebFluxTests {
                 r1.kodeRenja()
         );
         RenjaTarget p2 = RenjaTargetService.buildUncheckedRealisasiRenjaTarget(
-                r2.renjaTargetId(),
-                r2.renjaTarget(),
-                r2.jenisRenjaTarget(),
+                r2.jenisRenjaId(),
+                r2.jenisRenja(),
                 r2.indikatorId(),
                 r2.indikator(),
                 r2.targetId(),

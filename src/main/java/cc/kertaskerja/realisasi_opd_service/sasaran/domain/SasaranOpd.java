@@ -15,8 +15,8 @@ import java.time.Instant;
 public record SasaranOpd(
         @Id Long id,
 
-        String sasaranId,
-        String sasaran,
+        String renjaId,
+        String renja,
         String indikatorId,
         String indikator,
         String targetId,
@@ -37,8 +37,8 @@ public record SasaranOpd(
         @Version int version
 ) {
     public static SasaranOpd of(
-            String sasaranId,
-            String sasaran,
+            String renjaId,
+            String renja,
             String indikatorId,
             String indikator,
             String targetId,
@@ -54,7 +54,7 @@ public record SasaranOpd(
             SasaranOpdStatus status
     ) {
         return new SasaranOpd(null,
-                sasaranId, sasaran, indikatorId, indikator,
+                renjaId, renja, indikatorId, indikator,
                 targetId, target, realisasi, satuan, tahun,
                 bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, status,
                 null, null, 0);

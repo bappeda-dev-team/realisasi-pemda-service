@@ -19,10 +19,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record RenjaPagu(
         @Id Long id,
 
-        @Column("renja_id")
-        String renjaPaguId,
-        @Column("renja")
-        String renjaPagu,
+        @Column("jenis_renja_id")
+        String jenisRenjaId,
         @Column("jenis_renja")
         JenisRenja jenisRenjaPagu,
         Integer pagu,
@@ -55,8 +53,7 @@ public record RenjaPagu(
         @Version int version
 ) {
     public static RenjaPagu of (
-            String renjaPaguId,
-            String renjaPagu,
+            String jenisRenjaId,
             JenisRenja jenisRenjaPagu,
             Integer pagu,
             Integer realisasi,
@@ -69,7 +66,7 @@ public record RenjaPagu(
             RenjaPaguStatus status
     ) {
         return new RenjaPagu(null,
-                renjaPaguId, renjaPagu, jenisRenjaPagu, pagu, realisasi, satuan,
+                jenisRenjaId, jenisRenjaPagu, pagu, realisasi, satuan,
                 tahun, bulan, jenisRealisasi, kodeOpd, kodeRenja, status,
                 null, null, null, null, 0);
     }
