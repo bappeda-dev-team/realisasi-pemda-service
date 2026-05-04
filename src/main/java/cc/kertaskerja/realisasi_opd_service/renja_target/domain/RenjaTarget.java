@@ -19,10 +19,8 @@ import java.time.Instant;
 public record RenjaTarget(
         @Id Long id,
 
-        @Column("renja_id")
-        String renjaTargetId,
-        @Column("renja")
-        String renjaTarget,
+        @Column("jenis_renja_id")
+        String jenisRenjaId,
         @Column("jenis_renja")
         JenisRenja jenisRenjaTarget,
         @Column("indikator_id")
@@ -62,8 +60,7 @@ public record RenjaTarget(
         @Version int version
 ) {
     public static RenjaTarget of(
-            String renjaId,
-            String renja,
+            String jenisRenjaId,
             JenisRenja jenisRenja,
             String indikatorId,
             String indikator,
@@ -79,7 +76,7 @@ public record RenjaTarget(
             RenjaTargetStatus status
     ) {
         return new RenjaTarget(null,
-                renjaId, renja, jenisRenja, indikatorId, indikator, targetId, target,
+                jenisRenjaId, jenisRenja, indikatorId, indikator, targetId, target,
                 realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, kodeRenja, status,
                 null, null, null, null, 0);
     }

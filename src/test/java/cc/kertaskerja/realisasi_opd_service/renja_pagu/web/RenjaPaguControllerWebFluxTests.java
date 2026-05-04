@@ -36,18 +36,17 @@ public class RenjaPaguControllerWebFluxTests {
     @Test
     void whenBatchSubmit_thenReturnsSavedRenjaPagus() throws Exception {
         RenjaPaguRequest r1 = new RenjaPaguRequest(
-                null, "RENJA-1", "Program A", JenisRenja.PROGRAM, 100, 50,
+                null, "RENJA-1", JenisRenja.PROGRAM, 100, 50,
                 "rupiah", "2025", "01", JenisRealisasi.NAIK, "001", "001"
         );
         RenjaPaguRequest r2 = new RenjaPaguRequest(
-                null, "RENJA-2", "Program B", JenisRenja.KEGIATAN, 200, 75,
+                null, "RENJA-2", JenisRenja.KEGIATAN, 200, 75,
                 "rupiah", "2026", "02", JenisRealisasi.NAIK, "001", "002"
         );
 
         RenjaPagu p1 = RenjaPaguService.buildUncheckedRealisasiRenjaPagu(
-                r1.renjaPaguId(),
-                r1.renjaPagu(),
-                r1.jenisRenjaPagu(),
+                r1.jenisRenjaId(),
+                r1.jenisRenja(),
                 r1.pagu(),
                 r1.realisasi(),
                 r1.satuan(),
@@ -58,9 +57,8 @@ public class RenjaPaguControllerWebFluxTests {
                 r1.kodeRenja()
         );
         RenjaPagu p2 = RenjaPaguService.buildUncheckedRealisasiRenjaPagu(
-                r2.renjaPaguId(),
-                r2.renjaPagu(),
-                r2.jenisRenjaPagu(),
+                r2.jenisRenjaId(),
+                r2.jenisRenja(),
                 r2.pagu(),
                 r2.realisasi(),
                 r2.satuan(),
@@ -99,7 +97,7 @@ public class RenjaPaguControllerWebFluxTests {
     @Test
     void whenGetByFilterLengkap_thenReturnsFilteredRenjaPagus() throws Exception {
         RenjaPagu p1 = RenjaPaguService.buildUncheckedRealisasiRenjaPagu(
-                "RENJA-1", "Program A", JenisRenja.PROGRAM, 100, 50,
+                "RENJA-1", JenisRenja.PROGRAM, 100, 50,
                 "rupiah", "2025", "01", JenisRealisasi.NAIK, "001", "001"
         );
 
@@ -119,7 +117,7 @@ public class RenjaPaguControllerWebFluxTests {
                     var body = response.getResponseBody();
                     Assertions.assertNotNull(body);
                     Assertions.assertEquals(1, body.size());
-                    Assertions.assertEquals("RENJA-1", body.get(0).renjaPaguId());
+                    Assertions.assertEquals("RENJA-1", body.get(0).jenisRenjaId());
                     Assertions.assertEquals("001", body.get(0).kodeOpd());
                     Assertions.assertEquals("2025", body.get(0).tahun());
                     Assertions.assertEquals("01", body.get(0).bulan());

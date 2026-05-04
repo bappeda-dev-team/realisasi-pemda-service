@@ -13,7 +13,6 @@ public class RenjaTargetTests {
         RenjaTarget renjaTarget = new RenjaTarget(
                 1L,
                 "RENJA-1",
-                "Program A",
                 JenisRenja.PROGRAM,
                 "IND-1",
                 "Indikator A",
@@ -42,7 +41,6 @@ public class RenjaTargetTests {
         RenjaTarget renjaTarget = new RenjaTarget(
                 2L,
                 "RENJA-2",
-                "Program B",
                 JenisRenja.KEGIATAN,
                 "IND-2",
                 "Indikator B",
@@ -71,7 +69,6 @@ public class RenjaTargetTests {
         RenjaTarget renjaTarget = new RenjaTarget(
                 3L,
                 "RENJA-3",
-                "Program C",
                 JenisRenja.SUBKEGIATAN,
                 "IND-3",
                 "Indikator C",
@@ -100,7 +97,6 @@ public class RenjaTargetTests {
         RenjaTarget renjaTarget = new RenjaTarget(
                 4L,
                 "RENJA-4",
-                "Program D",
                 JenisRenja.PROGRAM,
                 "IND-4",
                 "Indikator D",

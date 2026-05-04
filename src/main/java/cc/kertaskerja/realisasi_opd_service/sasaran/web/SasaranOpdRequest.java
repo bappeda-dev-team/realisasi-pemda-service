@@ -13,10 +13,10 @@ public record SasaranOpdRequest(
         @Schema(description = "ID internal data realisasi. Kosongkan saat create.", example = "1", nullable = true)
         Long targetRealisasiId,
 
-        @NotNull(message = "ID sasaran tidak boleh kosong")
-        @NotEmpty(message = "ID sasaran tidak boleh kosong")
-        @Schema(description = "ID sasaran dari sistem sumber", example = "SAS-001")
-        String sasaranId,
+        @NotNull(message = "ID renja tidak boleh kosong")
+        @NotEmpty(message = "ID renja tidak boleh kosong")
+        @Schema(description = "ID renja dari sistem sumber", example = "REN-001")
+        String renjaId,
 
         @NotNull(message = "ID indikator tidak boleh kosong")
         @NotEmpty(message = "ID indikator tidak boleh kosong")

@@ -49,15 +49,15 @@ public class SasaranOpdController {
         return sasaranOpdService.getRealisasiSasaranOpdById(id);
     }
 
-    @GetMapping("/by-sasaran/{sasaranId}")
-    @Operation(summary = "Cari realisasi sasaran OPD berdasarkan ID sasaran", description = "Mengambil daftar realisasi sasaran OPD berdasarkan `sasaranId`.")
+    @GetMapping("/by-renja/{renjaId}")
+    @Operation(summary = "Cari realisasi sasaran OPD berdasarkan ID renja", description = "Mengambil daftar realisasi sasaran OPD berdasarkan `renjaId`.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Daftar realisasi sasaran OPD", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SasaranOpd.class)))),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
-    public Flux<SasaranOpd> getRealisasiSasaranOpdBySasaranOpdId(
-            @Parameter(description = "ID sasaran", example = "SAS-001") @PathVariable String sasaranId) {
-        return sasaranOpdService.getRealisasiSasaranOpdBySasaranId(sasaranId);
+    public Flux<SasaranOpd> getRealisasiSasaranOpdByRenjaId(
+            @Parameter(description = "ID renja", example = "REN-001") @PathVariable String renjaId) {
+        return sasaranOpdService.getRealisasiSasaranOpdByRenjaId(renjaId);
     }
 
     @GetMapping("/{kodeOpd}")
@@ -72,7 +72,7 @@ public class SasaranOpdController {
     }
 
     @GetMapping("/{kodeOpd}/by-tahun/{tahun}")
-    @Operation(summary = "Cari realisasi sasaran OPD per tahun", description = "Mengambil realisasi sasaran OPD berdasarkan kode OPD dan tahun, dapat difilter lagi dengan `sasaranId`.")
+    @Operation(summary = "Cari realisasi sasaran OPD per tahun", description = "Mengambil realisasi sasaran OPD berdasarkan kode OPD dan tahun, dapat difilter lagi dengan `renjaId`.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Daftar realisasi sasaran OPD", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SasaranOpd.class)))),
             @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
@@ -81,9 +81,9 @@ public class SasaranOpdController {
     public Flux<SasaranOpd> getRealisasiSasaranOpdByTahunAndKodeOpd(
             @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
             @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
-            @Parameter(description = "Filter opsional ID sasaran", example = "SAS-001") @RequestParam(required = false) String sasaranId) {
-        if (sasaranId != null && !sasaranId.isBlank()) {
-            return sasaranOpdService.getRealisasiSasaranOpdByTahunAndSasaranIdAndKodeOpd(tahun, sasaranId, kodeOpd);
+            @Parameter(description = "Filter opsional ID renja", example = "REN-001") @RequestParam(required = false) String renjaId) {
+        if (renjaId != null && !renjaId.isBlank()) {
+            return sasaranOpdService.getRealisasiSasaranOpdByTahunAndRenjaIdAndKodeOpd(tahun, renjaId, kodeOpd);
         }
         return sasaranOpdService.getRealisasiSasaranOpdByTahunAndKodeOpd(tahun, kodeOpd);
     }
@@ -139,7 +139,7 @@ public class SasaranOpdController {
                     content = @Content(schema = @Schema(implementation = SasaranOpdRequest.class)))
             @RequestBody @Valid SasaranOpdRequest sasaranOpdRequest) {
 return sasaranOpdService.submitRealisasiSasaranOpd(
-                sasaranOpdRequest.sasaranId(),
+                sasaranOpdRequest.renjaId(),
                 sasaranOpdRequest.indikatorId(),
                 sasaranOpdRequest.targetId(),
                 sasaranOpdRequest.target(),

@@ -29,8 +29,8 @@ public class SasaranOpdService {
         return sasaranOpdRepository.findAllByKodeOpd(kodeOpd);
     }
 
-    public Flux<SasaranOpd> getRealisasiSasaranOpdBySasaranId(String sasaranId) {
-        return sasaranOpdRepository.findAllBySasaranId(sasaranId);
+    public Flux<SasaranOpd> getRealisasiSasaranOpdByRenjaId(String renjaId) {
+        return sasaranOpdRepository.findAllByRenjaId(renjaId);
     }
 
     public Flux<SasaranOpd> getRealisasiSasaranOpdByIndikatorId(String indikatorId) {
@@ -41,8 +41,8 @@ public class SasaranOpdService {
         return sasaranOpdRepository.findAllByTahunBetweenAndKodeOpd(tahunAwal, tahunAkhir, kodeOpd);
     }
 
-    public Flux<SasaranOpd> getRealisasiSasaranOpdByTahunAndSasaranIdAndKodeOpd(String tahun, String sasaranId, String kodeOpd) {
-        return sasaranOpdRepository.findAllByTahunAndSasaranIdAndKodeOpd(tahun, sasaranId, kodeOpd);
+    public Flux<SasaranOpd> getRealisasiSasaranOpdByTahunAndRenjaIdAndKodeOpd(String tahun, String renjaId, String kodeOpd) {
+        return sasaranOpdRepository.findAllByTahunAndRenjaIdAndKodeOpd(tahun, renjaId, kodeOpd);
     }
 
     public Flux<SasaranOpd> getRealisasiSasaranOpdByTahunAndBulanAndKodeOpd(String tahun, String bulan, String kodeOpd) {
@@ -53,15 +53,15 @@ public class SasaranOpdService {
         return sasaranOpdRepository.findById(id);
     }
 
-    public Mono<SasaranOpd> submitRealisasiSasaranOpd(String sasaranId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String rumusPerhitungan, String sumberData) {
-        return Mono.just(buildUncheckedRealisasiSasaranOpd(sasaranId, indikatorId, targetId, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData))
+    public Mono<SasaranOpd> submitRealisasiSasaranOpd(String renjaId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String rumusPerhitungan, String sumberData) {
+        return Mono.just(buildUncheckedRealisasiSasaranOpd(renjaId, indikatorId, targetId, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData))
                 .flatMap(sasaranOpdRepository::save);
     }
 
-    public static SasaranOpd buildUncheckedRealisasiSasaranOpd(String sasaranId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String rumusPerhitungan, String sumberData) {
+    public static SasaranOpd buildUncheckedRealisasiSasaranOpd(String renjaId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String rumusPerhitungan, String sumberData) {
         return SasaranOpd.of(
-                sasaranId,
-                "Realisasi Sasaran Opd " + sasaranId,
+                renjaId,
+                "Realisasi Renja Opd " + renjaId,
                 indikatorId,
                 "Realisasi Indikator Opd " + indikatorId,
                 targetId, target, realisasi, satuan, tahun,
@@ -78,8 +78,8 @@ public class SasaranOpdService {
                                 .flatMap(existing -> {
                                     SasaranOpd updated = new SasaranOpd(
                                             existing.id(),
-                                            existing.sasaranId(),
-                                            existing.sasaran(),
+                                            existing.renjaId(),
+                                            existing.renja(),
                                             existing.indikatorId(),
                                             existing.indikator(),
                                             existing.targetId(),
@@ -101,7 +101,7 @@ public class SasaranOpdService {
                                 })
                                 .switchIfEmpty(Mono.defer(() -> {
                                     SasaranOpd baru = buildUncheckedRealisasiSasaranOpd(
-                                            req.sasaranId(),
+                                            req.renjaId(),
                                             req.indikatorId(),
                                             req.targetId(),
                                             req.target(),
@@ -119,7 +119,7 @@ public class SasaranOpdService {
                     }
                     else {
                         SasaranOpd baru = buildUncheckedRealisasiSasaranOpd(
-                                req.sasaranId(),
+                                req.renjaId(),
                                 req.indikatorId(),
                                 req.targetId(),
                                 req.target(),
