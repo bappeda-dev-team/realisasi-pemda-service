@@ -14,7 +14,7 @@ public class TujuanTests {
                 "I1", "IND-1",
                 "TAR-1", "10.0", 10.0, "%",
                 "2025", "01", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
-                Instant.now(), Instant.now(), 1);
+                null, Instant.now(), Instant.now(), null, 1);
 
         Assertions.assertEquals("100.00%", t.capaian());
     }
@@ -24,14 +24,14 @@ public class TujuanTests {
         Tujuan t = new Tujuan(304L, "T1", "TUJ-1",
                 "I1", "IND-1",
                "TAR-1", "10", 10.0, "%",
-                "2025", "01", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
-                Instant.now(), Instant.now(), 1);
+                 "2025", "01", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
+                 null, Instant.now(), Instant.now(), null, 1);
 
         Tujuan t2 = new Tujuan(305L, "T2", "TUJ-2",
                 "I1", "IND-1",
                "TAR-2", "10,01", 10.01, "%",
-                "2025", "01", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
-                Instant.now(), Instant.now(), 1);
+                 "2025", "01", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
+                 null, Instant.now(), Instant.now(), null, 1);
 
         Assertions.assertEquals("100.00%", t.capaian());
         Assertions.assertEquals("100.00%", t2.capaian());
@@ -43,19 +43,19 @@ public class TujuanTests {
                 "I1", "IND-1",
                 "TAR-1", "10,0 - 15,0", 15.0, "%",
                 "2025", "01", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
-                Instant.now(), Instant.now(), 1);
+                null, Instant.now(), Instant.now(), null, 1);
 
         Tujuan t2 = new Tujuan(334L, "T3", "TUJ-3",
                 "I1", "IND-1",
                 "TAR-2", "10,0 - 15,0", 8.0, "%",
                 "2025", "01", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
-                Instant.now(), Instant.now(), 1);
+                null, Instant.now(), Instant.now(), null, 1);
 
         Tujuan t3 = new Tujuan(333L, "T4", "TUJ-4",
                 "I1", "IND-1",
                 "TAR-3", "10,0 - 15,0", 13.5, "%",
                 "2025", "01", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
-                Instant.now(), Instant.now(), 1);
+                null, Instant.now(), Instant.now(), null, 1);
 
         Assertions.assertEquals("100.00%", t.capaian());
         Assertions.assertEquals("53.33%", t2.capaian());

@@ -61,8 +61,10 @@ public Mono<Tujuan> submitRealisasiTujuan(String tujuanId, String indikatorId, S
                                             req.bulan(),
                                             req.jenisRealisasi(),
                                             TujuanStatus.UNCHECKED,
+                                            existing.createdBy(),
                                             existing.createdDate(),
                                             existing.lastModifiedDate(),
+                                            existing.lastModifiedBy(),
                                             existing.version()
                                     );
                                     return tujuanRepository.save(updated);

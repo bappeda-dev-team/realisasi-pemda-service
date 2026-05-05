@@ -93,8 +93,10 @@ public class SasaranOpdService {
                                             req.rumusPerhitungan(),
                                             req.sumberData(),
                                             SasaranOpdStatus.UNCHECKED,
+                                            existing.createdBy(),
                                             existing.createdDate(),
                                             existing.lastModifiedDate(),
+                                            existing.lastModifiedBy(),
                                             existing.version()
                                     );
                                     return sasaranOpdRepository.save(updated);

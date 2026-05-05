@@ -82,8 +82,10 @@ public class SasaranService {
                                             req.bulan(),
                                             req.jenisRealisasi(),
                                             SasaranStatus.UNCHECKED,
+                                            existing.createdBy(),
                                             existing.createdDate(),
                                             existing.lastModifiedDate(),
+                                            existing.lastModifiedBy(),
                                             existing.version()
                                     );
                                     return sasaranRepository.save(updated);
