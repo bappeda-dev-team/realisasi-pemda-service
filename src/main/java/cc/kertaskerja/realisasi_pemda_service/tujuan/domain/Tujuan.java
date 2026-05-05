@@ -4,6 +4,7 @@ import cc.kertaskerja.capaian.domain.Capaian;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.*;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
@@ -25,8 +26,14 @@ public record Tujuan(
         JenisRealisasi jenisRealisasi,
         TujuanStatus status,
 
+        @CreatedBy
+        @Column("created_by")
+        String createdBy,
         @CreatedDate Instant createdDate,
         @LastModifiedDate Instant lastModifiedDate,
+        @LastModifiedBy
+        @Column("last_modified_by")
+        String lastModifiedBy,
 
         @Version int version
 ) {
@@ -47,7 +54,7 @@ public record Tujuan(
         return new Tujuan(null,
                 tujuanId, tujuan, indikatorId, indikator,
                 targetId, target, realisasi, satuan, tahun, bulan, jenisRealisasi, status,
-                null, null, 0);
+                null, null, null, null, 0);
     }
 
     @JsonProperty("capaian")

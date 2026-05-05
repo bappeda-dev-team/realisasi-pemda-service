@@ -1,6 +1,8 @@
 package cc.kertaskerja.realisasi_opd_service.renja_target.web;
 
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi_opd_service.renja.web.RenjaOpdHierarkiResponse;
+import cc.kertaskerja.realisasi_opd_service.renja.web.RenjaOpdHierarkiService;
 import cc.kertaskerja.realisasi_opd_service.renja_target.domain.RenjaTarget;
 import cc.kertaskerja.realisasi_opd_service.renja_target.domain.RenjaTargetService;
 import cc.kertaskerja.renja.domain.JenisRenja;
@@ -14,6 +16,7 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -29,8 +32,45 @@ public class RenjaTargetControllerWebFluxTests {
     @MockitoBean
     private RenjaTargetService renjaTargetService;
 
+    @MockitoBean
+    private RenjaOpdHierarkiService renjaOpdHierarkiService;
+
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Test
+    void whenGetByKodeOpdTahunBulan_thenReturnsHierarkiResponse() {
+        RenjaOpdHierarkiResponse response = new RenjaOpdHierarkiResponse(List.of(
+                new RenjaOpdHierarkiResponse.DataItem(
+                        "001", "2025", "01", 4006000,
+                        List.of(new RenjaOpdHierarkiResponse.RenjaItem(
+                                "5", null, "URUSAN",
+                                List.of(new RenjaOpdHierarkiResponse.TargetItem("TAR-1", "100")),
+                                0,
+                                List.of(),
+                                List.of(),
+                                null,
+                                null,
+                                null
+                        ))
+                )
+        ));
+
+        when(renjaOpdHierarkiService.getHierarkiByKodeOpdTahunBulan("001", "2025", "01"))
+                .thenReturn(Mono.just(response));
+
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt()
+                        .authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
+                .get()
+                .uri("/renja_target/kodeOpd/001/tahun/2025/bulan/01")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.data[0].kode_opd").isEqualTo("001")
+                .jsonPath("$.data[0].pagu_total").isEqualTo(4006000)
+                .jsonPath("$.data[0].urusan[0].nama_renja").isEmpty();
+    }
 
 @Test
     void whenBatchSubmit_thenReturnsSavedRenjaTargets() throws Exception {

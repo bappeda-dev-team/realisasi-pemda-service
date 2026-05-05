@@ -93,8 +93,10 @@ public class TujuanOpdService {
                                             req.rumusPerhitungan(),
                                             req.sumberData(),
                                             TujuanOpdStatus.UNCHECKED,
+                                            existing.createdBy(),
                                             existing.createdDate(),
                                             existing.lastModifiedDate(),
+                                            existing.lastModifiedBy(),
                                             existing.version()
                                     );
                                     return tujuanOpdRepository.save(updated);
