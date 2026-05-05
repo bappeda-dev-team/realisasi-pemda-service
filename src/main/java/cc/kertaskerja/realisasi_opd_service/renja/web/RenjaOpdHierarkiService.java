@@ -11,6 +11,11 @@ import java.util.*;
 
 @Service
 public class RenjaOpdHierarkiService {
+    public enum DataSource {
+        TARGET,
+        PAGU
+    }
+
     private final RenjaTargetRepository renjaTargetRepository;
     private final RenjaPaguRepository renjaPaguRepository;
 
@@ -19,53 +24,102 @@ public class RenjaOpdHierarkiService {
         this.renjaPaguRepository = renjaPaguRepository;
     }
 
-    public Mono<RenjaOpdHierarkiResponse> getHierarkiByKodeOpdTahunBulan(String kodeOpd, String tahun, String bulan) {
+    public Mono<RenjaOpdHierarkiResponse> getHierarkiByKodeOpdTahunBulan(String kodeOpd, String tahun, String bulan, DataSource dataSource) {
         Mono<List<RenjaTarget>> targetsMono = renjaTargetRepository.findAllByTahunAndBulanAndKodeOpd(tahun, bulan, kodeOpd).collectList();
         Mono<List<RenjaPagu>> pagusMono = renjaPaguRepository.findAllByTahunAndBulanAndKodeOpd(tahun, bulan, kodeOpd).collectList();
 
         return Mono.zip(targetsMono, pagusMono)
-                .map(tuple -> buildResponse(kodeOpd, tahun, bulan, tuple.getT1(), tuple.getT2()));
+                .map(tuple -> buildResponse(kodeOpd, tahun, bulan, tuple.getT1(), tuple.getT2(), dataSource));
     }
 
-    private RenjaOpdHierarkiResponse buildResponse(String kodeOpd, String tahun, String bulan, List<RenjaTarget> targets, List<RenjaPagu> pagus) {
-        Map<String, Node> nodes = new HashMap<>();
-
+    private RenjaOpdHierarkiResponse buildResponse(String kodeOpd, String tahun, String bulan, List<RenjaTarget> targets, List<RenjaPagu> pagus, DataSource dataSource) {
+        LinkedHashSet<String> renjaIds = new LinkedHashSet<>();
         for (RenjaTarget target : targets) {
+            renjaIds.add(target.jenisRenjaId());
+        }
+        for (RenjaPagu pagu : pagus) {
+            renjaIds.add(pagu.jenisRenjaId());
+        }
+
+        List<RenjaOpdHierarkiResponse.DataItem> dataItems = new ArrayList<>();
+        for (String renjaId : renjaIds) {
+            dataItems.add(buildDataItem(kodeOpd, tahun, bulan, renjaId, targets, pagus, dataSource));
+        }
+
+        return new RenjaOpdHierarkiResponse(dataItems);
+    }
+
+    private RenjaOpdHierarkiResponse.DataItem buildDataItem(
+            String kodeOpd,
+            String tahun,
+            String bulan,
+            String renjaId,
+            List<RenjaTarget> allTargets,
+            List<RenjaPagu> allPagus,
+            DataSource dataSource
+    ) {
+        Map<String, Node> nodes = new HashMap<>();
+        long paguTotal = 0;
+
+        for (RenjaTarget target : allTargets) {
+            if (!Objects.equals(renjaId, target.jenisRenjaId())) {
+                continue;
+            }
             String kodeRenja = target.kodeRenja();
             if (kodeRenja == null || kodeRenja.isBlank()) {
                 continue;
             }
             Node node = nodes.computeIfAbsent(kodeRenja, ignored -> new Node());
-            node.targets.add(new RenjaOpdHierarkiResponse.TargetItem(target.targetId(), target.target()));
+            node.targets.add(new RenjaOpdHierarkiResponse.TargetItem(
+                    target.targetId(),
+                    target.target(),
+                    target.realisasi() == null ? null : target.realisasi().toString(),
+                    target.satuan(),
+                    target.jenisRealisasi() == null ? null : target.jenisRealisasi().name(),
+                    target.status() == null ? null : target.status().name(),
+                    target.createdBy(),
+                    target.lastModifiedBy(),
+                    target.capaian(),
+                    target.keteranganCapaian()
+            ));
             if (target.indikatorId() != null || target.indikator() != null) {
                 node.indikators.add(new RenjaOpdHierarkiResponse.IndikatorItem(target.indikatorId(), target.indikator()));
             }
         }
 
-        long paguTotal = 0;
-        for (RenjaPagu pagu : pagus) {
+        for (RenjaPagu pagu : allPagus) {
+            if (!Objects.equals(renjaId, pagu.jenisRenjaId())) {
+                continue;
+            }
             String kodeRenja = pagu.kodeRenja();
             if (kodeRenja == null || kodeRenja.isBlank()) {
                 continue;
             }
             Node node = nodes.computeIfAbsent(kodeRenja, ignored -> new Node());
-            long value = pagu.pagu() == null ? 0 : pagu.pagu();
-            node.pagu += value;
-            paguTotal += value;
+            node.pagus.add(new RenjaOpdHierarkiResponse.PaguItem(
+                    pagu.realisasi() == null ? null : pagu.realisasi().toString(),
+                    pagu.pagu(),
+                    pagu.status() == null ? null : pagu.status().name(),
+                    pagu.createdBy(),
+                    pagu.lastModifiedBy(),
+                    pagu.capaian(),
+                    pagu.keteranganCapaian()
+            ));
+            paguTotal += pagu.realisasi() == null ? 0 : pagu.realisasi();
         }
 
-        List<RenjaOpdHierarkiResponse.RenjaItem> urusanItems = buildUrusan(nodes);
-        RenjaOpdHierarkiResponse.DataItem dataItem = new RenjaOpdHierarkiResponse.DataItem(
+        List<RenjaOpdHierarkiResponse.RenjaItem> urusanItems = buildUrusan(nodes, dataSource);
+        return new RenjaOpdHierarkiResponse.DataItem(
                 kodeOpd,
                 tahun,
                 bulan,
                 paguTotal,
+                renjaId,
                 urusanItems
         );
-        return new RenjaOpdHierarkiResponse(List.of(dataItem));
     }
 
-    private List<RenjaOpdHierarkiResponse.RenjaItem> buildUrusan(Map<String, Node> nodes) {
+    private List<RenjaOpdHierarkiResponse.RenjaItem> buildUrusan(Map<String, Node> nodes, DataSource dataSource) {
         List<String> allCodes = new ArrayList<>(nodes.keySet());
         allCodes.sort(this::compareKodeRenja);
 
@@ -80,9 +134,9 @@ public class RenjaOpdHierarkiService {
                     null,
                     "URUSAN",
                     dedupTargets(urusanNode.targets),
-                    urusanNode.pagu,
+                    dedupPagus(urusanNode.pagus),
                     dedupIndikators(urusanNode.indikators),
-                    buildBidang(nodes, allCodes, urusanCode),
+                    buildBidang(nodes, allCodes, urusanCode, dataSource),
                     null,
                     null,
                     null
@@ -91,7 +145,7 @@ public class RenjaOpdHierarkiService {
         return result;
     }
 
-    private List<RenjaOpdHierarkiResponse.RenjaItem> buildBidang(Map<String, Node> nodes, List<String> allCodes, String urusanCode) {
+    private List<RenjaOpdHierarkiResponse.RenjaItem> buildBidang(Map<String, Node> nodes, List<String> allCodes, String urusanCode, DataSource dataSource) {
         List<RenjaOpdHierarkiResponse.RenjaItem> result = new ArrayList<>();
         for (String bidangCode : allCodes) {
             if (!isBidangUrusan(bidangCode) || !isDirectChild(urusanCode, bidangCode)) {
@@ -103,10 +157,10 @@ public class RenjaOpdHierarkiService {
                     null,
                     "BIDANGURUSAN",
                     dedupTargets(bidangNode.targets),
-                    bidangNode.pagu,
+                    dedupPagus(bidangNode.pagus),
                     dedupIndikators(bidangNode.indikators),
                     null,
-                    buildProgram(nodes, allCodes, bidangCode),
+                    buildProgram(nodes, allCodes, bidangCode, dataSource),
                     null,
                     null
             ));
@@ -114,7 +168,7 @@ public class RenjaOpdHierarkiService {
         return result;
     }
 
-    private List<RenjaOpdHierarkiResponse.RenjaItem> buildProgram(Map<String, Node> nodes, List<String> allCodes, String bidangCode) {
+    private List<RenjaOpdHierarkiResponse.RenjaItem> buildProgram(Map<String, Node> nodes, List<String> allCodes, String bidangCode, DataSource dataSource) {
         List<RenjaOpdHierarkiResponse.RenjaItem> result = new ArrayList<>();
         for (String programCode : allCodes) {
             if (!isProgram(programCode) || !isDirectChild(bidangCode, programCode)) {
@@ -126,18 +180,18 @@ public class RenjaOpdHierarkiService {
                     null,
                     "PROGRAM",
                     dedupTargets(programNode.targets),
-                    programNode.pagu,
+                    dedupPagus(programNode.pagus),
                     dedupIndikators(programNode.indikators),
                     null,
                     null,
-                    buildKegiatan(nodes, allCodes, programCode),
+                    buildKegiatan(nodes, allCodes, programCode, dataSource),
                     null
             ));
         }
         return result;
     }
 
-    private List<RenjaOpdHierarkiResponse.RenjaItem> buildKegiatan(Map<String, Node> nodes, List<String> allCodes, String programCode) {
+    private List<RenjaOpdHierarkiResponse.RenjaItem> buildKegiatan(Map<String, Node> nodes, List<String> allCodes, String programCode, DataSource dataSource) {
         List<RenjaOpdHierarkiResponse.RenjaItem> result = new ArrayList<>();
         for (String kegiatanCode : allCodes) {
             if (!isKegiatan(kegiatanCode) || !isDirectChild(programCode, kegiatanCode)) {
@@ -149,18 +203,18 @@ public class RenjaOpdHierarkiService {
                     null,
                     "KEGIATAN",
                     dedupTargets(kegiatanNode.targets),
-                    kegiatanNode.pagu,
+                    dedupPagus(kegiatanNode.pagus),
                     dedupIndikators(kegiatanNode.indikators),
                     null,
                     null,
                     null,
-                    buildSubkegiatan(nodes, allCodes, kegiatanCode)
+                    buildSubkegiatan(nodes, allCodes, kegiatanCode, dataSource)
             ));
         }
         return result;
     }
 
-    private List<RenjaOpdHierarkiResponse.RenjaItem> buildSubkegiatan(Map<String, Node> nodes, List<String> allCodes, String kegiatanCode) {
+    private List<RenjaOpdHierarkiResponse.RenjaItem> buildSubkegiatan(Map<String, Node> nodes, List<String> allCodes, String kegiatanCode, DataSource dataSource) {
         List<RenjaOpdHierarkiResponse.RenjaItem> result = new ArrayList<>();
         for (String subkegiatanCode : allCodes) {
             if (!isSubkegiatan(subkegiatanCode) || !isDirectChild(kegiatanCode, subkegiatanCode)) {
@@ -171,8 +225,8 @@ public class RenjaOpdHierarkiService {
                     subkegiatanCode,
                     null,
                     "SUBKEGIATAN",
-                    null,
-                    subkegiatanNode.pagu,
+                    dedupTargets(subkegiatanNode.targets),
+                    dedupPagus(subkegiatanNode.pagus),
                     dedupIndikators(subkegiatanNode.indikators),
                     null,
                     null,
@@ -260,7 +314,33 @@ public class RenjaOpdHierarkiService {
     private List<RenjaOpdHierarkiResponse.TargetItem> dedupTargets(List<RenjaOpdHierarkiResponse.TargetItem> items) {
         LinkedHashMap<String, RenjaOpdHierarkiResponse.TargetItem> unique = new LinkedHashMap<>();
         for (RenjaOpdHierarkiResponse.TargetItem item : items) {
-            String key = (item.idTarget() == null ? "" : item.idTarget()) + "|" + (item.target() == null ? "" : item.target());
+            String key = String.join("|",
+                    item.idTarget() == null ? "" : item.idTarget(),
+                    item.target() == null ? "" : item.target(),
+                    item.realisasi() == null ? "" : item.realisasi(),
+                    item.satuan() == null ? "" : item.satuan(),
+                    item.jenisRealisasi() == null ? "" : item.jenisRealisasi(),
+                    item.status() == null ? "" : item.status(),
+                    item.createdBy() == null ? "" : item.createdBy(),
+                    item.lastModifiedBy() == null ? "" : item.lastModifiedBy(),
+                    item.capaian() == null ? "" : item.capaian(),
+                    item.keteranganCapaian() == null ? "" : item.keteranganCapaian());
+            unique.putIfAbsent(key, item);
+        }
+        return new ArrayList<>(unique.values());
+    }
+
+    private List<RenjaOpdHierarkiResponse.PaguItem> dedupPagus(List<RenjaOpdHierarkiResponse.PaguItem> items) {
+        LinkedHashMap<String, RenjaOpdHierarkiResponse.PaguItem> unique = new LinkedHashMap<>();
+        for (RenjaOpdHierarkiResponse.PaguItem item : items) {
+            String key = String.join("|",
+                    item.realisasi() == null ? "" : item.realisasi(),
+                    item.pagu() == null ? "" : item.pagu().toString(),
+                    item.status() == null ? "" : item.status(),
+                    item.createdBy() == null ? "" : item.createdBy(),
+                    item.lastModifiedBy() == null ? "" : item.lastModifiedBy(),
+                    item.capaian() == null ? "" : item.capaian(),
+                    item.keteranganCapaian() == null ? "" : item.keteranganCapaian());
             unique.putIfAbsent(key, item);
         }
         return new ArrayList<>(unique.values());
@@ -276,8 +356,8 @@ public class RenjaOpdHierarkiService {
     }
 
     private static class Node {
-        long pagu;
         final List<RenjaOpdHierarkiResponse.TargetItem> targets = new ArrayList<>();
+        final List<RenjaOpdHierarkiResponse.PaguItem> pagus = new ArrayList<>();
         final List<RenjaOpdHierarkiResponse.IndikatorItem> indikators = new ArrayList<>();
 
         private Node() {
