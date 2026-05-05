@@ -4,6 +4,8 @@ import java.util.List;
 
 import cc.kertaskerja.realisasi_opd_service.renja_pagu.domain.RenjaPagu;
 import cc.kertaskerja.realisasi_opd_service.renja_pagu.domain.RenjaPaguService;
+import cc.kertaskerja.realisasi_opd_service.renja.web.RenjaOpdHierarkiResponse;
+import cc.kertaskerja.realisasi_opd_service.renja.web.RenjaOpdHierarkiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -29,9 +31,11 @@ import reactor.core.publisher.Mono;
 @Tag(name = "OPD - Renja Pagu", description = "Endpoint realisasi renja pagu tingkat OPD")
 public class RenjaPaguController {
     private final RenjaPaguService renjaPaguService;
+    private final RenjaOpdHierarkiService renjaOpdHierarkiService;
 
-    public RenjaPaguController(RenjaPaguService renjaPaguService) {
+    public RenjaPaguController(RenjaPaguService renjaPaguService, RenjaOpdHierarkiService renjaOpdHierarkiService) {
         this.renjaPaguService = renjaPaguService;
+        this.renjaOpdHierarkiService = renjaOpdHierarkiService;
     }
 
     @GetMapping
@@ -75,11 +79,11 @@ public class RenjaPaguController {
             @ApiResponse(responseCode = "200", description = "Daftar realisasi renja pagu", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenjaPagu.class)))),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
-    public Flux<RenjaPagu> getRealisasiRenjaPaguByKodeOpdAndTahunAndBulan(
+    public Mono<RenjaOpdHierarkiResponse> getRealisasiRenjaPaguByKodeOpdAndTahunAndBulan(
             @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
             @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
             @Parameter(description = "Bulan realisasi", example = "01") @PathVariable String bulan) {
-        return renjaPaguService.getRealisasiRenjaPaguByTahunAndBulanAndKodeOpd(tahun, bulan, kodeOpd);
+        return renjaOpdHierarkiService.getHierarkiByKodeOpdTahunBulan(kodeOpd, tahun, bulan);
     }
 
     @GetMapping("/kodeOpd/{kodeOpd}/by-tahun/{tahun}/by-bulan/{bulan}/by-jenis-renja/{jenisRenja}/by-kode-renja/{kodeRenja}/by-jenis-renja-id/{jenisRenjaId}")
