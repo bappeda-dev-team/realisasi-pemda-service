@@ -83,7 +83,12 @@ public class RenjaPaguController {
             @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
             @Parameter(description = "Tahun realisasi", example = "2025") @PathVariable String tahun,
             @Parameter(description = "Bulan realisasi", example = "01") @PathVariable String bulan) {
-        return renjaOpdHierarkiService.getHierarkiByKodeOpdTahunBulan(kodeOpd, tahun, bulan);
+        return renjaOpdHierarkiService.getHierarkiByKodeOpdTahunBulan(
+                kodeOpd,
+                tahun,
+                bulan,
+                RenjaOpdHierarkiService.DataSource.PAGU
+        );
     }
 
     @GetMapping("/kodeOpd/{kodeOpd}/by-tahun/{tahun}/by-bulan/{bulan}/by-jenis-renja/{jenisRenja}/by-kode-renja/{kodeRenja}/by-jenis-renja-id/{jenisRenjaId}")

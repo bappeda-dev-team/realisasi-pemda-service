@@ -54,7 +54,12 @@ public class RenjaTargetController {
             @Parameter(description = "Tahun") @PathVariable String tahun,
             @Parameter(description = "Bulan") @PathVariable String bulan
     ) {
-        return renjaOpdHierarkiService.getHierarkiByKodeOpdTahunBulan(kodeOpd, tahun, bulan);
+        return renjaOpdHierarkiService.getHierarkiByKodeOpdTahunBulan(
+                kodeOpd,
+                tahun,
+                bulan,
+                RenjaOpdHierarkiService.DataSource.TARGET
+        );
     }
 
     @GetMapping("/kodeOpd/{kodeOpd}/by-tahun/{tahun}/by-bulan/{bulan}/by-jenis-renja/{jenisRenja}/by-kode-renja/{kodeRenja}/by-jenis-renja-id/{jenisRenjaId}")

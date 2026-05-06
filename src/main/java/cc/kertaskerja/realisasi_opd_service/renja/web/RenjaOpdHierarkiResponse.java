@@ -11,7 +11,8 @@ public record RenjaOpdHierarkiResponse(List<DataItem> data) {
             @JsonProperty("kode_opd") String kodeOpd,
             String tahun,
             String bulan,
-            @JsonProperty("pagu_total") long paguTotal,
+            @JsonProperty("pagu_total_realisasi") long paguTotalRealisasi,
+            @JsonProperty("id_renja") String idRenja,
             List<RenjaItem> urusan
     ) {
     }
@@ -21,7 +22,7 @@ public record RenjaOpdHierarkiResponse(List<DataItem> data) {
             @JsonProperty("nama_renja") String namaRenja,
             @JsonProperty("jenis_renja") String jenisRenja,
             @JsonInclude(JsonInclude.Include.NON_NULL) List<TargetItem> target,
-            long pagu,
+            @JsonInclude(JsonInclude.Include.NON_NULL) List<PaguItem> pagu,
             List<IndikatorItem> indikator,
             @JsonInclude(JsonInclude.Include.NON_NULL)
             @JsonProperty("bidang_urusan") List<RenjaItem> bidangUrusan,
@@ -33,7 +34,26 @@ public record RenjaOpdHierarkiResponse(List<DataItem> data) {
 
     public record TargetItem(
             @JsonProperty("id_target") String idTarget,
-            String target
+            String target,
+            String realisasi,
+            String satuan,
+            String jenisRealisasi,
+            String status,
+            String createdBy,
+            String lastModifiedBy,
+            String capaian,
+            String keteranganCapaian
+    ) {
+    }
+
+    public record PaguItem(
+            String realisasi,
+            Integer pagu,
+            String status,
+            String createdBy,
+            String lastModifiedBy,
+            String capaian,
+            String keteranganCapaian
     ) {
     }
 
