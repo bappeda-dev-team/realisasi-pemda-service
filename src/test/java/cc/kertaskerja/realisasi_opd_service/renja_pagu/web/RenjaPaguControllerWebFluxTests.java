@@ -46,10 +46,10 @@ public class RenjaPaguControllerWebFluxTests {
                         List.of(new RenjaOpdHierarkiResponse.RenjaItem(
                                 "5", null, "URUSAN",
                                 List.of(new RenjaOpdHierarkiResponse.TargetItem(
-                                        "TAR-1", "100", "10", "%", "NAIK", "CHECKED", "maker", "reviewer", "10.00%", null
+                                        1L, "TAR-1", "100", "10", "%", "NAIK", "CHECKED", "maker", "reviewer", "10.00%", null
                                 )),
                                 List.of(new RenjaOpdHierarkiResponse.PaguItem(
-                                        "500000", 1000000, "CHECKED", "maker", "reviewer", "50.00%", null
+                                        1L, "500000", 1000000, "CHECKED", "maker", "reviewer", "50.00%", null
                                 )),
                                 List.of(),
                                 List.of(new RenjaOpdHierarkiResponse.RenjaItem(
@@ -76,10 +76,10 @@ public class RenjaPaguControllerWebFluxTests {
                                                         List.of(new RenjaOpdHierarkiResponse.RenjaItem(
                                                                 "5.01.03.2.02.0005", null, "SUBKEGIATAN",
                                                                 List.of(new RenjaOpdHierarkiResponse.TargetItem(
-                                                                        "TAR-1", "100", "10", "%", "NAIK", "CHECKED", "maker", "reviewer", "10.00%", null
+                                                                        2L, "TAR-1", "100", "10", "%", "NAIK", "CHECKED", "maker", "reviewer", "10.00%", null
                                                                 )),
                                                                 List.of(new RenjaOpdHierarkiResponse.PaguItem(
-                                                                        "500000", 1000000, "CHECKED", "maker", "reviewer", "50.00%", null
+                                                                        2L, "500000", 1000000, "CHECKED", "maker", "reviewer", "50.00%", null
                                                                 )),
                                                                 List.of(),
                                                                 null,
@@ -114,12 +114,14 @@ public class RenjaPaguControllerWebFluxTests {
                 .jsonPath("$.data[0].kode_opd").isEqualTo("001")
                 .jsonPath("$.data[0].pagu_total_realisasi").isEqualTo(500000)
                 .jsonPath("$.data[0].id_renja").isEqualTo("RENJA-1")
+                .jsonPath("$.data[0].urusan[0].target[0].targetRealisasiId").isEqualTo(1)
                 .jsonPath("$.data[0].urusan[0].target[0].realisasi").isEqualTo("10")
                 .jsonPath("$.data[0].urusan[0].target[0].jenisRealisasi").isEqualTo("NAIK")
                 .jsonPath("$.data[0].urusan[0].target[0].status").isEqualTo("CHECKED")
                 .jsonPath("$.data[0].urusan[0].target[0].createdBy").isEqualTo("maker")
                 .jsonPath("$.data[0].urusan[0].target[0].lastModifiedBy").isEqualTo("reviewer")
                 .jsonPath("$.data[0].urusan[0].target[0].capaian").isEqualTo("10.00%")
+                .jsonPath("$.data[0].urusan[0].pagu[0].paguRealisasiId").isEqualTo(1)
                 .jsonPath("$.data[0].urusan[0].pagu[0].realisasi").isEqualTo("500000")
                 .jsonPath("$.data[0].urusan[0].pagu[0].pagu").isEqualTo(1000000)
                 .jsonPath("$.data[0].urusan[0].bidang_urusan[0].program[0].kegiatan[0].subkegiatan[0].target[0].id_target").isEqualTo("TAR-1")

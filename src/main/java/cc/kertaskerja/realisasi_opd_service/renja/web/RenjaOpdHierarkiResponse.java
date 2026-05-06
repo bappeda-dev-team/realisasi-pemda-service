@@ -33,6 +33,7 @@ public record RenjaOpdHierarkiResponse(List<DataItem> data) {
     }
 
     public record TargetItem(
+            Long targetRealisasiId,
             @JsonProperty("id_target") String idTarget,
             String target,
             String realisasi,
@@ -47,6 +48,7 @@ public record RenjaOpdHierarkiResponse(List<DataItem> data) {
     }
 
     public record PaguItem(
+            Long paguRealisasiId,
             String realisasi,
             Integer pagu,
             String status,
