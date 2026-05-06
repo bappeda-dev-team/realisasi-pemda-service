@@ -71,6 +71,7 @@ public class RenjaOpdHierarkiService {
             }
             Node node = nodes.computeIfAbsent(kodeRenja, ignored -> new Node());
             node.targets.add(new RenjaOpdHierarkiResponse.TargetItem(
+                    target.id(),
                     target.targetId(),
                     target.target(),
                     target.realisasi() == null ? null : target.realisasi().toString(),
@@ -97,6 +98,7 @@ public class RenjaOpdHierarkiService {
             }
             Node node = nodes.computeIfAbsent(kodeRenja, ignored -> new Node());
             node.pagus.add(new RenjaOpdHierarkiResponse.PaguItem(
+                    pagu.id(),
                     pagu.realisasi() == null ? null : pagu.realisasi().toString(),
                     pagu.pagu(),
                     pagu.status() == null ? null : pagu.status().name(),
@@ -315,6 +317,7 @@ public class RenjaOpdHierarkiService {
         LinkedHashMap<String, RenjaOpdHierarkiResponse.TargetItem> unique = new LinkedHashMap<>();
         for (RenjaOpdHierarkiResponse.TargetItem item : items) {
             String key = String.join("|",
+                    item.targetRealisasiId() == null ? "" : item.targetRealisasiId().toString(),
                     item.idTarget() == null ? "" : item.idTarget(),
                     item.target() == null ? "" : item.target(),
                     item.realisasi() == null ? "" : item.realisasi(),
@@ -334,6 +337,7 @@ public class RenjaOpdHierarkiService {
         LinkedHashMap<String, RenjaOpdHierarkiResponse.PaguItem> unique = new LinkedHashMap<>();
         for (RenjaOpdHierarkiResponse.PaguItem item : items) {
             String key = String.join("|",
+                    item.paguRealisasiId() == null ? "" : item.paguRealisasiId().toString(),
                     item.realisasi() == null ? "" : item.realisasi(),
                     item.pagu() == null ? "" : item.pagu().toString(),
                     item.status() == null ? "" : item.status(),
