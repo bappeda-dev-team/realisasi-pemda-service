@@ -18,15 +18,30 @@ public record TujuanOpdRequest(
         @Schema(description = "ID tujuan dari sistem sumber", example = "TUJ-123")
         String tujuanId,
 
+        @NotNull(message = "Kode tujuan opd tidak boleh kosong")
+        @NotEmpty(message = "Kode tujuan opd tidak boleh kosong")
+        @Schema(description = "Kode tujuan OPD", example = "KODE-TUJ-OPD-001")
+        String kodeTujuanOpd,
+
         @NotNull(message = "ID indikator tidak boleh kosong")
         @NotEmpty(message = "ID indikator tidak boleh kosong")
         @Schema(description = "ID indikator tujuan", example = "IND-TUJ-123")
         String indikatorId,
 
+        @NotNull(message = "Kode indikator tujuan opd tidak boleh kosong")
+        @NotEmpty(message = "Kode indikator tujuan opd tidak boleh kosong")
+        @Schema(description = "Kode indikator tujuan OPD", example = "KODE-IND-TUJ-OPD-001")
+        String kodeIndikatorTujuanOpd,
+
         @NotNull(message = "Target harus terdefinisi")
         @NotEmpty(message = "ID target tidak boleh kosong")
         @Schema(description = "ID target indikator", example = "TAR-1")
         String targetId,
+
+        @NotNull(message = "Kode target tujuan opd tidak boleh kosong")
+        @NotEmpty(message = "Kode target tujuan opd tidak boleh kosong")
+        @Schema(description = "Kode target tujuan OPD", example = "KODE-TAR-TUJ-OPD-001")
+        String kodeTargetTujuanOpd,
 
         @NotNull(message = "Target harus terdefinisi")
         @Schema(description = "Nilai target yang ditetapkan", example = "100.0")

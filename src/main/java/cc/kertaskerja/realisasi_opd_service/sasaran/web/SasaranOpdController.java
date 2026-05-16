@@ -97,8 +97,11 @@ public class SasaranOpdController {
             @RequestBody @Valid SasaranOpdRequest sasaranOpdRequest) {
 return sasaranOpdService.submitRealisasiSasaranOpd(
                 sasaranOpdRequest.renjaId(),
+                sasaranOpdRequest.kodeSasaranOpd(),
                 sasaranOpdRequest.indikatorId(),
+                sasaranOpdRequest.kodeIndikatorSasaranOpd(),
                 sasaranOpdRequest.targetId(),
+                sasaranOpdRequest.kodeTargetSasaranOpd(),
                 sasaranOpdRequest.target(),
                 sasaranOpdRequest.realisasi(),
                 sasaranOpdRequest.satuan(),

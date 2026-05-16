@@ -49,18 +49,22 @@ public class SasaranOpdService {
         return sasaranOpdRepository.findById(id);
     }
 
-    public Mono<SasaranOpd> submitRealisasiSasaranOpd(String renjaId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String rumusPerhitungan, String sumberData, String definisiOperational) {
-        return Mono.just(buildUncheckedRealisasiSasaranOpd(renjaId, indikatorId, targetId, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational))
+    public Mono<SasaranOpd> submitRealisasiSasaranOpd(String renjaId, String kodeSasaranOpd, String indikatorId, String kodeIndikatorSasaranOpd, String targetId, String kodeTargetSasaranOpd, String target, Double realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String rumusPerhitungan, String sumberData, String definisiOperational) {
+        return Mono.just(buildUncheckedRealisasiSasaranOpd(renjaId, kodeSasaranOpd, indikatorId, kodeIndikatorSasaranOpd, targetId, kodeTargetSasaranOpd, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational))
                 .flatMap(sasaranOpdRepository::save);
     }
 
-    public static SasaranOpd buildUncheckedRealisasiSasaranOpd(String renjaId, String indikatorId, String targetId, String target, Double realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String rumusPerhitungan, String sumberData, String definisiOperational) {
+    public static SasaranOpd buildUncheckedRealisasiSasaranOpd(String renjaId, String kodeSasaranOpd, String indikatorId, String kodeIndikatorSasaranOpd, String targetId, String kodeTargetSasaranOpd, String target, Double realisasi, String satuan, String tahun, String bulan, JenisRealisasi jenisRealisasi, String kodeOpd, String rumusPerhitungan, String sumberData, String definisiOperational) {
         return SasaranOpd.of(
                 renjaId,
+                kodeSasaranOpd,
                 "Realisasi Renja Opd " + renjaId,
                 indikatorId,
+                kodeIndikatorSasaranOpd,
                 "Realisasi Indikator Opd " + indikatorId,
-                targetId, target, realisasi, satuan, tahun,
+                targetId,
+                kodeTargetSasaranOpd,
+                target, realisasi, satuan, tahun,
                 bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational,
                 SasaranOpdStatus.UNCHECKED
         );

@@ -26,8 +26,11 @@ public class SasaranOpdServiceTest {
     void submitRealisasiSasaranOpd_ShouldReturnSavedEntity_WhenValidInputProvided() {
         // Arrange
         String sasaranId = UUID.randomUUID().toString();
+        String kodeSasaranOpd = "KODE-SAS-OPD-001";
         String indikatorId = UUID.randomUUID().toString();
+        String kodeIndikatorSasaranOpd = "KODE-IND-SAS-OPD-001";
         String targetId = UUID.randomUUID().toString();
+        String kodeTargetSasaranOpd = "KODE-TAR-SAS-OPD-001";
         String target = "100";
         Double realisasi = 80.0;
         String satuan = "Unit";
@@ -41,10 +44,13 @@ public class SasaranOpdServiceTest {
 
         SasaranOpd expectedSasaranOpd = SasaranOpd.of(
                 sasaranId,
+                kodeSasaranOpd,
                 "Realisasi Sasaran Opd " + sasaranId,
                 indikatorId,
+                kodeIndikatorSasaranOpd,
                 "Realisasi Indikator Opd " + indikatorId,
                 targetId,
+                kodeTargetSasaranOpd,
                 target,
                 realisasi,
                 satuan,
@@ -62,14 +68,17 @@ public class SasaranOpdServiceTest {
 
         // Act
         Mono<SasaranOpd> result = sasaranOpdService.submitRealisasiSasaranOpd(
-                sasaranId, indikatorId, targetId, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational);
+                sasaranId, kodeSasaranOpd, indikatorId, kodeIndikatorSasaranOpd, targetId, kodeTargetSasaranOpd, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational);
 
         // Assert
         StepVerifier.create(result)
                 .expectNextMatches(sasaranOpd ->
                         sasaranOpd.renjaId().equals(expectedSasaranOpd.renjaId()) &&
+                                sasaranOpd.kodeSasaranOpd().equals(expectedSasaranOpd.kodeSasaranOpd()) &&
                                 sasaranOpd.indikatorId().equals(expectedSasaranOpd.indikatorId()) &&
+                                sasaranOpd.kodeIndikatorSasaranOpd().equals(expectedSasaranOpd.kodeIndikatorSasaranOpd()) &&
                                 sasaranOpd.target().equals(expectedSasaranOpd.target()) &&
+                                sasaranOpd.kodeTargetSasaranOpd().equals(expectedSasaranOpd.kodeTargetSasaranOpd()) &&
                                 sasaranOpd.realisasi().equals(expectedSasaranOpd.realisasi()) &&
                                 sasaranOpd.capaian().equals(expectedSasaranOpd.capaian()) &&
                                 sasaranOpd.satuan().equals(expectedSasaranOpd.satuan()) &&
@@ -88,8 +97,11 @@ public class SasaranOpdServiceTest {
     void submitRealisasiSasaranOpd_ShouldThrowError_WhenRepositoryFails() {
         // Arrange
         String sasaranId = UUID.randomUUID().toString();
+        String kodeSasaranOpd = "KODE-SAS-OPD-001";
         String indikatorId = UUID.randomUUID().toString();
+        String kodeIndikatorSasaranOpd = "KODE-IND-SAS-OPD-001";
         String targetId = UUID.randomUUID().toString();
+        String kodeTargetSasaranOpd = "KODE-TAR-SAS-OPD-001";
         String target = "100";
         Double realisasi = 80.0;
         String satuan = "Unit";
@@ -105,7 +117,7 @@ public class SasaranOpdServiceTest {
 
         // Act
         Mono<SasaranOpd> result = sasaranOpdService.submitRealisasiSasaranOpd(
-                sasaranId, indikatorId, targetId, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational);
+                sasaranId, kodeSasaranOpd, indikatorId, kodeIndikatorSasaranOpd, targetId, kodeTargetSasaranOpd, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational);
 
         // Assert
         StepVerifier.create(result)

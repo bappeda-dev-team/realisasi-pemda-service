@@ -19,10 +19,13 @@ public record SasaranOpd(
         @Id Long id,
 
         String renjaId,
+        String kodeSasaranOpd,
         String renja,
         String indikatorId,
+        String kodeIndikatorSasaranOpd,
         String indikator,
         String targetId,
+        String kodeTargetSasaranOpd,
         String target,
         Double realisasi,
         String satuan,
@@ -48,10 +51,13 @@ public record SasaranOpd(
 ) {
     public static SasaranOpd of(
             String renjaId,
+            String kodeSasaranOpd,
             String renja,
             String indikatorId,
+            String kodeIndikatorSasaranOpd,
             String indikator,
             String targetId,
+            String kodeTargetSasaranOpd,
             String target,
             Double realisasi,
             String satuan,
@@ -65,8 +71,8 @@ public record SasaranOpd(
             SasaranOpdStatus status
     ) {
         return new SasaranOpd(null,
-                renjaId, renja, indikatorId, indikator,
-                targetId, target, realisasi, satuan, tahun,
+                renjaId, kodeSasaranOpd, renja, indikatorId, kodeIndikatorSasaranOpd, indikator,
+                targetId, kodeTargetSasaranOpd, target, realisasi, satuan, tahun,
                 bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational, status,
                 null, null, null, null, 0);
     }
