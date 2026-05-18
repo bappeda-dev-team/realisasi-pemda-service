@@ -1,116 +1,228 @@
 package cc.kertaskerja.realisasi_opd_service.tujuan.domain;
 
-import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.integration.penetapan.PenetapanTujuanOpdClient;
+import cc.kertaskerja.realisasi_opd_service.tujuan.domain.indikator.IndikatorTujuanOpd;
+import cc.kertaskerja.realisasi_opd_service.tujuan.domain.indikator.IndikatorTujuanOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.tujuan.domain.target.TargetIndikatorTujuanOpd;
+import cc.kertaskerja.realisasi_opd_service.tujuan.domain.target.TargetIndikatorTujuanOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.tujuan.web.TujuanOpdRequest;
+import cc.kertaskerja.realisasi_opd_service.tujuan.web.TujuanOpdResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TujuanOpdServiceTest {
+class TujuanOpdServiceTest {
     @Mock
     private TujuanOpdRepository tujuanOpdRepository;
+    @Mock
+    private IndikatorTujuanOpdRepository indikatorTujuanOpdRepository;
+    @Mock
+    private TargetIndikatorTujuanOpdRepository targetIndikatorTujuanOpdRepository;
+    @Mock
+    private PenetapanTujuanOpdClient penetapanTujuanOpdClient;
 
     @InjectMocks
     private TujuanOpdService tujuanOpdService;
 
     @Test
-    void submitRealisasiTujuanOpd_ShouldReturnSavedEntity_WhenValidInputProvided() {
-        // Arrange
-        String tujuanId = UUID.randomUUID().toString();
-        String indikatorId = UUID.randomUUID().toString();
-        String targetId = UUID.randomUUID().toString();
-        String target = "100";
-        Double realisasi = 80.0;
-        String satuan = "Unit";
-        String tahun = "2025";
-        String bulan = "1";
-        JenisRealisasi jenisRealisasi = JenisRealisasi.NAIK;
-        String kodeOpd = "OPD001";
-        String rumusPerhitungan = "(realisasi/target)*100";
-        String sumberData = "SIMDA";
-        String definisiOperational = "Definisi indikator tujuan";
+    void getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan_ShouldReturnMappedResponses() {
+        TujuanOpd tujuan = new TujuanOpd(1L, "5.01.5.05.0.00.01.0000", "TUJ-OPD-001",
+                "2026", "3", "tester", Instant.now(), Instant.now(), "tester");
+        IndikatorTujuanOpd indikator = new IndikatorTujuanOpd(2L, 1L, "IND-01", "5.01.5.05.0.00.01.0000",
+                "2026", "3", Instant.now(), Instant.now(), "tester", null);
+        TargetIndikatorTujuanOpd target = new TargetIndikatorTujuanOpd(3L, 2L, "TGT-001", BigDecimal.valueOf(75),
+                "2026", "3", Instant.now(), Instant.now(), "tester", null);
 
-        TujuanOpd expectedTujuanOpd = TujuanOpd.of(
-                tujuanId,
-                "Realisasi Tujuan Opd " + tujuanId,
-                indikatorId,
-                "Realisasi Indikator Opd " + indikatorId,
-                targetId,
-                target,
-                realisasi,
-                satuan,
-                tahun,
-                bulan,
-                jenisRealisasi,
-                kodeOpd,
-                rumusPerhitungan,
-                sumberData,
-                definisiOperational,
-                TujuanOpdStatus.UNCHECKED
-        );
+        when(tujuanOpdRepository.findAllByTahunAndKodeOpdAndBulan("2026", "5.01.5.05.0.00.01.0000", "3"))
+                .thenReturn(Flux.just(tujuan));
+        when(indikatorTujuanOpdRepository.findAll()).thenReturn(Flux.just(indikator));
+        when(targetIndikatorTujuanOpdRepository.findAll()).thenReturn(Flux.just(target));
+        when(penetapanTujuanOpdClient.fetchTujuanOpd("5.01.5.05.0.00.01.0000", 2026)).thenReturn(Mono.just(List.of()));
 
-        when(tujuanOpdRepository.save(any(TujuanOpd.class))).thenReturn(Mono.just(expectedTujuanOpd));
-
-        // Act
-        Mono<TujuanOpd> result = tujuanOpdService.submitRealisasiTujuanOpd(
-                tujuanId, indikatorId, targetId, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational);
-
-        // Assert
-        StepVerifier.create(result)
-                .expectNextMatches(tujuanOpd ->
-                        tujuanOpd.tujuanId().equals(expectedTujuanOpd.tujuanId()) &&
-                                tujuanOpd.indikatorId().equals(expectedTujuanOpd.indikatorId()) &&
-                                tujuanOpd.target().equals(expectedTujuanOpd.target()) &&
-                                tujuanOpd.realisasi().equals(expectedTujuanOpd.realisasi()) &&
-                                tujuanOpd.capaian().equals(expectedTujuanOpd.capaian()) &&
-                                tujuanOpd.satuan().equals(expectedTujuanOpd.satuan()) &&
-                                tujuanOpd.tahun().equals(expectedTujuanOpd.tahun()) &&
-                                tujuanOpd.bulan().equals(expectedTujuanOpd.bulan()) &&
-                                tujuanOpd.jenisRealisasi() == expectedTujuanOpd.jenisRealisasi() &&
-                                tujuanOpd.kodeOpd().equals(expectedTujuanOpd.kodeOpd()) &&
-                                tujuanOpd.rumusPerhitungan().equals(expectedTujuanOpd.rumusPerhitungan()) &&
-                                tujuanOpd.sumberData().equals(expectedTujuanOpd.sumberData()) &&
-                                tujuanOpd.definisiOperational().equals(expectedTujuanOpd.definisiOperational()) &&
-                                tujuanOpd.status() == TujuanOpdStatus.UNCHECKED)
+        StepVerifier.create(tujuanOpdService.getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan("2026", "5.01.5.05.0.00.01.0000", "3"))
+                .assertNext(response -> {
+                    org.junit.jupiter.api.Assertions.assertEquals(1L, response.id());
+                    org.junit.jupiter.api.Assertions.assertEquals(75.0, response.indikator().getFirst().target().getFirst().realisasi());
+                })
                 .verifyComplete();
     }
 
     @Test
-    void submitRealisasiTujuanOpd_ShouldThrowError_WhenRepositoryFails() {
-        // Arrange
-        String tujuanId = UUID.randomUUID().toString();
-        String indikatorId = UUID.randomUUID().toString();
-        String targetId = UUID.randomUUID().toString();
-        String target = "100";
-        Double realisasi = 80.0;
-        String satuan = "Unit";
-        String tahun = "2025";
-        String bulan = "1";
-        JenisRealisasi jenisRealisasi = JenisRealisasi.NAIK;
-        String kodeOpd = "OPD001";
-        String rumusPerhitungan = "(realisasi/target)*100";
-        String sumberData = "SIMDA";
-        String definisiOperational = "Definisi indikator tujuan";
+    void submitRealisasiTujuanOpd_ShouldCreateNewAndReturnResponse() {
+        TujuanOpdRequest request = new TujuanOpdRequest(
+                "KODE-TUJ-OPD-001", "KODE-IND-TUJ-OPD-001",
+                "KODE-TAR-TUJ-OPD-001", 75.5, "2026", "1",
+                "1.01.0.00.0.00.01.0000"
+        );
+        TujuanOpd saved = new TujuanOpd(1L, "1.01.0.00.0.00.01.0000", "KODE-TUJ-OPD-001",
+                "2026", "1", null, Instant.now(), Instant.now(), null);
+        IndikatorTujuanOpd savedIndikator = new IndikatorTujuanOpd(2L, 1L, "KODE-IND-TUJ-OPD-001",
+                "1.01.0.00.0.00.01.0000", "2026", "1",
+                Instant.now(), Instant.now(), null, null);
+        TargetIndikatorTujuanOpd savedTarget = new TargetIndikatorTujuanOpd(3L, 2L, "KODE-TAR-TUJ-OPD-001",
+                BigDecimal.valueOf(76), "2026", "1", Instant.now(), Instant.now(), null, null);
 
-        when(tujuanOpdRepository.save(any(TujuanOpd.class))).thenReturn(Mono.error(new RuntimeException("Unexpected error")));
+        when(tujuanOpdRepository.findFirstByKodeOpdAndKodeTujuanOpdAndTahunAndBulan(
+                "1.01.0.00.0.00.01.0000", "KODE-TUJ-OPD-001", "2026", "1"))
+                .thenReturn(Mono.empty());
+        when(tujuanOpdRepository.save(any(TujuanOpd.class))).thenReturn(Mono.just(saved));
+        when(indikatorTujuanOpdRepository.findFirstByTujuanOpdIdAndKodeIndikatorAndKodeOpdAndTahunAndBulan(
+                1L, "KODE-IND-TUJ-OPD-001", "1.01.0.00.0.00.01.0000", "2026", "1"))
+                .thenReturn(Mono.empty());
+        when(indikatorTujuanOpdRepository.save(any(IndikatorTujuanOpd.class))).thenReturn(Mono.just(savedIndikator));
+        when(targetIndikatorTujuanOpdRepository.findFirstByIndikatorTujuanIdAndKodeTargetAndTahunAndBulan(
+                2L, "KODE-TAR-TUJ-OPD-001", "2026", "1"))
+                .thenReturn(Mono.empty());
+        when(targetIndikatorTujuanOpdRepository.save(any(TargetIndikatorTujuanOpd.class))).thenReturn(Mono.just(savedTarget));
+        when(indikatorTujuanOpdRepository.findAll()).thenReturn(Flux.just(savedIndikator));
+        when(targetIndikatorTujuanOpdRepository.findAll()).thenReturn(Flux.just(savedTarget));
+        when(penetapanTujuanOpdClient.fetchTujuanOpd("1.01.0.00.0.00.01.0000", 2026)).thenReturn(Mono.just(List.of()));
 
-        // Act
-        Mono<TujuanOpd> result = tujuanOpdService.submitRealisasiTujuanOpd(
-                tujuanId, indikatorId, targetId, target, realisasi, satuan, tahun, bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational);
+        StepVerifier.create(tujuanOpdService.submitRealisasiTujuanOpd(request))
+                .assertNext(response -> {
+                    org.junit.jupiter.api.Assertions.assertEquals(1L, response.id());
+                    org.junit.jupiter.api.Assertions.assertEquals("KODE-TUJ-OPD-001", response.kodeTujuanOpd());
+                    org.junit.jupiter.api.Assertions.assertEquals(1, response.indikator().size());
+                    org.junit.jupiter.api.Assertions.assertEquals(76.0, response.indikator().getFirst().target().getFirst().realisasi());
+                })
+                .verifyComplete();
+    }
 
-        // Assert
-        StepVerifier.create(result)
-                .expectErrorMatches(throwable -> throwable instanceof RuntimeException &&
-                        throwable.getMessage().equals("Unexpected error"))
-                .verify();
+    @Test
+    void submitRealisasiTujuanOpd_ShouldUpdateExistingTarget() {
+        TujuanOpdRequest request = new TujuanOpdRequest(
+                "KODE-TUJ-OPD-001", "KODE-IND-TUJ-OPD-001",
+                "KODE-TAR-TUJ-OPD-001", 90.0, "2026", "1",
+                "1.01.0.00.0.00.01.0000"
+        );
+        TujuanOpd existingTujuan = new TujuanOpd(1L, "1.01.0.00.0.00.01.0000", "KODE-TUJ-OPD-001",
+                "2026", "1", "admin", Instant.now(), Instant.now(), "admin");
+        IndikatorTujuanOpd existingIndikator = new IndikatorTujuanOpd(2L, 1L, "KODE-IND-TUJ-OPD-001",
+                "1.01.0.00.0.00.01.0000", "2026", "1", Instant.now(), Instant.now(), "admin", null);
+        TargetIndikatorTujuanOpd existingTarget = new TargetIndikatorTujuanOpd(3L, 2L, "KODE-TAR-TUJ-OPD-001",
+                BigDecimal.valueOf(50), "2026", "1", Instant.now(), Instant.now(), "admin", null);
+        TargetIndikatorTujuanOpd updatedTarget = new TargetIndikatorTujuanOpd(3L, 2L, "KODE-TAR-TUJ-OPD-001",
+                BigDecimal.valueOf(90), "2026", "1", Instant.now(), null, "admin", null);
+
+        when(tujuanOpdRepository.findFirstByKodeOpdAndKodeTujuanOpdAndTahunAndBulan(
+                "1.01.0.00.0.00.01.0000", "KODE-TUJ-OPD-001", "2026", "1"))
+                .thenReturn(Mono.just(existingTujuan));
+        when(indikatorTujuanOpdRepository.findFirstByTujuanOpdIdAndKodeIndikatorAndKodeOpdAndTahunAndBulan(
+                1L, "KODE-IND-TUJ-OPD-001", "1.01.0.00.0.00.01.0000", "2026", "1"))
+                .thenReturn(Mono.just(existingIndikator));
+        when(targetIndikatorTujuanOpdRepository.findFirstByIndikatorTujuanIdAndKodeTargetAndTahunAndBulan(
+                2L, "KODE-TAR-TUJ-OPD-001", "2026", "1"))
+                .thenReturn(Mono.just(existingTarget));
+        when(targetIndikatorTujuanOpdRepository.save(any(TargetIndikatorTujuanOpd.class))).thenReturn(Mono.just(updatedTarget));
+        when(indikatorTujuanOpdRepository.findAll()).thenReturn(Flux.just(existingIndikator));
+        when(targetIndikatorTujuanOpdRepository.findAll()).thenReturn(Flux.just(updatedTarget));
+        when(penetapanTujuanOpdClient.fetchTujuanOpd("1.01.0.00.0.00.01.0000", 2026)).thenReturn(Mono.just(List.of()));
+
+        StepVerifier.create(tujuanOpdService.submitRealisasiTujuanOpd(request))
+                .assertNext(response -> {
+                    org.junit.jupiter.api.Assertions.assertEquals(90.0, response.indikator().getFirst().target().getFirst().realisasi());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void batchSubmitRealisasiTujuanOpd_ShouldSubmitAll() {
+        TujuanOpdRequest req1 = new TujuanOpdRequest(
+                "KODE-1", "KODE-IND-1",
+                "KODE-TAR-1", 25.0, "2026", "1",
+                "OPD-001"
+        );
+        TujuanOpdRequest req2 = new TujuanOpdRequest(
+                "KODE-2", "KODE-IND-2",
+                "KODE-TAR-2", 50.0, "2026", "1",
+                "OPD-001"
+        );
+
+        TujuanOpd saved1 = new TujuanOpd(1L, "OPD-001", "KODE-1",
+                "2026", "1", null, Instant.now(), Instant.now(), null);
+        TujuanOpd saved2 = new TujuanOpd(2L, "OPD-001", "KODE-2",
+                "2026", "1", null, Instant.now(), Instant.now(), null);
+
+        when(tujuanOpdRepository.findFirstByKodeOpdAndKodeTujuanOpdAndTahunAndBulan(
+                "OPD-001", "KODE-1", "2026", "1")).thenReturn(Mono.empty());
+        when(tujuanOpdRepository.findFirstByKodeOpdAndKodeTujuanOpdAndTahunAndBulan(
+                "OPD-001", "KODE-2", "2026", "1")).thenReturn(Mono.empty());
+
+        when(tujuanOpdRepository.save(any(TujuanOpd.class)))
+                .thenReturn(Mono.just(saved1), Mono.just(saved2));
+
+        when(indikatorTujuanOpdRepository.findFirstByTujuanOpdIdAndKodeIndikatorAndKodeOpdAndTahunAndBulan(
+                any(), any(), any(), any(), any())).thenReturn(Mono.empty());
+        IndikatorTujuanOpd ind1 = new IndikatorTujuanOpd(3L, 1L, "KODE-IND-1", "OPD-001",
+                "2026", "1", null, null, null, null);
+        IndikatorTujuanOpd ind2 = new IndikatorTujuanOpd(4L, 2L, "KODE-IND-2", "OPD-001",
+                "2026", "1", null, null, null, null);
+        when(indikatorTujuanOpdRepository.save(any(IndikatorTujuanOpd.class)))
+                .thenReturn(Mono.just(ind1), Mono.just(ind2));
+
+        when(targetIndikatorTujuanOpdRepository.findFirstByIndikatorTujuanIdAndKodeTargetAndTahunAndBulan(
+                any(), any(), any(), any())).thenReturn(Mono.empty());
+        TargetIndikatorTujuanOpd tgt1 = new TargetIndikatorTujuanOpd(5L, 3L, "KODE-TAR-1",
+                BigDecimal.valueOf(25), "2026", "1", null, null, null, null);
+        TargetIndikatorTujuanOpd tgt2 = new TargetIndikatorTujuanOpd(6L, 4L, "KODE-TAR-2",
+                BigDecimal.valueOf(50), "2026", "1", null, null, null, null);
+        when(targetIndikatorTujuanOpdRepository.save(any(TargetIndikatorTujuanOpd.class)))
+                .thenReturn(Mono.just(tgt1), Mono.just(tgt2));
+
+        when(indikatorTujuanOpdRepository.findAll())
+                .thenReturn(Flux.just(ind1), Flux.just(ind2));
+        when(targetIndikatorTujuanOpdRepository.findAll())
+                .thenReturn(Flux.just(tgt1), Flux.just(tgt2));
+        when(penetapanTujuanOpdClient.fetchTujuanOpd("OPD-001", 2026)).thenReturn(Mono.just(List.of()));
+
+        StepVerifier.create(tujuanOpdService.batchSubmitRealisasiTujuanOpd(List.of(req1, req2)))
+                .expectNextCount(2)
+                .verifyComplete();
+    }
+
+    @Test
+    void getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan_ShouldReturnEmpty_WhenNoData() {
+        when(tujuanOpdRepository.findAllByTahunAndKodeOpdAndBulan("2026", "1.01.0.00.0.00.01.0000", "1"))
+                .thenReturn(Flux.empty());
+
+        StepVerifier.create(tujuanOpdService.getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan("2026", "1.01.0.00.0.00.01.0000", "1"))
+                .verifyComplete();
+    }
+
+    @Test
+    void getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan_ShouldHideOrphanData() {
+        TujuanOpd tujuan = new TujuanOpd(1L, "5.01.5.05.0.00.01.0000", "TUJ-ORPHAN",
+                "2026", "3", "tester", Instant.now(), Instant.now(), "tester");
+        IndikatorTujuanOpd indikator = new IndikatorTujuanOpd(2L, 1L, "IND-ORPHAN", "5.01.5.05.0.00.01.0000",
+                "2026", "3", Instant.now(), Instant.now(), "tester", null);
+        TargetIndikatorTujuanOpd target = new TargetIndikatorTujuanOpd(3L, 2L, "TGT-ORPHAN", BigDecimal.valueOf(75),
+                "2026", "3", Instant.now(), Instant.now(), "tester", null);
+
+        when(tujuanOpdRepository.findAllByTahunAndKodeOpdAndBulan("2026", "5.01.5.05.0.00.01.0000", "3"))
+                .thenReturn(Flux.just(tujuan));
+        when(indikatorTujuanOpdRepository.findAll()).thenReturn(Flux.just(indikator));
+        when(targetIndikatorTujuanOpdRepository.findAll()).thenReturn(Flux.just(target));
+        when(penetapanTujuanOpdClient.fetchTujuanOpd("5.01.5.05.0.00.01.0000", 2026)).thenReturn(Mono.just(List.of()));
+
+        StepVerifier.create(tujuanOpdService.getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan("2026", "5.01.5.05.0.00.01.0000", "3"))
+                .assertNext(response -> {
+                    org.junit.jupiter.api.Assertions.assertEquals("TUJ-ORPHAN", response.kodeTujuanOpd());
+                    org.junit.jupiter.api.Assertions.assertTrue(response.indikator().getFirst().target().stream()
+                            .anyMatch(t -> "TGT-ORPHAN".equals(t.kodeTarget())));
+                })
+                .verifyComplete();
     }
 }
