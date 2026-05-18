@@ -1,14 +1,10 @@
 package cc.kertaskerja.realisasi_opd_service.sasaran.domain;
 
-import cc.kertaskerja.capaian.domain.Capaian;
-import cc.kertaskerja.realisasi.domain.JenisRealisasi;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -18,25 +14,12 @@ import java.time.Instant;
 public record SasaranOpd(
         @Id Long id,
 
-        String renjaId,
+        @Column("kode_opd")
+        String kodeOpd,
+        @Column("kode_sasaran_opd")
         String kodeSasaranOpd,
-        String renja,
-        String indikatorId,
-        String kodeIndikatorSasaranOpd,
-        String indikator,
-        String targetId,
-        String kodeTargetSasaranOpd,
-        String target,
-        Double realisasi,
-        String satuan,
         String tahun,
         String bulan,
-        JenisRealisasi jenisRealisasi,
-        String kodeOpd,
-        String rumusPerhitungan,
-        String sumberData,
-        String definisiOperational,
-        SasaranOpdStatus status,
 
         @CreatedBy
         @Column("created_by")
@@ -45,56 +28,16 @@ public record SasaranOpd(
         @LastModifiedDate Instant lastModifiedDate,
         @LastModifiedBy
         @Column("last_modified_by")
-        String lastModifiedBy,
-
-        @Version int version
+        String lastModifiedBy
 ) {
     public static SasaranOpd of(
-            String renjaId,
-            String kodeSasaranOpd,
-            String renja,
-            String indikatorId,
-            String kodeIndikatorSasaranOpd,
-            String indikator,
-            String targetId,
-            String kodeTargetSasaranOpd,
-            String target,
-            Double realisasi,
-            String satuan,
-            String tahun,
-            String bulan,
-            JenisRealisasi jenisRealisasi,
             String kodeOpd,
-            String rumusPerhitungan,
-            String sumberData,
-            String definisiOperational,
-            SasaranOpdStatus status
+            String kodeSasaranOpd,
+            String tahun,
+            String bulan
     ) {
         return new SasaranOpd(null,
-                renjaId, kodeSasaranOpd, renja, indikatorId, kodeIndikatorSasaranOpd, indikator,
-                targetId, kodeTargetSasaranOpd, target, realisasi, satuan, tahun,
-                bulan, jenisRealisasi, kodeOpd, rumusPerhitungan, sumberData, definisiOperational, status,
-                null, null, null, null, 0);
-    }
-
-    @JsonProperty("capaian")
-    public String capaian() {
-        double calculatedCapaian = capaianSasaranOpd();
-        return formatCapaian(Math.min(calculatedCapaian, 100));
-    }
-
-    @JsonProperty("keteranganCapaian")
-    public String keteranganCapaian() {
-        double calculatedCapaian = capaianSasaranOpd();
-        return calculatedCapaian > 100 ? "nilai capaian lebih dari 100% (" + formatCapaian(calculatedCapaian) + ")" : null;
-    }
-
-    private String formatCapaian(double value) {
-        return String.format("%.2f%%", value);
-    }
-
-    public Double capaianSasaranOpd() {
-        Capaian capaian = new Capaian(realisasi, target, jenisRealisasi);
-        return capaian.hasilCapaian();
+                kodeOpd, kodeSasaranOpd, tahun, bulan,
+                null, null, null, null);
     }
 }
