@@ -6,6 +6,8 @@ import cc.kertaskerja.realisasi_opd_service.tujuan.domain.indikator.IndikatorTuj
 import cc.kertaskerja.realisasi_opd_service.tujuan.domain.indikator.IndikatorTujuanOpdRepository;
 import cc.kertaskerja.realisasi_opd_service.tujuan.domain.target.TargetIndikatorTujuanOpd;
 import cc.kertaskerja.realisasi_opd_service.tujuan.domain.target.TargetIndikatorTujuanOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.tujuan.web.PenetapanTujuanOpdListResponse;
+import cc.kertaskerja.realisasi_opd_service.tujuan.web.TujuanOpdPenetapanResponse;
 import cc.kertaskerja.realisasi_opd_service.tujuan.web.TujuanOpdRequest;
 import cc.kertaskerja.realisasi_opd_service.tujuan.web.TujuanOpdResponse;
 import org.junit.jupiter.api.Test;
@@ -56,7 +58,7 @@ class TujuanOpdServiceTest {
         StepVerifier.create(tujuanOpdService.getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan("2026", "5.01.5.05.0.00.01.0000", "3"))
                 .assertNext(response -> {
                     org.junit.jupiter.api.Assertions.assertEquals(1L, response.id());
-                    org.junit.jupiter.api.Assertions.assertEquals(75.0, response.indikator().getFirst().target().getFirst().realisasi());
+                    org.junit.jupiter.api.Assertions.assertEquals(75.0, response.indikators().getFirst().targets().getFirst().realisasi());
                 })
                 .verifyComplete();
     }
@@ -96,8 +98,8 @@ class TujuanOpdServiceTest {
                 .assertNext(response -> {
                     org.junit.jupiter.api.Assertions.assertEquals(1L, response.id());
                     org.junit.jupiter.api.Assertions.assertEquals("KODE-TUJ-OPD-001", response.kodeTujuanOpd());
-                    org.junit.jupiter.api.Assertions.assertEquals(1, response.indikator().size());
-                    org.junit.jupiter.api.Assertions.assertEquals(76.0, response.indikator().getFirst().target().getFirst().realisasi());
+                    org.junit.jupiter.api.Assertions.assertEquals(1, response.indikators().size());
+                    org.junit.jupiter.api.Assertions.assertEquals(76.0, response.indikators().getFirst().targets().getFirst().realisasi());
                 })
                 .verifyComplete();
     }
@@ -134,7 +136,7 @@ class TujuanOpdServiceTest {
 
         StepVerifier.create(tujuanOpdService.submitRealisasiTujuanOpd(request))
                 .assertNext(response -> {
-                    org.junit.jupiter.api.Assertions.assertEquals(90.0, response.indikator().getFirst().target().getFirst().realisasi());
+                    org.junit.jupiter.api.Assertions.assertEquals(90.0, response.indikators().getFirst().targets().getFirst().realisasi());
                 })
                 .verifyComplete();
     }
@@ -226,7 +228,7 @@ class TujuanOpdServiceTest {
         StepVerifier.create(tujuanOpdService.getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan("2026", "5.01.5.05.0.00.01.0000", "3"))
                 .assertNext(response -> {
                     org.junit.jupiter.api.Assertions.assertEquals("TUJ-ORPHAN", response.kodeTujuanOpd());
-                    org.junit.jupiter.api.Assertions.assertTrue(response.indikator().getFirst().target().stream()
+                    org.junit.jupiter.api.Assertions.assertTrue(response.indikators().getFirst().targets().stream()
                             .anyMatch(t -> "TGT-ORPHAN".equals(t.kodeTarget())));
                 })
                 .verifyComplete();
@@ -252,15 +254,15 @@ class TujuanOpdServiceTest {
 
         PenetapanTujuanOpd.TujuanPenetapanData hiddenTujuan = new PenetapanTujuanOpd.TujuanPenetapanData(
                 11L,
-                kodeOpd,
                 "TUJ-1",
                 "Tujuan Tersembunyi",
                 "2026-2031",
+                kodeOpd,
                 2026,
                 1,
+                null,
                 List.of(new PenetapanTujuanOpd.IndikatorPenetapanData(
                         12L,
-                        11L,
                         "IND-1",
                         "Indikator Tersembunyi",
                         "Rumus 1",
@@ -269,7 +271,6 @@ class TujuanOpdServiceTest {
                         2026,
                         List.of(new PenetapanTujuanOpd.TargetPenetapanData(
                                 13L,
-                                12L,
                                 "TGT-HIDDEN",
                                 "persen",
                                 2026,
@@ -280,15 +281,15 @@ class TujuanOpdServiceTest {
 
         PenetapanTujuanOpd.TujuanPenetapanData visibleTujuan = new PenetapanTujuanOpd.TujuanPenetapanData(
                 21L,
-                kodeOpd,
                 "TUJ-2",
                 "Tujuan Februari",
                 "2026-2031",
+                kodeOpd,
                 2026,
                 1,
+                null,
                 List.of(new PenetapanTujuanOpd.IndikatorPenetapanData(
                         22L,
-                        21L,
                         "IND-2",
                         "Indikator Februari",
                         "Rumus 2",
@@ -297,7 +298,6 @@ class TujuanOpdServiceTest {
                         2026,
                         List.of(new PenetapanTujuanOpd.TargetPenetapanData(
                                 23L,
-                                22L,
                                 "TGT-VISIBLE",
                                 "persen",
                                 2026,
@@ -318,12 +318,23 @@ class TujuanOpdServiceTest {
                 .thenReturn(Flux.just(januaryTarget, februaryTarget));
 
         StepVerifier.create(tujuanOpdService.getPenetapanWithRealisasi(kodeOpd, 2026, "2"))
-                .assertNext(response -> {
-                    org.junit.jupiter.api.Assertions.assertEquals("TUJ-2", response.kodeTujuanOpd());
-                    org.junit.jupiter.api.Assertions.assertEquals(1, response.indikator().size());
-                    org.junit.jupiter.api.Assertions.assertEquals(1, response.indikator().getFirst().target().size());
-                    org.junit.jupiter.api.Assertions.assertEquals("TGT-VISIBLE", response.indikator().getFirst().target().getFirst().kodeTarget());
-                    org.junit.jupiter.api.Assertions.assertEquals(55.0, response.indikator().getFirst().target().getFirst().realisasi());
+                .assertNext(wrapper -> {
+                    org.junit.jupiter.api.Assertions.assertEquals(2, wrapper.tujuanOpds().size());
+
+                    TujuanOpdPenetapanResponse visible = wrapper.tujuanOpds().stream()
+                            .filter(t -> "TUJ-2".equals(t.kodeTujuanOpd()))
+                            .findFirst()
+                            .orElseThrow();
+                    org.junit.jupiter.api.Assertions.assertEquals(1, visible.indikators().size());
+                    org.junit.jupiter.api.Assertions.assertEquals(1, visible.indikators().getFirst().targets().size());
+                    org.junit.jupiter.api.Assertions.assertEquals("TGT-VISIBLE", visible.indikators().getFirst().targets().getFirst().kodeTarget());
+                    org.junit.jupiter.api.Assertions.assertEquals(55.0, visible.indikators().getFirst().targets().getFirst().realisasi());
+
+                    TujuanOpdPenetapanResponse hidden = wrapper.tujuanOpds().stream()
+                            .filter(t -> "TUJ-1".equals(t.kodeTujuanOpd()))
+                            .findFirst()
+                            .orElseThrow();
+                    org.junit.jupiter.api.Assertions.assertEquals(0, hidden.indikators().size());
                 })
                 .verifyComplete();
     }
