@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -41,28 +40,40 @@ public class PenetapanTujuanOpdClient {
                 .bodyToMono(String.class)
                 .map(this::parseTujuanOpdPayload)
                 .onErrorResume(e -> {
-                    log.warn("Failed to fetch penetapan tujuan OPD for kodeOpd={}, tahun={}: {}",
-                            kodeOpd, tahun, e.getMessage());
+                    log.warn("Failed to fetch penetapan tujuan OPD for kodeOpd={}, tahun={}", kodeOpd, tahun, e);
                     return Mono.just(List.of());
                 });
     }
 
     private List<PenetapanTujuanOpd.TujuanPenetapanData> parseTujuanOpdPayload(String payload) {
         try {
-            JsonNode root = objectMapper.readTree(payload);
-            JsonNode dataNode = root;
-            if (root != null && root.isObject() && root.has("data")) {
-                dataNode = root.get("data");
+            JsonNode rootNode = objectMapper.readTree(payload);
+            JsonNode dataNode = rootNode;
+            if (rootNode != null && rootNode.isObject() && rootNode.has("data")) {
+                dataNode = rootNode.get("data");
             }
 
-            if (dataNode == null || !dataNode.isArray()) {
+            PenetapanTujuanOpd.PenetapanTujuanOpdRoot root = objectMapper.treeToValue(dataNode, PenetapanTujuanOpd.PenetapanTujuanOpdRoot.class);
+            if (root == null || root.tujuanOpds() == null) {
+                log.warn("PenetapanTujuanOpdRoot or tujuanOpds is null");
                 return List.of();
             }
 
-            PenetapanTujuanOpd.TujuanPenetapanData[] rows = objectMapper.treeToValue(dataNode, PenetapanTujuanOpd.TujuanPenetapanData[].class);
-            return Arrays.asList(rows);
+            return root.tujuanOpds().stream()
+                    .map(t -> new PenetapanTujuanOpd.TujuanPenetapanData(
+                            t.id(),
+                            t.kodeTujuanOpd(),
+                            t.tujuanOpd(),
+                            t.periode(),
+                            root.kodeOpd(),
+                            root.tahunAktif(),
+                            root.versi(),
+                            root.isLocked(),
+                            t.indikators()
+                    ))
+                    .toList();
         } catch (Exception e) {
-            log.warn("Failed to parse penetapan tujuan OPD payload: {}", e.getMessage());
+            log.warn("Failed to parse penetapan tujuan OPD payload", e);
             return List.of();
         }
     }

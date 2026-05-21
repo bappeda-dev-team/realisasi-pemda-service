@@ -1,48 +1,51 @@
-package cc.kertaskerja.realisasi_opd_service.tujuan.web;
+package cc.kertaskerja.realisasi_individu_service.sasaran.web;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record TujuanOpdResponse(
+public record SasaranIndividuPenetapanResponse(
         Long id,
-        @JsonProperty("kode_opd")
-        String kodeOpd,
-        @JsonProperty("kode_tujuan_opd")
-        String kodeTujuanOpd,
-        @JsonProperty("tujuan_opd")
-        String tujuanOpd,
-        Integer tahun,
-        Integer bulan,
-        List<IndikatorResponse> indikators
+
+        @JsonProperty("kode_sasaran_opd")
+        String kodeSasaranOpd,
+
+        @JsonProperty("sasaran_opd")
+        String sasaranOpd,
+
+        List<SasaranIndividuPenetapanResponse.IndikatorPenetapan> indikators
 ) {
-    public record IndikatorResponse(
-            Long id,
+    public record IndikatorPenetapan(
             @JsonProperty("kode_indikator")
             String kodeIndikator,
+
             String indikator,
+
             @JsonProperty("rumus_perhitungan")
             String rumusPerhitungan,
+
             @JsonProperty("sumber_data")
             String sumberData,
+
             @JsonProperty("definisi_operasional")
             String definisiOperasional,
-            Integer tahun,
-            Integer bulan,
-            List<TargetResponse> targets
+
+            List<SasaranIndividuPenetapanResponse.TargetPenetapan> targets
     ) {
     }
 
-    public record TargetResponse(
-            Long id,
+    public record TargetPenetapan(
             @JsonProperty("kode_target")
             String kodeTarget,
-            Double target,
+
             String satuan,
-            Integer tahun,
-            Integer bulan,
+
+            Double target,
+
             Double realisasi,
+
             Double capaian,
+
             @JsonProperty("keterangan_capaian")
             String keteranganCapaian
     ) {

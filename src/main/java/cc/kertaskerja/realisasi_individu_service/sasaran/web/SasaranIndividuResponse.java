@@ -1,20 +1,20 @@
-package cc.kertaskerja.realisasi_opd_service.tujuan.web;
+package cc.kertaskerja.realisasi_individu_service.sasaran.web;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record TujuanOpdResponse(
+public record SasaranIndividuResponse(
         Long id,
         @JsonProperty("kode_opd")
         String kodeOpd,
-        @JsonProperty("kode_tujuan_opd")
-        String kodeTujuanOpd,
-        @JsonProperty("tujuan_opd")
-        String tujuanOpd,
+        @JsonProperty("kode_sasaran_opd")
+        String kodeSasaranOpd,
+        @JsonProperty("sasaran_opd")
+        String sasaranOpd,
         Integer tahun,
         Integer bulan,
-        List<IndikatorResponse> indikators
+        List<SasaranIndividuResponse.IndikatorResponse> indikators
 ) {
     public record IndikatorResponse(
             Long id,
@@ -29,7 +29,7 @@ public record TujuanOpdResponse(
             String definisiOperasional,
             Integer tahun,
             Integer bulan,
-            List<TargetResponse> targets
+            List<SasaranIndividuResponse.TargetResponse> targets
     ) {
     }
 
