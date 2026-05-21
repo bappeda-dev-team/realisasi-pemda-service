@@ -86,7 +86,6 @@ public class TujuanOpdService {
                                 Set<String> hiddenKeys = tuple.getT2();
                                 List<TujuanOpdPenetapanResponse> items = penetapanList.stream()
                                         .map(p -> mergePenetapanWithRealisasi(p, rMap.get(p.kodeTujuanOpd()), hiddenKeys))
-                                        .filter(response -> !response.indikators().isEmpty())
                                         .toList();
                                 return new PenetapanTujuanOpdListResponse(rootKodeOpd, effectiveTahun, items);
                             }

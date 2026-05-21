@@ -11,6 +11,7 @@ public record TujuanOpdSubmitListResponse(
         @JsonProperty("tahun")
         Integer tahun,
 
+        @JsonProperty("tujuan_opds")
         List<TujuanOpdResponse> tujuanOpds
 ) {
 }
