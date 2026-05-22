@@ -96,16 +96,7 @@ public class SasaranIndividuService {
 
                     Mono<Set<String>> hiddenTargetKeys = getHiddenTargetKeysForPreviousMonths(kodeOpd, effectiveTahun, bulan);
                     Mono<Map<String, SasaranIndividuResponse>> realisasiMap =
-                            sasaranIndividuRepository.findAllByTahunAndKodeOpd(String.valueOf(effectiveTahun), kodeOpd)
-                                    .flatMap(this::toResponseFromStoredData)
-                                    .groupBy(SasaranIndividuResponse::kodeSasaranOpd)
-                                    .flatMap(group -> group.reduce((a, b) -> {
-                                        Integer aBulan = a.bulan();
-                                        Integer bBulan = b.bulan();
-                                        if (aBulan == null) return b;
-                                        if (bBulan == null) return a;
-                                        return aBulan >= bBulan ? a : b;
-                                    }))
+                            getRealisasiSasaranIndividuByTahunAndKodeOpdAndBulan(String.valueOf(effectiveTahun), kodeOpd, bulan)
                                     .collectMap(SasaranIndividuResponse::kodeSasaranOpd);
 
                     return Mono.zip(realisasiMap, hiddenTargetKeys).map(tuple -> {
@@ -182,14 +173,14 @@ public class SasaranIndividuService {
 
     private Mono<Set<String>> getHiddenTargetKeysForPreviousMonths(String kodeOpd, int tahun, String bulan) {
         Integer activeMonth = parseInteger(bulan);
-        if (activeMonth == null || activeMonth <= 1) {
+        if (activeMonth == null) {
             return Mono.just(Set.of());
         }
 
         return sasaranIndividuRepository.findAllByTahunAndKodeOpd(String.valueOf(tahun), kodeOpd)
                 .filter(sasaran -> {
                     Integer sasaranMonth = parseInteger(sasaran.bulan());
-                    return sasaranMonth != null && sasaranMonth < activeMonth;
+                    return sasaranMonth != null && !sasaranMonth.equals(activeMonth);
                 })
                 .flatMap(this::toResponseFromStoredData)
                 .flatMapIterable(response -> response.indikators().stream()

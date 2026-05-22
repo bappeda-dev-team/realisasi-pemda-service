@@ -337,6 +337,8 @@ class TujuanOpdServiceTest {
                 .thenReturn(Mono.just(List.of(hiddenTujuan, visibleTujuan, unfilledTujuan)));
         when(tujuanOpdRepository.findAllByTahunAndKodeOpd("2026", kodeOpd))
                 .thenReturn(Flux.just(januaryTujuan, februaryTujuan));
+        when(tujuanOpdRepository.findAllByTahunAndKodeOpdAndBulan("2026", kodeOpd, "2"))
+                .thenReturn(Flux.just(februaryTujuan));
         when(indikatorTujuanOpdRepository.findAll())
                 .thenReturn(Flux.just(januaryIndikator, februaryIndikator));
         when(targetIndikatorTujuanOpdRepository.findAll())
