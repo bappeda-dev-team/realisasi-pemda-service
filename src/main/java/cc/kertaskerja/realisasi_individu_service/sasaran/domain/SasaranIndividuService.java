@@ -24,9 +24,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,27 +88,42 @@ public class SasaranIndividuService {
 
                     if (bulan == null || bulan.isBlank()) {
                         List<SasaranIndividuPenetapanResponse> items = penetapanList.stream()
-                                .map(p -> mergePenetapanWithRealisasi(p, null))
+                                .map(p -> mergePenetapanWithRealisasi(p, null, Set.of()))
+                                .filter(response -> !response.indikators().isEmpty())
                                 .toList();
-                        return Mono.just(new PenetapanSasaranIndividuListResponse(rootKodeOpd, effectiveTahun, items));
+                        return Mono.just(new PenetapanSasaranIndividuListResponse(rootKodeOpd, effectiveTahun, null, items));
                     }
 
+                    Mono<Set<String>> hiddenTargetKeys = getHiddenTargetKeysForPreviousMonths(kodeOpd, effectiveTahun, bulan);
                     Mono<Map<String, SasaranIndividuResponse>> realisasiMap =
-                            getRealisasiSasaranIndividuByTahunAndKodeOpdAndBulan(String.valueOf(effectiveTahun), kodeOpd, bulan)
+                            sasaranIndividuRepository.findAllByTahunAndKodeOpd(String.valueOf(effectiveTahun), kodeOpd)
+                                    .flatMap(this::toResponseFromStoredData)
+                                    .groupBy(SasaranIndividuResponse::kodeSasaranOpd)
+                                    .flatMap(group -> group.reduce((a, b) -> {
+                                        Integer aBulan = a.bulan();
+                                        Integer bBulan = b.bulan();
+                                        if (aBulan == null) return b;
+                                        if (bBulan == null) return a;
+                                        return aBulan >= bBulan ? a : b;
+                                    }))
                                     .collectMap(SasaranIndividuResponse::kodeSasaranOpd);
 
-                    return realisasiMap.map(rMap -> {
+                    return Mono.zip(realisasiMap, hiddenTargetKeys).map(tuple -> {
+                        Map<String, SasaranIndividuResponse> rMap = tuple.getT1();
+                        Set<String> hiddenKeys = tuple.getT2();
                         List<SasaranIndividuPenetapanResponse> items = penetapanList.stream()
-                                .map(p -> mergePenetapanWithRealisasi(p, rMap.get(p.kodeSasaranOpd())))
+                                .map(p -> mergePenetapanWithRealisasi(p, rMap.get(p.kodeSasaranOpd()), hiddenKeys))
+                                .filter(response -> !response.indikators().isEmpty())
                                 .toList();
-                        return new PenetapanSasaranIndividuListResponse(rootKodeOpd, effectiveTahun, items);
+                        return new PenetapanSasaranIndividuListResponse(rootKodeOpd, effectiveTahun, parseInteger(bulan), items);
                     });
                 });
     }
 
     private SasaranIndividuPenetapanResponse mergePenetapanWithRealisasi(
             PenetapanSasaranOpd.SasaranPenetapanData penetapan,
-            SasaranIndividuResponse realisasi
+            SasaranIndividuResponse realisasi,
+            Set<String> hiddenTargetKeys
     ) {
         Map<String, SasaranIndividuResponse.IndikatorResponse> indikatorMap = realisasi != null
                 ? realisasi.indikators().stream()
@@ -122,6 +139,7 @@ public class SasaranIndividuService {
                             : Map.of();
 
                     List<SasaranIndividuPenetapanResponse.TargetPenetapan> targetList = ind.targets().stream()
+                            .filter(t -> !hiddenTargetKeys.contains(buildTargetKey(penetapan.kodeSasaranOpd(), ind.kodeIndikator(), t.kodeTarget())))
                             .map(t -> {
                                 SasaranIndividuResponse.TargetResponse matchedTarget = targetMap.get(t.kodeTarget());
                                 Double targetPenetapan = t.target();
@@ -138,6 +156,10 @@ public class SasaranIndividuService {
                             })
                             .toList();
 
+                    if (targetList.isEmpty()) {
+                        return null;
+                    }
+
                     return new SasaranIndividuPenetapanResponse.IndikatorPenetapan(
                             ind.kodeIndikator(),
                             ind.indikator(),
@@ -147,6 +169,7 @@ public class SasaranIndividuService {
                             targetList
                     );
                 })
+                .filter(Objects::nonNull)
                 .toList();
 
         return new SasaranIndividuPenetapanResponse(
@@ -155,6 +178,29 @@ public class SasaranIndividuService {
                 penetapan.sasaranOpd(),
                 indikatorList
         );
+    }
+
+    private Mono<Set<String>> getHiddenTargetKeysForPreviousMonths(String kodeOpd, int tahun, String bulan) {
+        Integer activeMonth = parseInteger(bulan);
+        if (activeMonth == null || activeMonth <= 1) {
+            return Mono.just(Set.of());
+        }
+
+        return sasaranIndividuRepository.findAllByTahunAndKodeOpd(String.valueOf(tahun), kodeOpd)
+                .filter(sasaran -> {
+                    Integer sasaranMonth = parseInteger(sasaran.bulan());
+                    return sasaranMonth != null && sasaranMonth < activeMonth;
+                })
+                .flatMap(this::toResponseFromStoredData)
+                .flatMapIterable(response -> response.indikators().stream()
+                        .flatMap(indikator -> indikator.targets().stream()
+                                .map(target -> buildTargetKey(response.kodeSasaranOpd(), indikator.kodeIndikator(), target.kodeTarget())))
+                        .toList())
+                .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    private String buildTargetKey(String kodeSasaranOpd, String kodeIndikator, String kodeTarget) {
+        return kodeSasaranOpd + "|" + kodeIndikator + "|" + kodeTarget;
     }
 
     private Mono<SasaranIndividuResponse> enrichWithPenetapan(Mono<SasaranIndividuResponse> responseMono, String kodeOpd, String tahun) {

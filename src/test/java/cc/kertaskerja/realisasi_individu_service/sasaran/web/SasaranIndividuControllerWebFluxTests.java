@@ -27,7 +27,7 @@ public class SasaranIndividuControllerWebFluxTests {
     @Test
     void whenGetPenetapan_thenReturnsPenetapanSasaranIndividuListResponse() {
         PenetapanSasaranIndividuListResponse response = new PenetapanSasaranIndividuListResponse(
-                "1.01.0.00.0.00.01.0000", 2026, List.of()
+                "1.01.0.00.0.00.01.0000", 2026, null, List.of()
         );
 
         when(sasaranIndividuService.getPenetapanWithRealisasi(any(), anyInt(), any()))

@@ -12,5 +12,7 @@ public interface SasaranIndividuRepository extends ReactiveCrudRepository<Sasara
             String bulan
     );
 
+    Flux<SasaranIndividu> findAllByTahunAndKodeOpd(String tahun, String kodeOpd);
+
     Flux<SasaranIndividu> findAllByTahunAndKodeOpdAndBulan(String tahun, String kodeOpd, String bulan);
 }

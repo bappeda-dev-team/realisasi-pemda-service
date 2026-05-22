@@ -78,7 +78,16 @@ public class TujuanOpdService {
 
                     Mono<Set<String>> hiddenTargetKeys = getHiddenTargetKeysForPreviousMonths(kodeOpd, effectiveTahun, bulan);
                     Mono<Map<String, TujuanOpdResponse>> realisasiMap =
-                            getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan(String.valueOf(effectiveTahun), kodeOpd, bulan)
+                            tujuanOpdRepository.findAllByTahunAndKodeOpd(String.valueOf(effectiveTahun), kodeOpd)
+                                    .flatMap(this::toResponseFromStoredData)
+                                    .groupBy(TujuanOpdResponse::kodeTujuanOpd)
+                                    .flatMap(group -> group.reduce((a, b) -> {
+                                        Integer aBulan = a.bulan();
+                                        Integer bBulan = b.bulan();
+                                        if (aBulan == null) return b;
+                                        if (bBulan == null) return a;
+                                        return aBulan >= bBulan ? a : b;
+                                    }))
                                     .collectMap(TujuanOpdResponse::kodeTujuanOpd);
 
                     return Mono.zip(realisasiMap, hiddenTargetKeys).map(tuple -> {
