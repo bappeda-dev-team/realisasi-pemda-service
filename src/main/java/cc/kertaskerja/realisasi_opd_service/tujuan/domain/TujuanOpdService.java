@@ -78,16 +78,7 @@ public class TujuanOpdService {
 
                     Mono<Set<String>> hiddenTargetKeys = getHiddenTargetKeysForPreviousMonths(kodeOpd, effectiveTahun, bulan);
                     Mono<Map<String, TujuanOpdResponse>> realisasiMap =
-                            tujuanOpdRepository.findAllByTahunAndKodeOpd(String.valueOf(effectiveTahun), kodeOpd)
-                                    .flatMap(this::toResponseFromStoredData)
-                                    .groupBy(TujuanOpdResponse::kodeTujuanOpd)
-                                    .flatMap(group -> group.reduce((a, b) -> {
-                                        Integer aBulan = a.bulan();
-                                        Integer bBulan = b.bulan();
-                                        if (aBulan == null) return b;
-                                        if (bBulan == null) return a;
-                                        return aBulan >= bBulan ? a : b;
-                                    }))
+                            getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan(String.valueOf(effectiveTahun), kodeOpd, bulan)
                                     .collectMap(TujuanOpdResponse::kodeTujuanOpd);
 
                     return Mono.zip(realisasiMap, hiddenTargetKeys).map(tuple -> {
@@ -166,14 +157,14 @@ public class TujuanOpdService {
     // Sembunyikan data penetapan yang sudah di isi realisasinya di bulan tertentu
     private Mono<Set<String>> getHiddenTargetKeysForPreviousMonths(String kodeOpd, int tahun, String bulan) {
         Integer activeMonth = parseInteger(bulan);
-        if (activeMonth == null || activeMonth <= 1) {
+        if (activeMonth == null) {
             return Mono.just(Set.of());
         }
 
         return tujuanOpdRepository.findAllByTahunAndKodeOpd(String.valueOf(tahun), kodeOpd)
                 .filter(tujuan -> {
                     Integer tujuanMonth = parseInteger(tujuan.bulan());
-                    return tujuanMonth != null && tujuanMonth < activeMonth;
+                    return tujuanMonth != null && !tujuanMonth.equals(activeMonth);
                 })
                 .flatMap(this::toResponseFromStoredData)
                 .flatMapIterable(response -> response.indikators().stream()
