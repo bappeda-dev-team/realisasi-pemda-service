@@ -84,8 +84,8 @@ public class SasaranIndividuController {
                 });
     }
 
-    @GetMapping("/{kodeOpd}/tahun/{tahun}/penetapan")
-    @Operation(summary = "Integrasi penetapan dengan realisasi sasaran Individu", description = "Menggabungkan data penetapan (dari external service) dengan data realisasi sasaran Individu berdasarkan kode OPD dan tahun. Parameter bulan bersifat opsional; jika tidak dikirim, hanya data penetapan tanpa realisasi yang dikembalikan.")
+    @GetMapping("/{kodeOpd}/nip/{nip}/tahun/{tahun}/penetapan")
+    @Operation(summary = "Integrasi penetapan dengan realisasi sasaran Individu", description = "Menggabungkan data penetapan (dari external service) dengan data realisasi sasaran Individu berdasarkan kode OPD, NIP, dan tahun. Parameter bulan bersifat opsional; jika tidak dikirim, hanya data penetapan tanpa realisasi yang dikembalikan.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Data penetapan terintegrasi dengan realisasi", content = @Content(schema = @Schema(implementation = PenetapanSasaranIndividuListResponse.class))),
             @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
@@ -93,8 +93,9 @@ public class SasaranIndividuController {
     })
     public Mono<PenetapanSasaranIndividuListResponse> getPenetapanWithRealisasi(
             @Parameter(description = "Kode OPD", example = "5.01.5.05.0.00.01.0000") @PathVariable String kodeOpd,
+            @Parameter(description = "NIP pegawai", example = "198001012010011001") @PathVariable String nip,
             @Parameter(description = "Tahun", example = "2026") @PathVariable String tahun,
             @Parameter(description = "Bulan realisasi (opsional)", example = "1") @RequestParam(required = false) String bulan) {
-        return sasaranIndividuService.getPenetapanWithRealisasi(kodeOpd, Integer.parseInt(tahun), bulan);
+        return sasaranIndividuService.getPenetapanWithRealisasi(kodeOpd, nip, Integer.parseInt(tahun), bulan);
     }
 }
