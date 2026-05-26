@@ -2,9 +2,7 @@ package cc.kertaskerja.realisasi_opd_service.sasaran.domain;
 
 import cc.kertaskerja.integration.penetapan.PenetapanSasaranOpdClient;
 import cc.kertaskerja.integration.penetapan.sasaran_opd.PenetapanSasaranOpd;
-import cc.kertaskerja.realisasi_opd_service.sasaran.domain.target.TargetIndikatorSasaranOpd;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.target.TargetIndikatorSasaranOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.sasaran.domain.indikator.IndikatorSasaranOpd;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.indikator.IndikatorSasaranOpdRepository;
 import cc.kertaskerja.realisasi_opd_service.sasaran.web.PenetapanSasaranOpdListResponse;
 import cc.kertaskerja.realisasi_opd_service.sasaran.web.SasaranOpdPenetapanResponse;

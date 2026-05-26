@@ -16,16 +16,13 @@ public class PenetapanTujuanOpdClient {
 
     private static final Logger log = LoggerFactory.getLogger(PenetapanTujuanOpdClient.class);
     private final WebClient webClient;
-    private final PenetapanProperties properties;
     private final ObjectMapper objectMapper;
 
     public PenetapanTujuanOpdClient(
             WebClient penetapanWebClient,
-            PenetapanProperties properties,
             ObjectMapper objectMapper
     ) {
         this.webClient = penetapanWebClient;
-        this.properties = properties;
         this.objectMapper = objectMapper;
     }
 
