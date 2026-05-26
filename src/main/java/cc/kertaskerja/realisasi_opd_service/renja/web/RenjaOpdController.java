@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("renja")
+@RequestMapping("renja_opd")
 @Tag(name = "OPD - Renja", description = "Endpoint realisasi renja tingkat OPD.")
 public class RenjaOpdController {
     private final RenjaOpdService renjaOpdService;

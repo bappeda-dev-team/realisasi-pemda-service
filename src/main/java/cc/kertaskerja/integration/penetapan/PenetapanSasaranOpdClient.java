@@ -16,16 +16,13 @@ public class PenetapanSasaranOpdClient {
 
     private static final Logger log = LoggerFactory.getLogger(PenetapanSasaranOpdClient.class);
     private final WebClient webClient;
-    private final PenetapanProperties properties;
     private final ObjectMapper objectMapper;
 
     public PenetapanSasaranOpdClient(
             WebClient penetapanWebClient,
-            PenetapanProperties properties,
             ObjectMapper objectMapper
     ) {
         this.webClient = penetapanWebClient;
-        this.properties = properties;
         this.objectMapper = objectMapper;
     }
 

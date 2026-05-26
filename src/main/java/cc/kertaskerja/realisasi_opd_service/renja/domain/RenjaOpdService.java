@@ -9,8 +9,6 @@ import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpd
 import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpd;
 import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpdRepository;
 import cc.kertaskerja.realisasi_opd_service.renja.web.RenjaOpdPenetapanResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +18,6 @@ import java.util.Objects;
 
 @Service
 public class RenjaOpdService {
-    private static final Logger log = LoggerFactory.getLogger(RenjaOpdService.class);
     private final PenetapanRenjaOpdClient penetapanClient;
     private final RenjaProgramOpdRepository targetProgramRepo;
     private final RenjaKegiatanOpdRepository targetKegiatanRepo;

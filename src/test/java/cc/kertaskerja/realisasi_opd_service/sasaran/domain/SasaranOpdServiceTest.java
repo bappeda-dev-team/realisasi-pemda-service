@@ -5,7 +5,6 @@ import cc.kertaskerja.realisasi_opd_service.sasaran.domain.indikator.IndikatorSa
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.indikator.IndikatorSasaranOpdRepository;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.target.TargetIndikatorSasaranOpd;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.target.TargetIndikatorSasaranOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.sasaran.web.SasaranOpdResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -52,7 +52,7 @@ class RenjaOpdControllerWebFluxTests {
         webTestClient
                 .mutateWith(SecurityMockServerConfigurers.mockJwt().authorities(new SimpleGrantedAuthority("admin_opd")))
                 .get()
-                .uri("/renja/5.01.5.05.0.00.01.0000/tahun/2026/penetapan")
+                .uri("/renja_opd/5.01.5.05.0.00.01.0000/tahun/2026/penetapan")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -93,7 +93,7 @@ class RenjaOpdControllerWebFluxTests {
         webTestClient
                 .mutateWith(SecurityMockServerConfigurers.mockJwt().authorities(new SimpleGrantedAuthority("admin_opd")))
                 .get()
-                .uri("/renja/5.01.5.05.0.00.01.0000/tahun/2026/penetapan?bulan=1")
+                .uri("/renja_opd/5.01.5.05.0.00.01.0000/tahun/2026/penetapan?bulan=1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
