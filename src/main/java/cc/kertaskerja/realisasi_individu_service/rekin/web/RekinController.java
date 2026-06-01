@@ -81,24 +81,7 @@ public class RekinController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload realisasi rekin", required = true,
                     content = @Content(schema = @Schema(implementation = RekinRequest.class)))
             @RequestBody @Valid RekinRequest rekinRequest) {
-        return rekinService.submitRealisasiRekin(
-                rekinRequest.rekinId(),
-                rekinRequest.rekin(),
-                rekinRequest.indikatorId(),
-                rekinRequest.indikator(),
-                rekinRequest.nip(),
-                rekinRequest.namaPegawai(),
-                rekinRequest.idSasaran(),
-                rekinRequest.sasaran(),
-                rekinRequest.targetId(),
-                rekinRequest.target(),
-                rekinRequest.realisasi(),
-                rekinRequest.satuan(),
-                rekinRequest.tahun(),
-                rekinRequest.bulan(),
-                rekinRequest.kodeOpd(),
-                rekinRequest.jenisRealisasi()
-        );
+        return rekinService.submitRealisasiRekin(rekinRequest);
     }
 
     @PostMapping("/batch")

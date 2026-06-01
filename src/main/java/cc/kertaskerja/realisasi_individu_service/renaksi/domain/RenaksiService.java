@@ -37,37 +37,37 @@ public class RenaksiService {
         return renaksiRepository.findAllByKodeOpdAndTahunAndBulan(kodeOpd, tahun, bulan);
     }
 
-    public Mono<Renaksi> submitRealisasiRenaksi(
-            String renaksiId,
-            String renaksi,
-            String nip,
-            String namaPegawai,
-            String rekinId,
-            String rekin,
-            String targetId,
-            String target,
-            Integer realisasi,
-            String satuan,
-            String bulan,
-            String tahun,
-            JenisRealisasi jenisRealisasi,
-            String kodeOpd) {
-        return Mono.just(buildUncheckedRealisasiRenaksi(
-                        renaksiId,
-                        renaksi,
-                        nip,
-                        namaPegawai,
-                        rekinId,
-                        rekin,
-                        targetId,
-                        target,
-                        realisasi,
-                        satuan,
-                        bulan,
-                        tahun,
-                        jenisRealisasi,
-                        kodeOpd))
-                .flatMap(renaksiRepository::save);
+    public Mono<Renaksi> submitRealisasiRenaksi(RenaksiRequest req) {
+        if (req.targetRealisasiId() != null) {
+            return renaksiRepository.findById(req.targetRealisasiId())
+                    .flatMap(existing -> renaksiRepository.save(buildUpdatedRealisasiRenaksi(existing, req)))
+                    .switchIfEmpty(Mono.defer(() -> {
+                        Renaksi baru = buildUncheckedRealisasiRenaksi(
+                                req.renaksiId(), req.renaksi(),
+                                req.nip(), req.namaPegawai(),
+                                req.rekinId(), req.rekin(),
+                                req.targetId(), req.target(),
+                                req.realisasi(), req.satuan(),
+                                req.bulan(), req.tahun(),
+                                req.jenisRealisasi(), req.kodeOpd());
+                        return renaksiRepository.save(baru);
+                    }));
+        }
+
+        return renaksiRepository.findFirstByNipAndBulanAndRekinIdAndRenaksiId(
+                        req.nip(), req.bulan(), req.rekinId(), req.renaksiId())
+                .flatMap(existing -> renaksiRepository.save(buildUpdatedRealisasiRenaksi(existing, req)))
+                .switchIfEmpty(Mono.defer(() -> {
+                    Renaksi baru = buildUncheckedRealisasiRenaksi(
+                            req.renaksiId(), req.renaksi(),
+                            req.nip(), req.namaPegawai(),
+                            req.rekinId(), req.rekin(),
+                            req.targetId(), req.target(),
+                            req.realisasi(), req.satuan(),
+                            req.bulan(), req.tahun(),
+                            req.jenisRealisasi(), req.kodeOpd());
+                    return renaksiRepository.save(baru);
+                }));
     }
 
     public static Renaksi buildUncheckedRealisasiRenaksi(
