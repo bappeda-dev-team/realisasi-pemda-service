@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -27,50 +27,46 @@ class SasaranOpdControllerWebFluxTests {
 
     @Test
     void whenLevel1GetsSasaranOpdByKodeOpdTahunBulan_thenMergedResponseReturned() {
-        SasaranOpdResponse result = new SasaranOpdResponse(
-                12L,
+        PenetapanSasaranOpdListResponse result = new PenetapanSasaranOpdListResponse(
                 "5.01.5.05.0.00.01.0000",
-                "SAS-OPD-193",
-                null,
                 2026,
                 3,
-                List.of(new SasaranOpdResponse.IndikatorResponse(
-                        13L,
-                        "IND-59",
+                List.of(new SasaranOpdPenetapanResponse(
+                        12L,
+                        "SAS-OPD-193",
                         null,
-                        null,
-                        null,
-                        null,
-                        2026,
-                        3,
-                        List.of(new SasaranOpdResponse.TargetResponse(
-                                14L,
-                                "TGT-TRG-SAS-1bdac",
+                        List.of(new SasaranOpdPenetapanResponse.IndikatorPenetapan(
+                                "IND-59",
                                 null,
                                 null,
-                                2026,
-                                3,
-                                80.0,
                                 null,
-                                null
+                                null,
+                                List.of(new SasaranOpdPenetapanResponse.TargetPenetapan(
+                                        "TGT-TRG-SAS-1bdac",
+                                        null,
+                                        null,
+                                        80.0,
+                                        null,
+                                        null
+                                ))
                         ))
                 ))
         );
 
-        when(sasaranOpdService.getRealisasiSasaranOpdByTahunAndKodeOpdAndBulan("2026", "5.01.5.05.0.00.01.0000", "3"))
-                .thenReturn(Flux.just(result));
+        when(sasaranOpdService.getPenetapanWithRealisasi("5.01.5.05.0.00.01.0000", 2026, "3"))
+                .thenReturn(Mono.just(result));
 
         webTestClient
                 .mutateWith(SecurityMockServerConfigurers.mockJwt().authorities(new SimpleGrantedAuthority("level_1")))
                 .get()
-                .uri("/sasaran_opd/5.01.5.05.0.00.01.0000/tahun/2026/bulan/3")
+                .uri("/sasaran_opd/5.01.5.05.0.00.01.0000/tahun/2026/penetapan?bulan=3")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.kode_opd").isEqualTo("5.01.5.05.0.00.01.0000")
                 .jsonPath("$.tahun").isEqualTo(2026)
-                .jsonPath("$.sasaran_opds[0].kode_sasaran_opd").isEqualTo("SAS-OPD-193")
-                .jsonPath("$.sasaran_opds[0].indikators[0].kode_indikator").isEqualTo("IND-59")
-                .jsonPath("$.sasaran_opds[0].indikators[0].targets[0].realisasi").isEqualTo(80.0);
+                .jsonPath("$.sasaranOpds[0].kode_sasaran_opd").isEqualTo("SAS-OPD-193")
+                .jsonPath("$.sasaranOpds[0].indikators[0].kode_indikator").isEqualTo("IND-59")
+                .jsonPath("$.sasaranOpds[0].indikators[0].targets[0].realisasi").isEqualTo(80.0);
     }
 }

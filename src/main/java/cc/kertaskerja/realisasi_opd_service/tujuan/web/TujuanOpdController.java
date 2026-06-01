@@ -27,21 +27,21 @@ public class TujuanOpdController {
         this.tujuanOpdService = tujuanOpdService;
     }
 
-    @GetMapping("/{kodeOpd}/tahun/{tahun}/bulan/{bulan}")
-    @Operation(summary = "Cari realisasi tujuan OPD per tahun dan bulan", description = "Mengambil realisasi tujuan OPD berdasarkan kode OPD, tahun, dan bulan.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar realisasi tujuan OPD", content = @Content(schema = @Schema(implementation = TujuanOpdSubmitListResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-    })
-    public Mono<TujuanOpdSubmitListResponse> getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan(
-            @Parameter(description = "Kode OPD", example = "5.01.5.05.0.00.01.0000") @PathVariable String kodeOpd,
-            @Parameter(description = "Tahun realisasi", example = "2026") @PathVariable String tahun,
-            @Parameter(description = "Bulan realisasi", example = "1") @PathVariable String bulan) {
-        return tujuanOpdService.getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan(tahun, kodeOpd, bulan)
-                .collectList()
-                .map(items -> new TujuanOpdSubmitListResponse(kodeOpd, Integer.parseInt(tahun), items));
-    }
+//     @GetMapping("/{kodeOpd}/tahun/{tahun}/bulan/{bulan}")
+//     @Operation(summary = "Cari realisasi tujuan OPD per tahun dan bulan", description = "Mengambil realisasi tujuan OPD berdasarkan kode OPD, tahun, dan bulan.")
+//     @ApiResponses(value = {
+//             @ApiResponse(responseCode = "200", description = "Daftar realisasi tujuan OPD", content = @Content(schema = @Schema(implementation = TujuanOpdSubmitListResponse.class))),
+//             @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
+//             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+//     })
+//     public Mono<TujuanOpdSubmitListResponse> getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan(
+//             @Parameter(description = "Kode OPD", example = "5.01.5.05.0.00.01.0000") @PathVariable String kodeOpd,
+//             @Parameter(description = "Tahun realisasi", example = "2026") @PathVariable String tahun,
+//             @Parameter(description = "Bulan realisasi", example = "1") @PathVariable String bulan) {
+//         return tujuanOpdService.getRealisasiTujuanOpdByTahunAndKodeOpdAndBulan(tahun, kodeOpd, bulan)
+//                 .collectList()
+//                 .map(items -> new TujuanOpdSubmitListResponse(kodeOpd, Integer.parseInt(tahun), items));
+//     }
 
     @GetMapping("/{kodeOpd}/tahun/{tahun}/penetapan")
     @Operation(summary = "Integrasi penetapan dengan realisasi tujuan OPD", description = "Menggabungkan data penetapan (dari external service) dengan data realisasi tujuan OPD berdasarkan kode OPD dan tahun. Parameter bulan bersifat opsional; jika tidak dikirim, hanya data penetapan tanpa realisasi yang dikembalikan.")
