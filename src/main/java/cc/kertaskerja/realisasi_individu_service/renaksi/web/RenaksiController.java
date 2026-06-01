@@ -82,22 +82,7 @@ public class RenaksiController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload realisasi renaksi", required = true,
                     content = @Content(schema = @Schema(implementation = RenaksiRequest.class)))
             @RequestBody @Valid RenaksiRequest renaksiRequest) {
-        return renaksiService.submitRealisasiRenaksi(
-                renaksiRequest.renaksiId(),
-                renaksiRequest.renaksi(),
-                renaksiRequest.nip(),
-                renaksiRequest.namaPegawai(),
-                renaksiRequest.rekinId(),
-                renaksiRequest.rekin(),
-                renaksiRequest.targetId(),
-                renaksiRequest.target(),
-                renaksiRequest.realisasi(),
-                renaksiRequest.satuan(),
-                renaksiRequest.bulan(),
-                renaksiRequest.tahun(),
-                renaksiRequest.jenisRealisasi(),
-                renaksiRequest.kodeOpd()
-        );
+        return renaksiService.submitRealisasiRenaksi(renaksiRequest);
     }
 
     @PostMapping("/batch")

@@ -33,15 +33,31 @@ public class RekinService {
         return rekinRepository.findAllByTahunBetween(tahunAwal, tahunAkhir);
     }
 
-    public Mono<Rekin> submitRealisasiRekin(String rekinId, String rekin,
-            String indikatorId, String indikator,
-            String nip, String namaPegawai, String idSasaran, String sasaran,
-            String targetId, String target, Integer realisasi,
-            String satuan, String tahun, String bulan, String kodeOpd, JenisRealisasi jenisRealisasi) {
-        return Mono.just(buildUncheckedRealisasiRekin(
-                rekinId, rekin, indikatorId, indikator, nip, namaPegawai, idSasaran, sasaran, targetId, target,
-                realisasi, satuan, tahun, bulan, kodeOpd, jenisRealisasi))
-                .flatMap(rekinRepository::save);
+    public Mono<Rekin> submitRealisasiRekin(RekinRequest req) {
+        if (req.targetRealisasiId() != null) {
+            return rekinRepository.findById(req.targetRealisasiId())
+                    .flatMap(existing -> rekinRepository.save(buildUpdatedRealisasiRekin(existing, req)))
+                    .switchIfEmpty(Mono.defer(() -> {
+                        Rekin baru = buildUncheckedRealisasiRekin(
+                                req.rekinId(), req.rekin(), req.indikatorId(), req.indikator(),
+                                req.nip(), req.namaPegawai(), req.idSasaran(), req.sasaran(),
+                                req.targetId(), req.target(), req.realisasi(), req.satuan(),
+                                req.tahun(), req.bulan(), req.kodeOpd(), req.jenisRealisasi());
+                        return rekinRepository.save(baru);
+                    }));
+        }
+
+        return rekinRepository.findFirstByNipAndIdSasaranAndTahunAndRekinId(
+                        req.nip(), req.idSasaran(), req.tahun(), req.rekinId())
+                .flatMap(existing -> rekinRepository.save(buildUpdatedRealisasiRekin(existing, req)))
+                .switchIfEmpty(Mono.defer(() -> {
+                    Rekin baru = buildUncheckedRealisasiRekin(
+                            req.rekinId(), req.rekin(), req.indikatorId(), req.indikator(),
+                            req.nip(), req.namaPegawai(), req.idSasaran(), req.sasaran(),
+                            req.targetId(), req.target(), req.realisasi(), req.satuan(),
+                            req.tahun(), req.bulan(), req.kodeOpd(), req.jenisRealisasi());
+                    return rekinRepository.save(baru);
+                }));
     }
 
     public static Rekin buildUncheckedRealisasiRekin(String rekinId, String rekin,

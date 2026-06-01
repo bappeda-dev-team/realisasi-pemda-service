@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 import cc.kertaskerja.config.SecurityConfig;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -111,23 +112,7 @@ public class RekinControllerWebFluxTests {
                 request.jenisRealisasi()
         );
 
-        when(rekinService.submitRealisasiRekin(
-                request.rekinId(),
-                request.rekin(),
-                request.indikatorId(),
-                request.indikator(),
-                request.nip(),
-                request.namaPegawai(),
-                request.idSasaran(),
-                request.sasaran(),
-                request.targetId(),
-                request.target(),
-                request.realisasi(),
-                request.satuan(),
-                request.tahun(),
-                request.bulan(),
-                request.kodeOpd(),
-                request.jenisRealisasi()))
+        when(rekinService.submitRealisasiRekin(any(RekinRequest.class)))
                 .thenReturn(Mono.just(result));
 
         webTestClient
@@ -183,23 +168,7 @@ public class RekinControllerWebFluxTests {
                 request.jenisRealisasi()
         );
 
-        when(rekinService.submitRealisasiRekin(
-                request.rekinId(),
-                request.rekin(),
-                request.indikatorId(),
-                request.indikator(),
-                request.nip(),
-                request.namaPegawai(),
-                request.idSasaran(),
-                request.sasaran(),
-                request.targetId(),
-                request.target(),
-                request.realisasi(),
-                request.satuan(),
-                request.tahun(),
-                request.bulan(),
-                request.kodeOpd(),
-                request.jenisRealisasi()))
+        when(rekinService.submitRealisasiRekin(any(RekinRequest.class)))
                 .thenReturn(Mono.just(result));
 
         webTestClient
