@@ -153,4 +153,48 @@ return tujuanService.submitRealisasiTujuan(
             @RequestBody @Valid List<TujuanRequest> tujuanRequests) {
         return tujuanService.batchSubmitRealisasiTujuan(tujuanRequests);
     }
+
+    @PostMapping("/faktor-penunjang")
+    @Operation(summary = "Perbarui faktor penunjang tujuan", description = "Memperbarui hanya field faktor_penunjang pada record Tujuan yang cocok dengan composite key (tujuanId, indikatorId, targetId, tahun, bulan).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = Tujuan.class))),
+            @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Tujuan tidak ditemukan", content = @Content)
+    })
+    public Mono<Tujuan> updateFaktorPenunjang(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload parsial faktor penunjang", required = true,
+                    content = @Content(schema = @Schema(implementation = FaktorPenunjangRequest.class)))
+            @RequestBody @Valid FaktorPenunjangRequest req) {
+        return tujuanService.updateFaktorPenunjang(
+                req.tujuanId(),
+                req.indikatorId(),
+                req.targetId(),
+                req.tahun(),
+                req.bulan(),
+                req.faktorPenunjang()
+        );
+    }
+
+    @PostMapping("/faktor-penghambat")
+    @Operation(summary = "Perbarui faktor penghambat tujuan", description = "Memperbarui hanya field faktor_penghambat pada record Tujuan yang cocok dengan composite key (tujuanId, indikatorId, targetId, tahun, bulan).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = Tujuan.class))),
+            @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Tujuan tidak ditemukan", content = @Content)
+    })
+    public Mono<Tujuan> updateFaktorPenghambat(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload parsial faktor penghambat", required = true,
+                    content = @Content(schema = @Schema(implementation = FaktorPenghambatRequest.class)))
+            @RequestBody @Valid FaktorPenghambatRequest req) {
+        return tujuanService.updateFaktorPenghambat(
+                req.tujuanId(),
+                req.indikatorId(),
+                req.targetId(),
+                req.tahun(),
+                req.bulan(),
+                req.faktorPenghambat()
+        );
+    }
 }
