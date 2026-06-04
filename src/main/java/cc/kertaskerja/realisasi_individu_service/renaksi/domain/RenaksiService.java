@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -49,7 +50,7 @@ public class RenaksiService {
                                 req.nip(), req.namaPegawai(),
                                 req.rekinId(), req.rekin(),
                                 req.targetId(), req.target(),
-                                req.realisasi(), req.satuan(),
+                                req.realisasi(), req.anggaran(), req.satuan(),
                                 req.bulan(), req.tahun(),
                                 req.jenisRealisasi(), req.kodeOpd());
                         return renaksiRepository.save(baru);
@@ -65,7 +66,7 @@ public class RenaksiService {
                             req.nip(), req.namaPegawai(),
                             req.rekinId(), req.rekin(),
                             req.targetId(), req.target(),
-                            req.realisasi(), req.satuan(),
+                            req.realisasi(), req.anggaran(), req.satuan(),
                             req.bulan(), req.tahun(),
                             req.jenisRealisasi(), req.kodeOpd());
                     return renaksiRepository.save(baru);
@@ -82,6 +83,7 @@ public class RenaksiService {
             String targetId,
             String target,
             Integer realisasi,
+            BigDecimal anggaran,
             String satuan,
             String bulan,
             String tahun,
@@ -97,6 +99,7 @@ public class RenaksiService {
                 targetId,
                 target,
                 realisasi,
+                anggaran,
                 satuan,
                 bulan,
                 tahun,
@@ -123,6 +126,7 @@ public class RenaksiService {
                                         req.targetId(),
                                         req.target(),
                                         req.realisasi(),
+                                        req.anggaran(),
                                         req.satuan(),
                                         req.bulan(),
                                         req.tahun(),
@@ -149,6 +153,7 @@ public class RenaksiService {
                                     req.targetId(),
                                     req.target(),
                                     req.realisasi(),
+                                    req.anggaran(),
                                     req.satuan(),
                                     req.bulan(),
                                     req.tahun(),
@@ -174,6 +179,7 @@ public class RenaksiService {
                             existing.targetId(),
                             existing.target(),
                             existing.realisasi(),
+                            existing.anggaran(),
                             existing.satuan(),
                             existing.bulan(),
                             existing.tahun(),
@@ -208,6 +214,7 @@ public class RenaksiService {
                             existing.targetId(),
                             existing.target(),
                             existing.realisasi(),
+                            existing.anggaran(),
                             existing.satuan(),
                             existing.bulan(),
                             existing.tahun(),
@@ -238,6 +245,7 @@ public class RenaksiService {
                 existing.targetId(),
                 existing.target(),
                 req.realisasi(),
+                req.anggaran(),
                 req.satuan(),
                 req.bulan(),
                 req.tahun(),
