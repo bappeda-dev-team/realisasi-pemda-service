@@ -21,6 +21,12 @@ public record TargetRenjaProgramIndividu(
         String bulan,
         BigDecimal realisasi,
 
+        @Column("faktor_penunjang")
+        String faktorPenunjang,
+
+        @Column("faktor_penghambat")
+        String faktorPenghambat,
+
         @CreatedDate Instant createdDate,
         @LastModifiedDate Instant lastModifiedDate,
         @CreatedBy String createdBy,

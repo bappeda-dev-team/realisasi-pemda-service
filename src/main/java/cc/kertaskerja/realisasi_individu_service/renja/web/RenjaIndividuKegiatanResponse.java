@@ -35,5 +35,11 @@ public record RenjaIndividuKegiatanResponse(
         Double capaian,
 
         @JsonProperty("keterangan_capaian")
-        String keteranganCapaian
+        String keteranganCapaian,
+
+        @JsonProperty("faktor_penunjang")
+        String faktorPenunjang,
+
+        @JsonProperty("faktor_penghambat")
+        String faktorPenghambat
 ) {}

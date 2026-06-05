@@ -23,6 +23,8 @@ public class RenjaOpdService {
     private final RenjaKegiatanOpdRepository targetKegiatanRepo;
     private final RenjaSubKegiatanOpdRepository targetSubKegiatanRepo;
 
+    record RealisasiData(Double realisasi, String faktorPenunjang, String faktorPenghambat) {}
+
     public RenjaOpdService(
             PenetapanRenjaOpdClient penetapanClient,
             RenjaProgramOpdRepository targetProgramRepo,
@@ -57,29 +59,35 @@ public class RenjaOpdService {
             PenetapanRenjaOpd.PenetapanRenjaOpdRoot root,
             String kodeOpd, int tahun, String bulan
     ) {
-        Mono<Map<String, Double>> programRealisasiMap = targetProgramRepo.findAllByTahunAndBulan(
+        Mono<Map<String, RealisasiData>> programRealisasiMap = targetProgramRepo.findAllByTahunAndBulan(
                         String.valueOf(tahun), bulan
                 )
                 .collectMap(RenjaProgramOpd::kodeTarget,
-                        t -> t.realisasi() != null ? t.realisasi().doubleValue() : null);
+                        t -> new RealisasiData(
+                                t.realisasi() != null ? t.realisasi().doubleValue() : null,
+                                t.faktorPenunjang(), t.faktorPenghambat()));
 
-        Mono<Map<String, Double>> kegiatanRealisasiMap = targetKegiatanRepo.findAllByTahunAndBulan(
+        Mono<Map<String, RealisasiData>> kegiatanRealisasiMap = targetKegiatanRepo.findAllByTahunAndBulan(
                         String.valueOf(tahun), bulan
                 )
                 .collectMap(RenjaKegiatanOpd::kodeTarget,
-                        t -> t.realisasi() != null ? t.realisasi().doubleValue() : null);
+                        t -> new RealisasiData(
+                                t.realisasi() != null ? t.realisasi().doubleValue() : null,
+                                t.faktorPenunjang(), t.faktorPenghambat()));
 
-        Mono<Map<String, Double>> subKegiatanRealisasiMap = targetSubKegiatanRepo.findAllByTahunAndBulan(
+        Mono<Map<String, RealisasiData>> subKegiatanRealisasiMap = targetSubKegiatanRepo.findAllByTahunAndBulan(
                         String.valueOf(tahun), bulan
                 )
                 .collectMap(RenjaSubKegiatanOpd::kodeTarget,
-                        t -> t.realisasi() != null ? t.realisasi().doubleValue() : null);
+                        t -> new RealisasiData(
+                                t.realisasi() != null ? t.realisasi().doubleValue() : null,
+                                t.faktorPenunjang(), t.faktorPenghambat()));
 
         return Mono.zip(programRealisasiMap, kegiatanRealisasiMap, subKegiatanRealisasiMap)
                 .map(tuple -> {
-                    Map<String, Double> progMap = tuple.getT1();
-                    Map<String, Double> kegMap = tuple.getT2();
-                    Map<String, Double> subMap = tuple.getT3();
+                    Map<String, RealisasiData> progMap = tuple.getT1();
+                    Map<String, RealisasiData> kegMap = tuple.getT2();
+                    Map<String, RealisasiData> subMap = tuple.getT3();
 
                     List<RenjaOpdPenetapanResponse.ProgramPenetapan> programs = safeList(root.programs()).stream()
                             .map(p -> mergeProgramWithRealisasi(p, progMap))
@@ -131,7 +139,8 @@ public class RenjaOpdService {
                         ind.targets().stream()
                                 .map(t -> new RenjaOpdPenetapanResponse.TargetPenetapan(
                                         t.id(), t.kodeTarget(), t.tahun(), null,
-                                        t.target(), null, t.satuan(), null, null
+                                        t.target(), null, t.satuan(), null, null,
+                                        null, null
                                 ))
                                 .toList()
                 ))
@@ -152,7 +161,8 @@ public class RenjaOpdService {
                         ind.targets().stream()
                                 .map(t -> new RenjaOpdPenetapanResponse.TargetPenetapan(
                                         t.id(), t.kodeTarget(), t.tahun(), null,
-                                        t.target(), null, t.satuan(), null, null
+                                        t.target(), null, t.satuan(), null, null,
+                                        null, null
                                 ))
                                 .toList()
                 ))
@@ -173,7 +183,8 @@ public class RenjaOpdService {
                         ind.targets().stream()
                                 .map(t -> new RenjaOpdPenetapanResponse.TargetPenetapan(
                                         t.id(), t.kodeTarget(), t.tahun(), null,
-                                        t.target(), null, t.satuan(), null, null
+                                        t.target(), null, t.satuan(), null, null,
+                                        null, null
                                 ))
                                 .toList()
                 ))
@@ -187,18 +198,21 @@ public class RenjaOpdService {
 
     private RenjaOpdPenetapanResponse.ProgramPenetapan mergeProgramWithRealisasi(
             PenetapanRenjaOpd.ProgramPenetapanData p,
-            Map<String, Double> realisasiMap
+            Map<String, RealisasiData> realisasiMap
     ) {
         List<RenjaOpdPenetapanResponse.IndikatorPenetapan> indikators = p.indikators().stream()
                 .map(ind -> {
                     List<RenjaOpdPenetapanResponse.TargetPenetapan> targets = ind.targets().stream()
                             .map(t -> {
-                                Double realisasi = realisasiMap.get(t.kodeTarget());
+                                RealisasiData data = realisasiMap.get(t.kodeTarget());
+                                Double realisasi = data != null ? data.realisasi() : null;
                                 var capaianResult = hitungCapaian(realisasi, t.target());
                                 return new RenjaOpdPenetapanResponse.TargetPenetapan(
                                         t.id(), t.kodeTarget(), t.tahun(), null,
                                         t.target(), realisasi, t.satuan(),
-                                        capaianResult.capaian(), capaianResult.keteranganCapaian()
+                                        capaianResult.capaian(), capaianResult.keteranganCapaian(),
+                                        data != null ? data.faktorPenunjang() : null,
+                                        data != null ? data.faktorPenghambat() : null
                                 );
                             })
                             .toList();
@@ -220,18 +234,21 @@ public class RenjaOpdService {
 
     private RenjaOpdPenetapanResponse.KegiatanPenetapan mergeKegiatanWithRealisasi(
             PenetapanRenjaOpd.KegiatanPenetapanData k,
-            Map<String, Double> realisasiMap
+            Map<String, RealisasiData> realisasiMap
     ) {
         List<RenjaOpdPenetapanResponse.IndikatorPenetapan> indikators = k.indikators().stream()
                 .map(ind -> {
                     List<RenjaOpdPenetapanResponse.TargetPenetapan> targets = ind.targets().stream()
                             .map(t -> {
-                                Double realisasi = realisasiMap.get(t.kodeTarget());
+                                RealisasiData data = realisasiMap.get(t.kodeTarget());
+                                Double realisasi = data != null ? data.realisasi() : null;
                                 var capaianResult = hitungCapaian(realisasi, t.target());
                                 return new RenjaOpdPenetapanResponse.TargetPenetapan(
                                         t.id(), t.kodeTarget(), t.tahun(), null,
                                         t.target(), realisasi, t.satuan(),
-                                        capaianResult.capaian(), capaianResult.keteranganCapaian()
+                                        capaianResult.capaian(), capaianResult.keteranganCapaian(),
+                                        data != null ? data.faktorPenunjang() : null,
+                                        data != null ? data.faktorPenghambat() : null
                                 );
                             })
                             .toList();
@@ -253,18 +270,21 @@ public class RenjaOpdService {
 
     private RenjaOpdPenetapanResponse.SubkegiatanPenetapan mergeSubKegiatanWithRealisasi(
             PenetapanRenjaOpd.SubkegiatanPenetapanData s,
-            Map<String, Double> realisasiMap
+            Map<String, RealisasiData> realisasiMap
     ) {
         List<RenjaOpdPenetapanResponse.IndikatorPenetapan> indikators = s.indikators().stream()
                 .map(ind -> {
                     List<RenjaOpdPenetapanResponse.TargetPenetapan> targets = ind.targets().stream()
                             .map(t -> {
-                                Double realisasi = realisasiMap.get(t.kodeTarget());
+                                RealisasiData data = realisasiMap.get(t.kodeTarget());
+                                Double realisasi = data != null ? data.realisasi() : null;
                                 var capaianResult = hitungCapaian(realisasi, t.target());
                                 return new RenjaOpdPenetapanResponse.TargetPenetapan(
                                         t.id(), t.kodeTarget(), t.tahun(), null,
                                         t.target(), realisasi, t.satuan(),
-                                        capaianResult.capaian(), capaianResult.keteranganCapaian()
+                                        capaianResult.capaian(), capaianResult.keteranganCapaian(),
+                                        data != null ? data.faktorPenunjang() : null,
+                                        data != null ? data.faktorPenghambat() : null
                                 );
                             })
                             .toList();
@@ -282,6 +302,78 @@ public class RenjaOpdService {
                 s.id(), s.kodeSubkegiatan(), s.subkegiatan(), s.isLocked(),
                 indikators, s.paguAnggaran()
         );
+    }
+
+    public Mono<RenjaProgramOpd> updateFaktorPenunjangProgram(String kodeTarget, String faktorPenunjang) {
+        return targetProgramRepo.findByKodeTarget(kodeTarget)
+                .flatMap(existing -> targetProgramRepo.save(new RenjaProgramOpd(
+                        existing.id(), existing.indikatorRenjaProgramOpdId(),
+                        existing.kodeTarget(), existing.tahun(), existing.bulan(),
+                        existing.realisasi(),
+                        faktorPenunjang, existing.faktorPenghambat(),
+                        existing.createdDate(), null,
+                        existing.createdBy(), null
+                )));
+    }
+
+    public Mono<RenjaProgramOpd> updateFaktorPenghambatProgram(String kodeTarget, String faktorPenghambat) {
+        return targetProgramRepo.findByKodeTarget(kodeTarget)
+                .flatMap(existing -> targetProgramRepo.save(new RenjaProgramOpd(
+                        existing.id(), existing.indikatorRenjaProgramOpdId(),
+                        existing.kodeTarget(), existing.tahun(), existing.bulan(),
+                        existing.realisasi(),
+                        existing.faktorPenunjang(), faktorPenghambat,
+                        existing.createdDate(), null,
+                        existing.createdBy(), null
+                )));
+    }
+
+    public Mono<RenjaKegiatanOpd> updateFaktorPenunjangKegiatan(String kodeTarget, String faktorPenunjang) {
+        return targetKegiatanRepo.findByKodeTarget(kodeTarget)
+                .flatMap(existing -> targetKegiatanRepo.save(new RenjaKegiatanOpd(
+                        existing.id(), existing.indikatorRenjaKegiatanOpdId(),
+                        existing.kodeTarget(), existing.tahun(), existing.bulan(),
+                        existing.realisasi(),
+                        faktorPenunjang, existing.faktorPenghambat(),
+                        existing.createdDate(), null,
+                        existing.createdBy(), null
+                )));
+    }
+
+    public Mono<RenjaKegiatanOpd> updateFaktorPenghambatKegiatan(String kodeTarget, String faktorPenghambat) {
+        return targetKegiatanRepo.findByKodeTarget(kodeTarget)
+                .flatMap(existing -> targetKegiatanRepo.save(new RenjaKegiatanOpd(
+                        existing.id(), existing.indikatorRenjaKegiatanOpdId(),
+                        existing.kodeTarget(), existing.tahun(), existing.bulan(),
+                        existing.realisasi(),
+                        existing.faktorPenunjang(), faktorPenghambat,
+                        existing.createdDate(), null,
+                        existing.createdBy(), null
+                )));
+    }
+
+    public Mono<RenjaSubKegiatanOpd> updateFaktorPenunjangSubKegiatan(String kodeTarget, String faktorPenunjang) {
+        return targetSubKegiatanRepo.findByKodeTarget(kodeTarget)
+                .flatMap(existing -> targetSubKegiatanRepo.save(new RenjaSubKegiatanOpd(
+                        existing.id(), existing.indikatorRenjaSubKegiatanOpdId(),
+                        existing.kodeTarget(), existing.tahun(), existing.bulan(),
+                        existing.realisasi(),
+                        faktorPenunjang, existing.faktorPenghambat(),
+                        existing.createdDate(), null,
+                        existing.createdBy(), null
+                )));
+    }
+
+    public Mono<RenjaSubKegiatanOpd> updateFaktorPenghambatSubKegiatan(String kodeTarget, String faktorPenghambat) {
+        return targetSubKegiatanRepo.findByKodeTarget(kodeTarget)
+                .flatMap(existing -> targetSubKegiatanRepo.save(new RenjaSubKegiatanOpd(
+                        existing.id(), existing.indikatorRenjaSubKegiatanOpdId(),
+                        existing.kodeTarget(), existing.tahun(), existing.bulan(),
+                        existing.realisasi(),
+                        existing.faktorPenunjang(), faktorPenghambat,
+                        existing.createdDate(), null,
+                        existing.createdBy(), null
+                )));
     }
 
     static CapaianResult hitungCapaian(Double realisasi, Double target) {
