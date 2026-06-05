@@ -7,4 +7,5 @@ import reactor.core.publisher.Mono;
 public interface TargetRenjaSubKegiatanIndividuRepository extends ReactiveCrudRepository<TargetRenjaSubKegiatanIndividu, Long> {
     Flux<TargetRenjaSubKegiatanIndividu> findAllByTahunAndBulan(String tahun, String bulan);
     Mono<TargetRenjaSubKegiatanIndividu> findByIndikatorRenjaSubKegiatanIndividuIdAndTahunAndBulan(Long indikatorRenjaSubKegiatanIndividuId, String tahun, String bulan);
+    Mono<TargetRenjaSubKegiatanIndividu> findByKodeTarget(String kodeTarget);
 }
