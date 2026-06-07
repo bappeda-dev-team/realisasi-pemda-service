@@ -502,12 +502,14 @@ public class RenjaIndividuService {
                                         indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
                                 .flatMap(existing -> targetProgramOpdRepo.save(new RenjaProgramOpd(
                                         existing.id(), existing.indikatorRenjaProgramOpdId(),
+                                        existing.kodeOpd(), existing.kodeProgram(),
                                         existing.kodeTarget(), existing.tahun(), existing.bulan(),
                                         BigDecimal.valueOf(req.realisasi()),
                                         existing.faktorPenunjang(), existing.faktorPenghambat(),
                                         existing.createdDate(), null, existing.createdBy(), null)))
                                 .switchIfEmpty(Mono.defer(() -> targetProgramOpdRepo.save(new RenjaProgramOpd(
-                                        null, indikator.id(), req.kodeTarget(),
+                                        null, indikator.id(), req.kodeOpd(), req.kodeProgram(),
+                                        req.kodeTarget(),
                                         req.tahun(), req.bulan(), BigDecimal.valueOf(req.realisasi()),
                                         "", "",
                                         null, null, null, null))))
@@ -530,12 +532,14 @@ public class RenjaIndividuService {
                                         indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
                                 .flatMap(existing -> targetKegiatanOpdRepo.save(new RenjaKegiatanOpd(
                                         existing.id(), existing.indikatorRenjaKegiatanOpdId(),
+                                        existing.kodeOpd(), existing.kodeKegiatan(),
                                         existing.kodeTarget(), existing.tahun(), existing.bulan(),
                                         BigDecimal.valueOf(req.realisasi()),
                                         existing.faktorPenunjang(), existing.faktorPenghambat(),
                                         existing.createdDate(), null, existing.createdBy(), null)))
                                 .switchIfEmpty(Mono.defer(() -> targetKegiatanOpdRepo.save(new RenjaKegiatanOpd(
-                                        null, indikator.id(), req.kodeTarget(),
+                                        null, indikator.id(), req.kodeOpd(), req.kodeKegiatan(),
+                                        req.kodeTarget(),
                                         req.tahun(), req.bulan(), BigDecimal.valueOf(req.realisasi()),
                                         "", "",
                                         null, null, null, null))))
@@ -558,12 +562,14 @@ public class RenjaIndividuService {
                                         indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
                                 .flatMap(existing -> targetSubKegiatanOpdRepo.save(new RenjaSubKegiatanOpd(
                                         existing.id(), existing.indikatorRenjaSubKegiatanOpdId(),
+                                        existing.kodeOpd(), existing.kodeSubkegiatan(),
                                         existing.kodeTarget(), existing.tahun(), existing.bulan(),
                                         BigDecimal.valueOf(req.realisasi()),
                                         existing.faktorPenunjang(), existing.faktorPenghambat(),
                                         existing.createdDate(), null, existing.createdBy(), null)))
                                 .switchIfEmpty(Mono.defer(() -> targetSubKegiatanOpdRepo.save(new RenjaSubKegiatanOpd(
-                                        null, indikator.id(), req.kodeTarget(),
+                                        null, indikator.id(), req.kodeOpd(), req.kodeSubKegiatan(),
+                                        req.kodeTarget(),
                                         req.tahun(), req.bulan(), BigDecimal.valueOf(req.realisasi()),
                                         "", "",
                                         null, null, null, null))))

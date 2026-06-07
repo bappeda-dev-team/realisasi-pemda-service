@@ -14,6 +14,12 @@ public record RenjaSubKegiatanOpd(
         @Column("indikator_renja_subkegiatan_opd_id")
         Long indikatorRenjaSubKegiatanOpdId,
 
+        @Column("kode_opd")
+        String kodeOpd,
+
+        @Column("kode_subkegiatan")
+        String kodeSubkegiatan,
+
         @Column("kode_target")
         String kodeTarget,
 

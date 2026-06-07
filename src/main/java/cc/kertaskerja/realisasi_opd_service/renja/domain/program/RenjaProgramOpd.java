@@ -14,6 +14,12 @@ public record RenjaProgramOpd(
         @Column("indikator_renja_program_opd_id")
         Long indikatorRenjaProgramOpdId,
 
+        @Column("kode_opd")
+        String kodeOpd,
+
+        @Column("kode_program")
+        String kodeProgram,
+
         @Column("kode_target")
         String kodeTarget,
 
