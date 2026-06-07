@@ -12,10 +12,6 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-22.04
-    env:
-      DB_URL: ${{ secrets.DB_URL }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     permissions:
       contents: read
       security-events: write
@@ -28,7 +24,11 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: gradle
-      - name: Build, unit tests and integration tests
+      - name: tests
+        run: |
+          chmod +x gradlew
+          ./gradlew test
+      - name: Build
         run: |
           chmod +x gradlew
           ./gradlew build
