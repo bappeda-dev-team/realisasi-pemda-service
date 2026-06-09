@@ -1,6 +1,5 @@
 package cc.kertaskerja.realisasi_opd_service.renja.web.program;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -40,7 +39,6 @@ public record FaktorPenunjangTargetRenjaProgramOpdRequest(
 
         @NotNull(message = "Faktor penunjang tidak boleh kosong")
         @NotEmpty(message = "Faktor penunjang tidak boleh kosong")
-        @JsonProperty("faktor_penunjang")
         @Schema(description = "Faktor penunjang target program", example = "Kerjasama tim yang baik")
         String faktorPenunjang
 ) {}
