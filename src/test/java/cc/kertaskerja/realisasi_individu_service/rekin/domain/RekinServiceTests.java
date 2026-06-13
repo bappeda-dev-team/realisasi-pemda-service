@@ -99,14 +99,18 @@ public class RekinServiceTests {
         IndikatorRekin savedInd = buildSavedIndikator(1L, req.kodeOpd(), req.nip(), req.tahun(), req.bulan());
         TargetIndikatorRekin savedTarget = buildSavedTarget(100L, req.kodeOpd(), req.nip(), req.tahun(), req.bulan());
 
-        when(indikatorRekinRepository.findAllByRekinId(anyLong()))
-                .thenReturn(Flux.empty(), Flux.just(savedInd));
+        when(indikatorRekinRepository.findFirstByRekinIdAndKodeIndikator(anyLong(), anyString()))
+                .thenReturn(Mono.empty());
         when(indikatorRekinRepository.save(ArgumentMatchers.any(IndikatorRekin.class)))
                 .thenReturn(Mono.just(savedInd));
-        when(targetIndikatorRekinRepository.findAllByIndikatorRekinIdIn(anyList()))
-                .thenReturn(Flux.just(savedTarget));
+        when(targetIndikatorRekinRepository.findFirstByIndikatorRekinIdAndKodeTarget(anyLong(), anyString()))
+                .thenReturn(Mono.empty());
         when(targetIndikatorRekinRepository.save(ArgumentMatchers.any(TargetIndikatorRekin.class)))
                 .thenReturn(Mono.just(savedTarget));
+        when(indikatorRekinRepository.findAllByRekinId(anyLong()))
+                .thenReturn(Flux.just(savedInd));
+        when(targetIndikatorRekinRepository.findAllByIndikatorRekinIdIn(anyList()))
+                .thenReturn(Flux.just(savedTarget));
 
         stubSasaranSync();
 
@@ -163,14 +167,18 @@ public class RekinServiceTests {
         IndikatorRekin savedInd = buildSavedIndikator(99L, req.kodeOpd(), req.nip(), req.tahun(), req.bulan());
         TargetIndikatorRekin savedTarget = buildSavedTarget(100L, req.kodeOpd(), req.nip(), req.tahun(), req.bulan());
 
-        when(indikatorRekinRepository.findAllByRekinId(anyLong()))
-                .thenReturn(Flux.empty(), Flux.just(savedInd));
+        when(indikatorRekinRepository.findFirstByRekinIdAndKodeIndikator(anyLong(), anyString()))
+                .thenReturn(Mono.empty());
         when(indikatorRekinRepository.save(ArgumentMatchers.any(IndikatorRekin.class)))
                 .thenReturn(Mono.just(savedInd));
-        when(targetIndikatorRekinRepository.findAllByIndikatorRekinIdIn(anyList()))
-                .thenReturn(Flux.just(savedTarget));
+        when(targetIndikatorRekinRepository.findFirstByIndikatorRekinIdAndKodeTarget(anyLong(), anyString()))
+                .thenReturn(Mono.empty());
         when(targetIndikatorRekinRepository.save(ArgumentMatchers.any(TargetIndikatorRekin.class)))
                 .thenReturn(Mono.just(savedTarget));
+        when(indikatorRekinRepository.findAllByRekinId(anyLong()))
+                .thenReturn(Flux.just(savedInd));
+        when(targetIndikatorRekinRepository.findAllByIndikatorRekinIdIn(anyList()))
+                .thenReturn(Flux.just(savedTarget));
 
         stubSasaranSync();
 
@@ -223,14 +231,18 @@ public class RekinServiceTests {
         IndikatorRekin savedInd = buildSavedIndikator(99L, req.kodeOpd(), req.nip(), req.tahun(), req.bulan());
         TargetIndikatorRekin savedTarget = buildSavedTarget(100L, req.kodeOpd(), req.nip(), req.tahun(), req.bulan());
 
-        when(indikatorRekinRepository.findAllByRekinId(anyLong()))
-                .thenReturn(Flux.empty(), Flux.just(savedInd));
+        when(indikatorRekinRepository.findFirstByRekinIdAndKodeIndikator(anyLong(), anyString()))
+                .thenReturn(Mono.empty());
         when(indikatorRekinRepository.save(ArgumentMatchers.any(IndikatorRekin.class)))
                 .thenReturn(Mono.just(savedInd));
-        when(targetIndikatorRekinRepository.findAllByIndikatorRekinIdIn(anyList()))
-                .thenReturn(Flux.just(savedTarget));
+        when(targetIndikatorRekinRepository.findFirstByIndikatorRekinIdAndKodeTarget(anyLong(), anyString()))
+                .thenReturn(Mono.empty());
         when(targetIndikatorRekinRepository.save(ArgumentMatchers.any(TargetIndikatorRekin.class)))
                 .thenReturn(Mono.just(savedTarget));
+        when(indikatorRekinRepository.findAllByRekinId(anyLong()))
+                .thenReturn(Flux.just(savedInd));
+        when(targetIndikatorRekinRepository.findAllByIndikatorRekinIdIn(anyList()))
+                .thenReturn(Flux.just(savedTarget));
 
         stubSasaranSync();
 
@@ -284,14 +296,18 @@ public class RekinServiceTests {
         IndikatorRekin savedInd = buildSavedIndikator(1L, req.kodeOpd(), req.nip(), req.tahun(), req.bulan());
         TargetIndikatorRekin savedTarget = buildSavedTarget(100L, req.kodeOpd(), req.nip(), req.tahun(), req.bulan());
 
-        when(indikatorRekinRepository.findAllByRekinId(anyLong()))
-                .thenReturn(Flux.empty(), Flux.just(savedInd));
+        when(indikatorRekinRepository.findFirstByRekinIdAndKodeIndikator(anyLong(), anyString()))
+                .thenReturn(Mono.empty());
         when(indikatorRekinRepository.save(ArgumentMatchers.any(IndikatorRekin.class)))
                 .thenReturn(Mono.just(savedInd));
-        when(targetIndikatorRekinRepository.findAllByIndikatorRekinIdIn(anyList()))
-                .thenReturn(Flux.just(savedTarget));
+        when(targetIndikatorRekinRepository.findFirstByIndikatorRekinIdAndKodeTarget(anyLong(), anyString()))
+                .thenReturn(Mono.empty());
         when(targetIndikatorRekinRepository.save(ArgumentMatchers.any(TargetIndikatorRekin.class)))
                 .thenReturn(Mono.just(savedTarget));
+        when(indikatorRekinRepository.findAllByRekinId(anyLong()))
+                .thenReturn(Flux.just(savedInd));
+        when(targetIndikatorRekinRepository.findAllByIndikatorRekinIdIn(anyList()))
+                .thenReturn(Flux.just(savedTarget));
 
         stubSasaranSync();
 
