@@ -6,12 +6,9 @@ import cc.kertaskerja.realisasi_individu_service.rekin.domain.indikator.Indikato
 import cc.kertaskerja.realisasi_individu_service.rekin.domain.target.TargetIndikatorRekin;
 import cc.kertaskerja.realisasi_individu_service.rekin.domain.target.TargetIndikatorRekinRepository;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.RekinRequest;
-import cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpd;
-import cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.sasaran.domain.indikator.IndikatorSasaranOpd;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.indikator.IndikatorSasaranOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.sasaran.domain.target.TargetIndikatorSasaranOpd;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.target.TargetIndikatorSasaranOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpdRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -65,38 +62,9 @@ public class RekinServiceTests {
     }
 
     private void stubSasaranSync() {
-        when(sasaranOpdRepository.findFirstByKodeOpdAndKodeSasaranOpdAndTahunAndBulan(
-                anyString(), anyString(), anyString(), anyString()))
+        when(targetIndikatorSasaranOpdRepository.findFirstByKodeOpdAndKodeSasaranOpdAndKodeIndikatorSasaranOpdAndKodeTargetSasaranOpdAndTahunAndBulan(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Mono.empty());
-        when(sasaranOpdRepository.save(any(SasaranOpd.class)))
-                .thenAnswer(inv -> {
-                    SasaranOpd s = inv.getArgument(0);
-                    return Mono.just(new SasaranOpd(
-                            1L, s.kodeOpd(), s.kodeSasaranOpd(), s.tahun(), s.bulan(),
-                            null, null, null, null));
-                });
-        when(indikatorSasaranOpdRepository.findFirstBySasaranOpdIdAndKodeIndikatorAndKodeOpdAndTahunAndBulan(
-                anyLong(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(Mono.empty());
-        when(indikatorSasaranOpdRepository.save(any(IndikatorSasaranOpd.class)))
-                .thenAnswer(inv -> {
-                    IndikatorSasaranOpd i = inv.getArgument(0);
-                    return Mono.just(new IndikatorSasaranOpd(
-                            1L, i.sasaranOpdId(), i.kodeIndikator(),
-                            i.kodeOpd(), i.tahun(), i.bulan(),
-                            null, null, null, null));
-                });
-        when(targetIndikatorSasaranOpdRepository.findFirstByIndikatorSasaranIdAndKodeTargetAndTahunAndBulan(
-                anyLong(), anyString(), anyString(), anyString()))
-                .thenReturn(Mono.empty());
-        when(targetIndikatorSasaranOpdRepository.save(any(TargetIndikatorSasaranOpd.class)))
-                .thenAnswer(inv -> {
-                    TargetIndikatorSasaranOpd t = inv.getArgument(0);
-                    return Mono.just(new TargetIndikatorSasaranOpd(
-                            1L, t.indikatorSasaranId(), t.kodeTarget(), t.realisasi(),
-                            t.tahun(), t.bulan(), "", "",
-                            null, null, null, null));
-                });
     }
 
     @Test
@@ -300,6 +268,9 @@ public class RekinServiceTests {
         );
 
         when(rekinRepository.findById(99L))
+                .thenReturn(Mono.empty());
+        when(rekinRepository.findFirstByNipAndTahunAndBulanAndKodeRekin(
+                anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Mono.empty());
         when(rekinRepository.save(ArgumentMatchers.any(Rekin.class)))
                 .thenAnswer(invocation -> {
