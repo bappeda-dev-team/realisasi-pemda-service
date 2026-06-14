@@ -53,12 +53,17 @@ public class RenaksiService {
         if (req.id() != null) {
             sasaranMono = sasaranIndividuRepository.findById(req.id())
                     .flatMap(existing -> sasaranIndividuRepository.save(buildUpdatedSasaran(existing, req)))
-                    .switchIfEmpty(Mono.defer(() -> {
-                        SasaranIndividu baru = buildUncheckedSasaran(
-                                req.kodeOpd(), req.nip(), req.kodeSasaran(),
-                                req.tahun(), req.bulan());
-                        return sasaranIndividuRepository.save(baru);
-                    }));
+                    .switchIfEmpty(Mono.defer(() ->
+                            sasaranIndividuRepository.findFirstByNipAndTahunAndBulanAndKodeSasaran(
+                                            req.nip(), req.tahun(), req.bulan(), req.kodeSasaran())
+                                    .flatMap(existing -> sasaranIndividuRepository.save(buildUpdatedSasaran(existing, req)))
+                                    .switchIfEmpty(Mono.defer(() -> {
+                                        SasaranIndividu baru = buildUncheckedSasaran(
+                                                req.kodeOpd(), req.nip(), req.kodeSasaran(),
+                                                req.tahun(), req.bulan());
+                                        return sasaranIndividuRepository.save(baru);
+                                    }))
+                    ));
         } else {
             sasaranMono = sasaranIndividuRepository.findFirstByNipAndTahunAndBulanAndKodeSasaran(
                             req.nip(), req.tahun(), req.bulan(), req.kodeSasaran())
@@ -73,8 +78,10 @@ public class RenaksiService {
 
         return sasaranMono
                 .flatMap(savedSasaran ->
-                        deleteExistingRenaksiAndDescendants(savedSasaran.id())
-                                .then(saveRenaksiAndTarget(savedSasaran, req))
+                        findOrCreateRenaksi(savedSasaran, req)
+                                .flatMap(renaksi -> findOrCreateIndikatorRenaksi(renaksi, req))
+                                .flatMap(indikator -> upsertTargetRenaksi(indikator.id(), req))
+                                .then(Mono.defer(() -> enrichWithDetails(savedSasaran)))
                 );
     }
 
@@ -160,60 +167,57 @@ public class RenaksiService {
                 );
     }
 
-    private Mono<Void> deleteExistingRenaksiAndDescendants(Long sasaranId) {
-        return renaksiIndividuRepository.findAllBySasaranId(sasaranId)
-                .collectList()
-                .flatMap(renaksis -> {
-                    if (renaksis.isEmpty()) return Mono.empty();
-                    List<Long> renaksiIds = renaksis.stream().map(RenaksiIndividu::id).toList();
-                    return indikatorRenaksiIndividuRepository.findAllByRenaksiIdIn(renaksiIds)
-                            .collectList()
-                            .flatMap(indikators -> {
-                                if (indikators.isEmpty()) {
-                                    return renaksiIndividuRepository.deleteAll(renaksis);
-                                }
-                                List<Long> indikatorIds = indikators.stream().map(IndikatorRenaksiIndividu::id).toList();
-                                return targetIndikatorRenaksiRepository.findAllByIndikatorRenaksiIdIn(indikatorIds)
-                                        .collectList()
-                                        .flatMap(targets -> {
-                                            if (targets.isEmpty()) {
-                                                return indikatorRenaksiIndividuRepository.deleteAll(indikators)
-                                                        .then(renaksiIndividuRepository.deleteAll(renaksis));
-                                            }
-                                            return targetIndikatorRenaksiRepository.deleteAll(targets)
-                                                    .then(indikatorRenaksiIndividuRepository.deleteAll(indikators))
-                                                    .then(renaksiIndividuRepository.deleteAll(renaksis));
-                                        });
-                            });
-                });
+    private Mono<RenaksiIndividu> findOrCreateRenaksi(SasaranIndividu sasaran, RenaksiIndividuRequest req) {
+        return renaksiIndividuRepository
+                .findFirstBySasaranIdAndKodeRenaksi(sasaran.id(), req.kodeRenaksi())
+                .switchIfEmpty(Mono.defer(() -> {
+                    RenaksiIndividu baru = RenaksiIndividu.of(
+                            sasaran.id(), sasaran.kodeOpd(), sasaran.nip(), req.kodeRenaksi(),
+                            "Realisasi Renaksi " + req.kodeRenaksi(),
+                            sasaran.tahun(), sasaran.bulan(), RenaksiStatus.UNCHECKED);
+                    return renaksiIndividuRepository.save(baru);
+                }));
     }
 
-    private Mono<SasaranWithDetails> saveRenaksiAndTarget(SasaranIndividu sasaran, RenaksiIndividuRequest req) {
-        RenaksiIndividu renaksi = RenaksiIndividu.of(
-                sasaran.id(), sasaran.kodeOpd(), sasaran.nip(), req.kodeRenaksi(),
-                "Realisasi Renaksi " + req.kodeRenaksi(),
-                sasaran.tahun(), sasaran.bulan(), RenaksiStatus.UNCHECKED
-        );
-        return renaksiIndividuRepository.save(renaksi)
-                .flatMap(savedRenaksi -> {
-                    IndikatorRenaksiIndividu indikator = IndikatorRenaksiIndividu.of(
-                            savedRenaksi.id(), req.kodeIndikator(), "Realisasi Indikator " + req.kodeIndikator(),
-                            sasaran.kodeOpd(), sasaran.nip(), sasaran.tahun(), sasaran.bulan()
+    private Mono<IndikatorRenaksiIndividu> findOrCreateIndikatorRenaksi(RenaksiIndividu renaksi, RenaksiIndividuRequest req) {
+        return indikatorRenaksiIndividuRepository
+                .findFirstByRenaksiIdAndKodeIndikator(renaksi.id(), req.kodeIndikator())
+                .switchIfEmpty(Mono.defer(() -> {
+                    IndikatorRenaksiIndividu baru = IndikatorRenaksiIndividu.of(
+                            renaksi.id(), req.kodeIndikator(), "Realisasi Indikator " + req.kodeIndikator(),
+                            renaksi.kodeOpd(), renaksi.nip(), renaksi.tahun(), renaksi.bulan());
+                    return indikatorRenaksiIndividuRepository.save(baru);
+                }));
+    }
+
+    private Mono<Void> upsertTargetRenaksi(Long indikatorId, RenaksiIndividuRequest req) {
+        BigDecimal realisasiVal = req.realisasi() != null ? req.realisasi() : BigDecimal.ZERO;
+        BigDecimal paguVal = req.paguAnggaran() != null ? req.paguAnggaran() : BigDecimal.ZERO;
+        return targetIndikatorRenaksiRepository
+                .findFirstByIndikatorRenaksiIdAndKodeTarget(indikatorId, req.kodeTarget())
+                .flatMap(existing -> {
+                    TargetIndikatorRenaksiIndividu updated = new TargetIndikatorRenaksiIndividu(
+                            existing.id(),
+                            existing.indikatorRenaksiId(),
+                            existing.kodeTarget(),
+                            req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
+                            paguVal, req.target(), realisasiVal, req.jenisRealisasi(),
+                            existing.faktorPenunjang(),
+                            existing.faktorPenghambat(),
+                            existing.createdBy(), existing.lastModifiedBy(),
+                            existing.createdDate(), existing.lastModifiedDate()
                     );
-                    return indikatorRenaksiIndividuRepository.save(indikator)
-                            .flatMap(savedIndikator -> {
-                                BigDecimal realisasiVal = req.realisasi() != null ? req.realisasi() : BigDecimal.ZERO;
-                                BigDecimal paguVal = req.paguAnggaran() != null ? req.paguAnggaran() : BigDecimal.ZERO;
-                                TargetIndikatorRenaksiIndividu target = TargetIndikatorRenaksiIndividu.of(
-                                        savedIndikator.id(), req.kodeTarget(),
-                                        sasaran.kodeOpd(), sasaran.nip(), sasaran.tahun(), sasaran.bulan(),
-                                        paguVal, req.target(), realisasiVal, req.jenisRealisasi(),
-                                        "", ""
-                                );
-                                return targetIndikatorRenaksiRepository.save(target);
-                            });
+                    return targetIndikatorRenaksiRepository.save(updated);
                 })
-                .then(Mono.defer(() -> enrichWithDetails(sasaran)));
+                .switchIfEmpty(Mono.defer(() -> {
+                    TargetIndikatorRenaksiIndividu baru = TargetIndikatorRenaksiIndividu.of(
+                            indikatorId, req.kodeTarget(),
+                            req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
+                            paguVal, req.target(), realisasiVal, req.jenisRealisasi(),
+                            "", "");
+                    return targetIndikatorRenaksiRepository.save(baru);
+                }))
+                .then();
     }
 
     public static SasaranIndividu buildUncheckedSasaran(

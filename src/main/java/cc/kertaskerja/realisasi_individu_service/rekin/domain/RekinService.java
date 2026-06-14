@@ -7,9 +7,7 @@ import cc.kertaskerja.realisasi_individu_service.rekin.domain.target.TargetIndik
 import cc.kertaskerja.realisasi_individu_service.rekin.web.FaktorPenghambatRekinRequest;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.FaktorPenunjangRekinRequest;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.RekinRequest;
-import cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpd;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.sasaran.domain.indikator.IndikatorSasaranOpd;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.indikator.IndikatorSasaranOpdRepository;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.target.TargetIndikatorSasaranOpd;
 import cc.kertaskerja.realisasi_opd_service.sasaran.domain.target.TargetIndikatorSasaranOpdRepository;
@@ -20,7 +18,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-import java.util.List;
 
 @Service
 
@@ -28,8 +25,6 @@ public class RekinService {
     private final RekinRepository rekinRepository;
     private final IndikatorRekinRepository indikatorRekinRepository;
     private final TargetIndikatorRekinRepository targetIndikatorRekinRepository;
-    private final SasaranOpdRepository sasaranOpdRepository;
-    private final IndikatorSasaranOpdRepository indikatorSasaranOpdRepository;
     private final TargetIndikatorSasaranOpdRepository targetIndikatorSasaranOpdRepository;
 
     public RekinService(RekinRepository rekinRepository,
@@ -41,8 +36,6 @@ public class RekinService {
         this.rekinRepository = rekinRepository;
         this.indikatorRekinRepository = indikatorRekinRepository;
         this.targetIndikatorRekinRepository = targetIndikatorRekinRepository;
-        this.sasaranOpdRepository = sasaranOpdRepository;
-        this.indikatorSasaranOpdRepository = indikatorSasaranOpdRepository;
         this.targetIndikatorSasaranOpdRepository = targetIndikatorSasaranOpdRepository;
     }
 
@@ -94,8 +87,7 @@ public class RekinService {
 
         return rekinMono
                 .flatMap(savedRekin ->
-                        deleteExistingIndikatorsAndTargets(savedRekin.id())
-                                .then(saveIndikatorAndTarget(savedRekin, req))
+                        saveIndikatorAndTarget(savedRekin, req)
                                 .flatMap(details ->
                                         syncToSasaranOpd(savedRekin, req)
                                                 .then(Mono.just(details)))
@@ -174,41 +166,49 @@ public class RekinService {
                 );
     }
 
-    private Mono<Void> deleteExistingIndikatorsAndTargets(Long rekinId) {
-        return indikatorRekinRepository.findAllByRekinId(rekinId)
-                .collectList()
-                .flatMap(indikators -> {
-                    if (indikators.isEmpty()) return Mono.empty();
-                    List<Long> indikatorIds = indikators.stream().map(IndikatorRekin::id).toList();
-                    return targetIndikatorRekinRepository
-                            .findAllByIndikatorRekinIdIn(indikatorIds)
-                            .collectList()
-                            .flatMap(targets -> {
-                                if (targets.isEmpty()) {
-                                    return indikatorRekinRepository.deleteAll(indikators);
-                                }
-                                return targetIndikatorRekinRepository.deleteAll(targets)
-                                        .then(indikatorRekinRepository.deleteAll(indikators));
-                            });
-                });
+    private Mono<RekinWithDetails> saveIndikatorAndTarget(Rekin rekin, RekinRequest req) {
+        return findOrCreateIndikator(rekin, req)
+                .flatMap(indikator -> upsertTarget(indikator.id(), req))
+                .then(Mono.defer(() -> enrichWithDetails(rekin)));
     }
 
-    private Mono<RekinWithDetails> saveIndikatorAndTarget(Rekin rekin, RekinRequest req) {
-        IndikatorRekin indikator = IndikatorRekin.of(
-                rekin.id(), req.kodeIndikator(), "Realisasi Indikator " + req.kodeIndikator(),
-                rekin.kodeOpd(), rekin.nip(), rekin.tahun(), rekin.bulan()
-        );
-        return indikatorRekinRepository.save(indikator)
-                .flatMap(savedInd -> {
-                    TargetIndikatorRekin target = TargetIndikatorRekin.of(
-                            savedInd.id(), req.kodeTarget(),
-                            rekin.kodeOpd(), rekin.nip(), rekin.tahun(), rekin.bulan(),
+    private Mono<IndikatorRekin> findOrCreateIndikator(Rekin rekin, RekinRequest req) {
+        return indikatorRekinRepository
+                .findFirstByRekinIdAndKodeIndikator(rekin.id(), req.kodeIndikator())
+                .switchIfEmpty(Mono.defer(() -> {
+                    IndikatorRekin baru = IndikatorRekin.of(
+                            rekin.id(), req.kodeIndikator(), "Realisasi Indikator " + req.kodeIndikator(),
+                            rekin.kodeOpd(), rekin.nip(), rekin.tahun(), rekin.bulan());
+                    return indikatorRekinRepository.save(baru);
+                }));
+    }
+
+    private Mono<Void> upsertTarget(Long indikatorId, RekinRequest req) {
+        return targetIndikatorRekinRepository
+                .findFirstByIndikatorRekinIdAndKodeTarget(indikatorId, req.kodeTarget())
+                .flatMap(existing -> {
+                    TargetIndikatorRekin updated = new TargetIndikatorRekin(
+                            existing.id(),
+                            existing.indikatorRekinId(),
+                            existing.kodeTarget(),
+                            req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
                             req.target(), req.realisasi(), req.jenisRealisasi(),
-                            "", ""
+                            existing.faktorPenunjang(),
+                            existing.faktorPenghambat(),
+                            existing.createdBy(), existing.lastModifiedBy(),
+                            existing.createdDate(), existing.lastModifiedDate()
                     );
-                    return targetIndikatorRekinRepository.save(target);
+                    return targetIndikatorRekinRepository.save(updated);
                 })
-                .then(Mono.defer(() -> enrichWithDetails(rekin)));
+                .switchIfEmpty(Mono.defer(() -> {
+                    TargetIndikatorRekin baru = TargetIndikatorRekin.of(
+                            indikatorId, req.kodeTarget(),
+                            req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
+                            req.target(), req.realisasi(), req.jenisRealisasi(),
+                            "", "");
+                    return targetIndikatorRekinRepository.save(baru);
+                }))
+                .then();
     }
 
     public static Rekin buildUncheckedRekin(
