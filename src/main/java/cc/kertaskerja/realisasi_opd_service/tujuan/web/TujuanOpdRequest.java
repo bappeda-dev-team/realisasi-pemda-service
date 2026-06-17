@@ -1,6 +1,7 @@
 package cc.kertaskerja.realisasi_opd_service.tujuan.web;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -13,20 +14,22 @@ public record TujuanOpdRequest(
         @Schema(description = "Kode tujuan OPD", example = "KODE-TUJ-OPD-001")
         String kodeTujuanOpd,
 
-        @NotNull(message = "Kode indikator tujuan opd tidak boleh kosong")
-        @NotEmpty(message = "Kode indikator tujuan opd tidak boleh kosong")
+        @NotNull(message = "Kode indikator tidak boleh kosong")
+        @NotEmpty(message = "Kode indikator tidak boleh kosong")
         @Schema(description = "Kode indikator tujuan OPD", example = "KODE-IND-TUJ-OPD-001")
-        String kodeIndikatorTujuanOpd,
+        String kodeIndikator,
 
-        @NotNull(message = "Kode target tujuan opd tidak boleh kosong")
-        @NotEmpty(message = "Kode target tujuan opd tidak boleh kosong")
+        @NotNull(message = "Kode target tidak boleh kosong")
+        @NotEmpty(message = "Kode target tidak boleh kosong")
         @Schema(description = "Kode target tujuan OPD", example = "KODE-TAR-TUJ-OPD-001")
-        String kodeTargetTujuanOpd,
+        String kodeTarget,
 
         @NotNull(message = "Realisasi harus terdefinisi")
         @PositiveOrZero(message = "Realisasi tidak boleh negatif")
         @Schema(description = "Nilai realisasi aktual", example = "75.5", minimum = "0")
         Double realisasi,
+
+        JenisRealisasi jenisRealisasi,
 
         @NotNull(message = "Tahun harus terdefinisi")
         @NotEmpty(message = "Tahun tidak boleh kosong")

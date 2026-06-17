@@ -1,4 +1,4 @@
-package cc.kertaskerja.realisasi_opd_service.tujuan.web;
+package cc.kertaskerja.realisasi_opd_service.tujuan.web.faktor_penghambat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
