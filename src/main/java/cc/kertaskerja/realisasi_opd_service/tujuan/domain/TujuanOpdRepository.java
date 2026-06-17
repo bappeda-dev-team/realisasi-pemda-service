@@ -6,14 +6,16 @@ import reactor.core.publisher.Mono;
 
 public interface TujuanOpdRepository extends ReactiveCrudRepository<TujuanOpd, Long> {
 
-    Mono<TujuanOpd> findFirstByKodeOpdAndKodeTujuanOpdAndTahunAndBulan(
+    Flux<TujuanOpd> findAllByKodeOpdAndTahunAndBulan(String kodeOpd, String tahun, String bulan);
+
+    Mono<TujuanOpd> findFirstByKodeOpdAndKodeTujuanOpdAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
             String kodeOpd,
             String kodeTujuanOpd,
+            String kodeIndikator,
+            String kodeTarget,
             String tahun,
             String bulan
     );
 
-    Flux<TujuanOpd> findAllByTahunAndKodeOpd(String tahun, String kodeOpd);
-
-    Flux<TujuanOpd> findAllByTahunAndKodeOpdAndBulan(String tahun, String kodeOpd, String bulan);
+    Flux<TujuanOpd> findAllByKodeOpdAndTahun(String kodeOpd, String tahun);
 }
