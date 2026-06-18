@@ -2,10 +2,8 @@ package cc.kertaskerja.realisasi_individu_service.rekin.web;
 
 import cc.kertaskerja.config.SecurityConfig;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
-import cc.kertaskerja.realisasi_individu_service.rekin.domain.Rekin;
+import cc.kertaskerja.realisasi_individu_service.rekin.domain.RekinIndividu;
 import cc.kertaskerja.realisasi_individu_service.rekin.domain.RekinService;
-import cc.kertaskerja.realisasi_individu_service.rekin.domain.RekinStatus;
-import cc.kertaskerja.realisasi_individu_service.rekin.domain.RekinWithDetails;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +13,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +46,7 @@ public class RekinControllerWebFluxTests {
                                 1L, "IND-REKIN-87169", "Persentase terlaksananya",
                                 List.of(new PenetapanRekinIndividuResponse.TargetPenetapanResponse(
                                         1L, "TRGT-IND-REKIN-66602", 2026, 100.0, "%",
-                                        null, null, null, null, null
+                                        null, null, null, null, null, null
                                 ))
                         ))
                 ))
@@ -94,7 +90,7 @@ public class RekinControllerWebFluxTests {
                                 1L, "IND-REKIN-87169", "Persentase terlaksananya",
                                 List.of(new PenetapanRekinIndividuResponse.TargetPenetapanResponse(
                                         1L, "TRGT-IND-REKIN-66602", 2026, 100.0, "%",
-                                        75.5, 75.5, null, null, null
+                                        75.5, 75.5, null, null, null, null
                                 ))
                         ))
                 ))
@@ -131,27 +127,16 @@ public class RekinControllerWebFluxTests {
                 "SAS-001",
                 "IND-REKIN-001",
                 "TAR-1",
-                new BigDecimal("100.0"),
                 new BigDecimal("75.5"),
                 JenisRealisasi.NAIK,
                 "2025",
                 "01"
         );
 
-        Rekin rekin = Rekin.of(
-                request.kodeOpd(),
-                request.nip(),
-                request.kodePkRekin(),
-                request.kodeSasaranOpd(),
-                0,
-                "",
-                "Realisasi Rekin " + request.kodePkRekin(),
-                request.tahun(),
-                request.bulan(),
-                RekinStatus.UNCHECKED
-        );
-
-        RekinWithDetails result = new RekinWithDetails(rekin, Collections.emptyList(), Collections.emptyList());
+        RekinIndividu result = RekinIndividu.of(
+                request.kodeOpd(), request.nip(), request.tahun(), request.bulan(),
+                request.kodePkRekin(), request.kodeIndikatorPKrekin(), request.kodeTargetPKrekin(),
+                request.realisasi(), request.jenisRealisasi(), "", "");
 
         when(rekinService.createRekin(any(RekinRequest.class)))
                 .thenReturn(Mono.just(result));
@@ -164,7 +149,7 @@ public class RekinControllerWebFluxTests {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(RekinWithDetails.class)
+                .expectBody(RekinIndividu.class)
                 .isEqualTo(result);
     }
 
@@ -177,27 +162,16 @@ public class RekinControllerWebFluxTests {
                 "SAS-001",
                 "IND-REKIN-001",
                 "TAR-1",
-                new BigDecimal("100.0"),
                 new BigDecimal("75.5"),
                 JenisRealisasi.NAIK,
                 "2025",
                 "01"
         );
 
-        Rekin rekin = Rekin.of(
-                request.kodeOpd(),
-                request.nip(),
-                request.kodePkRekin(),
-                request.kodeSasaranOpd(),
-                0,
-                "",
-                "Realisasi Rekin " + request.kodePkRekin(),
-                request.tahun(),
-                request.bulan(),
-                RekinStatus.UNCHECKED
-        );
-
-        RekinWithDetails result = new RekinWithDetails(rekin, Collections.emptyList(), Collections.emptyList());
+        RekinIndividu result = RekinIndividu.of(
+                request.kodeOpd(), request.nip(), request.tahun(), request.bulan(),
+                request.kodePkRekin(), request.kodeIndikatorPKrekin(), request.kodeTargetPKrekin(),
+                request.realisasi(), request.jenisRealisasi(), "", "");
 
         when(rekinService.createRekin(any(RekinRequest.class)))
                 .thenReturn(Mono.just(result));
@@ -210,7 +184,7 @@ public class RekinControllerWebFluxTests {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(RekinWithDetails.class)
+                .expectBody(RekinIndividu.class)
                 .isEqualTo(result);
     }
 }

@@ -1,0 +1,77 @@
+package cc.kertaskerja.realisasi_individu_service.rekin.domain;
+
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+
+@Table("realisasi_target_rekin_individu")
+public record RekinIndividu(
+        @Id Long id,
+
+        @Column("kode_opd")
+        String kodeOpd,
+        String nip,
+        String tahun,
+        String bulan,
+
+        @Column("kode_pk_rekin")
+        String kodePkRekin,
+
+        @Column("kode_indikator_pk_rekin")
+        String kodeIndikatorPkRekin,
+
+        @Column("kode_target_pk_rekin")
+        String kodeTargetPkRekin,
+        BigDecimal realisasi,
+
+        @Column("jenis_realisasi")
+        JenisRealisasi jenisRealisasi,
+
+        @Column("faktor_penunjang")
+        String faktorPenunjang,
+
+        @Column("faktor_penghambat")
+        String faktorPenghambat,
+
+        @CreatedBy
+        @Column("created_by")
+        String createdBy,
+        @LastModifiedBy
+        @Column("last_modified_by")
+        String lastModifiedBy,
+        @CreatedDate
+        @Column("created_date")
+        Instant createdDate,
+        @LastModifiedDate
+        @Column("last_modified_date")
+        Instant lastModifiedDate
+) {
+    public static RekinIndividu of(
+            String kodeOpd,
+            String nip,
+            String tahun,
+            String bulan,
+            String kodePkRekin,
+            String kodeIndikatorPkRekin,
+            String kodeTargetPkRekin,
+            BigDecimal realisasi,
+            JenisRealisasi jenisRealisasi,
+            String faktorPenunjang,
+            String faktorPenghambat
+    ) {
+        return new RekinIndividu(
+                null, kodeOpd, nip, tahun, bulan,
+                kodePkRekin, kodeIndikatorPkRekin, kodeTargetPkRekin,
+                realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat,
+                null, null, null, null
+        );
+    }
+}
