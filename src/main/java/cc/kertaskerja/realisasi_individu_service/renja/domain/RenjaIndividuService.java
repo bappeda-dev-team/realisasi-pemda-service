@@ -20,24 +20,12 @@ import cc.kertaskerja.realisasi_individu_service.renja.domain.subkegiatan.RenjaS
 import cc.kertaskerja.realisasi_individu_service.renja.domain.subkegiatan.RenjaSubKegiatanIndividuRepository;
 import cc.kertaskerja.realisasi_individu_service.renja.domain.subkegiatan.TargetRenjaSubKegiatanIndividu;
 import cc.kertaskerja.realisasi_individu_service.renja.domain.subkegiatan.TargetRenjaSubKegiatanIndividuRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.IndikatorRenjaProgramOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.IndikatorRenjaProgramOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpdHeaderRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpdHeader;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.IndikatorRenjaKegiatanOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.IndikatorRenjaKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpdHeader;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpdHeaderRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.IndikatorRenjaSubKegiatanOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.IndikatorRenjaSubKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpdHeader;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpdHeaderRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaProgramOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaProgramOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaSubKegiatanOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaSubKegiatanOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaKegiatanOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaKegiatanOpdRepository;
 import cc.kertaskerja.realisasi_individu_service.renja.web.kegiatan.FaktorPenghambatTargetRenjaKegiatanRequest;
 import cc.kertaskerja.realisasi_individu_service.renja.web.program.FaktorPenghambatTargetRenjaProgramRequest;
 import cc.kertaskerja.realisasi_individu_service.renja.web.subkegiatan.FaktorPenghambatTargetRenjaSubKegiatanRequest;
@@ -75,14 +63,8 @@ public class RenjaIndividuService {
     private final IndikatorRenjaSubKegiatanIndividuRepository indikatorSubKegiatanRepo;
     private final TargetRenjaSubKegiatanIndividuRepository targetSubKegiatanRepo;
 
-    private final RenjaProgramOpdHeaderRepository programOpdHeaderRepo;
-    private final IndikatorRenjaProgramOpdRepository indikatorProgramOpdRepo;
     private final RenjaProgramOpdRepository targetProgramOpdRepo;
-    private final RenjaKegiatanOpdHeaderRepository kegiatanOpdHeaderRepo;
-    private final IndikatorRenjaKegiatanOpdRepository indikatorKegiatanOpdRepo;
     private final RenjaKegiatanOpdRepository targetKegiatanOpdRepo;
-    private final RenjaSubKegiatanOpdHeaderRepository subKegiatanOpdHeaderRepo;
-    private final IndikatorRenjaSubKegiatanOpdRepository indikatorSubKegiatanOpdRepo;
     private final RenjaSubKegiatanOpdRepository targetSubKegiatanOpdRepo;
 
     public RenjaIndividuService(
@@ -96,14 +78,8 @@ public class RenjaIndividuService {
             RenjaSubKegiatanIndividuRepository subKegiatanRepo,
             IndikatorRenjaSubKegiatanIndividuRepository indikatorSubKegiatanRepo,
             TargetRenjaSubKegiatanIndividuRepository targetSubKegiatanRepo,
-            RenjaProgramOpdHeaderRepository programOpdHeaderRepo,
-            IndikatorRenjaProgramOpdRepository indikatorProgramOpdRepo,
             RenjaProgramOpdRepository targetProgramOpdRepo,
-            RenjaKegiatanOpdHeaderRepository kegiatanOpdHeaderRepo,
-            IndikatorRenjaKegiatanOpdRepository indikatorKegiatanOpdRepo,
             RenjaKegiatanOpdRepository targetKegiatanOpdRepo,
-            RenjaSubKegiatanOpdHeaderRepository subKegiatanOpdHeaderRepo,
-            IndikatorRenjaSubKegiatanOpdRepository indikatorSubKegiatanOpdRepo,
             RenjaSubKegiatanOpdRepository targetSubKegiatanOpdRepo
     ) {
         this.penetapanClient = penetapanClient;
@@ -116,14 +92,8 @@ public class RenjaIndividuService {
         this.subKegiatanRepo = subKegiatanRepo;
         this.indikatorSubKegiatanRepo = indikatorSubKegiatanRepo;
         this.targetSubKegiatanRepo = targetSubKegiatanRepo;
-        this.programOpdHeaderRepo = programOpdHeaderRepo;
-        this.indikatorProgramOpdRepo = indikatorProgramOpdRepo;
         this.targetProgramOpdRepo = targetProgramOpdRepo;
-        this.kegiatanOpdHeaderRepo = kegiatanOpdHeaderRepo;
-        this.indikatorKegiatanOpdRepo = indikatorKegiatanOpdRepo;
         this.targetKegiatanOpdRepo = targetKegiatanOpdRepo;
-        this.subKegiatanOpdHeaderRepo = subKegiatanOpdHeaderRepo;
-        this.indikatorSubKegiatanOpdRepo = indikatorSubKegiatanOpdRepo;
         this.targetSubKegiatanOpdRepo = targetSubKegiatanOpdRepo;
     }
 
@@ -495,90 +465,57 @@ public class RenjaIndividuService {
     }
 
     private Mono<Void> upsertProgramOpdHierarchy(RenjaIndividuProgramRequest req) {
-        return programOpdHeaderRepo.findByKodeOpdAndKodeProgramAndTahunAndBulan(
-                        req.kodeOpd(), req.kodeProgram(), req.tahun(), req.bulan())
-                .switchIfEmpty(Mono.defer(() -> programOpdHeaderRepo.save(
-                        RenjaProgramOpdHeader.of(req.kodeOpd(), req.kodeProgram(), req.tahun(), req.bulan()))))
-                .flatMap(header -> indikatorProgramOpdRepo
-                        .findByRenjaProgramOpdIdAndKodeIndikatorAndTahunAndBulan(
-                                header.id(), req.kodeIndikator(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.defer(() -> indikatorProgramOpdRepo.save(
-                                new IndikatorRenjaProgramOpd(null, header.id(), req.kodeIndikator(),
-                                        req.tahun(), req.bulan(), null, null, null, null))))
-                        .flatMap(indikator -> targetProgramOpdRepo
-                                .findByIndikatorRenjaProgramOpdIdAndKodeTargetAndTahunAndBulan(
-                                        indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
-                                .flatMap(existing -> targetProgramOpdRepo.save(new RenjaProgramOpd(
-                                        existing.id(), existing.indikatorRenjaProgramOpdId(),
-                                        existing.kodeTarget(), existing.tahun(), existing.bulan(),
-                                        BigDecimal.valueOf(req.realisasi()),
-                                        existing.faktorPenunjang(), existing.faktorPenghambat(),
-                                        existing.createdDate(), null, existing.createdBy(), null)))
-                                .switchIfEmpty(Mono.defer(() -> targetProgramOpdRepo.save(new RenjaProgramOpd(
-                                        null, indikator.id(),
-                                        req.kodeTarget(),
-                                        req.tahun(), req.bulan(), BigDecimal.valueOf(req.realisasi()),
-                                        "", "",
-                                        null, null, null, null))))
-                                .then()));
+        return targetProgramOpdRepo.findByKodeOpdAndKodeProgramAndKodeIndikatorAndKodeTargetAndTahun(
+                        req.kodeOpd(), req.kodeProgram(), req.kodeIndikator(), req.kodeTarget(), req.tahun())
+                .flatMap(existing -> targetProgramOpdRepo.save(new RenjaProgramOpd(
+                        existing.id(), existing.kodeOpd(), existing.tahun(), existing.bulan(),
+                        existing.kodeProgram(), existing.kodeIndikator(), existing.kodeTarget(),
+                        existing.kodePagu(), BigDecimal.valueOf(req.realisasi()), existing.jenisRealisasi(),
+                        existing.faktorPenunjang(), existing.faktorPenghambat(),
+                        existing.createdDate(), null, existing.createdBy(), null)))
+                .switchIfEmpty(Mono.defer(() -> targetProgramOpdRepo.save(new RenjaProgramOpd(
+                        null, req.kodeOpd(), req.tahun(), req.bulan(),
+                        req.kodeProgram(), req.kodeIndikator(), req.kodeTarget(),
+                        "", BigDecimal.valueOf(req.realisasi()), "",
+                        "", "",
+                        null, null, null, null))))
+                .then();
     }
 
     private Mono<Void> upsertKegiatanOpdHierarchy(RenjaIndividuKegiatanRequest req) {
-        return kegiatanOpdHeaderRepo.findByKodeOpdAndKodeKegiatanAndTahunAndBulan(
-                        req.kodeOpd(), req.kodeKegiatan(), req.tahun(), req.bulan())
-                .switchIfEmpty(Mono.defer(() -> kegiatanOpdHeaderRepo.save(
-                        RenjaKegiatanOpdHeader.of(req.kodeOpd(), req.kodeProgram(), req.kodeKegiatan(), req.tahun(), req.bulan()))))
-                .flatMap(header -> indikatorKegiatanOpdRepo
-                        .findByRenjaKegiatanOpdIdAndKodeIndikatorAndTahunAndBulan(
-                                header.id(), req.kodeIndikator(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.defer(() -> indikatorKegiatanOpdRepo.save(
-                                new IndikatorRenjaKegiatanOpd(null, header.id(), req.kodeIndikator(),
-                                        req.tahun(), req.bulan(), null, null, null, null))))
-                        .flatMap(indikator -> targetKegiatanOpdRepo
-                                .findByIndikatorRenjaKegiatanOpdIdAndKodeTargetAndTahunAndBulan(
-                                        indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
-                                .flatMap(existing -> targetKegiatanOpdRepo.save(new RenjaKegiatanOpd(
-                                        existing.id(), existing.indikatorRenjaKegiatanOpdId(),
-                                        existing.kodeTarget(), existing.tahun(), existing.bulan(),
-                                        BigDecimal.valueOf(req.realisasi()),
-                                        existing.faktorPenunjang(), existing.faktorPenghambat(),
-                                        existing.createdDate(), null, existing.createdBy(), null)))
-                                .switchIfEmpty(Mono.defer(() -> targetKegiatanOpdRepo.save(new RenjaKegiatanOpd(
-                                        null, indikator.id(),
-                                        req.kodeTarget(),
-                                        req.tahun(), req.bulan(), BigDecimal.valueOf(req.realisasi()),
-                                        "", "",
-                                        null, null, null, null))))
-                                .then()));
+        return targetKegiatanOpdRepo.findByKodeOpdAndKodeKegiatanAndKodeIndikatorAndKodeTargetAndTahun(
+                        req.kodeOpd(), req.kodeKegiatan(), req.kodeIndikator(), req.kodeTarget(), req.tahun())
+                .flatMap(existing -> targetKegiatanOpdRepo.save(new RenjaKegiatanOpd(
+                        existing.id(), existing.kodeOpd(), existing.tahun(), existing.bulan(),
+                        existing.kodeKegiatan(), existing.kodeIndikator(), existing.kodeTarget(),
+                        existing.kodePagu(), BigDecimal.valueOf(req.realisasi()), existing.jenisRealisasi(),
+                        existing.faktorPenunjang(), existing.faktorPenghambat(),
+                        existing.createdDate(), null, existing.createdBy(), null)))
+                .switchIfEmpty(Mono.defer(() -> targetKegiatanOpdRepo.save(new RenjaKegiatanOpd(
+                        null, req.kodeOpd(), req.tahun(), req.bulan(),
+                        req.kodeKegiatan(), req.kodeIndikator(), req.kodeTarget(),
+                        "", BigDecimal.valueOf(req.realisasi()), "",
+                        "", "",
+                        null, null, null, null))))
+                .then();
     }
 
     private Mono<Void> upsertSubKegiatanOpdHierarchy(RenjaIndividuSubKegiatanRequest req) {
-        return subKegiatanOpdHeaderRepo.findByKodeOpdAndKodeSubKegiatanAndTahunAndBulan(
-                        req.kodeOpd(), req.kodeSubKegiatan(), req.tahun(), req.bulan())
-                .switchIfEmpty(Mono.defer(() -> subKegiatanOpdHeaderRepo.save(
-                        RenjaSubKegiatanOpdHeader.of(req.kodeOpd(), req.kodeKegiatan(), req.kodeSubKegiatan(), req.tahun(), req.bulan()))))
-                .flatMap(header -> indikatorSubKegiatanOpdRepo
-                        .findByRenjaSubKegiatanOpdIdAndKodeIndikatorAndTahunAndBulan(
-                                header.id(), req.kodeIndikator(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.defer(() -> indikatorSubKegiatanOpdRepo.save(
-                                new IndikatorRenjaSubKegiatanOpd(null, header.id(), req.kodeIndikator(),
-                                        req.tahun(), req.bulan(), null, null, null, null))))
-                        .flatMap(indikator -> targetSubKegiatanOpdRepo
-                                .findByIndikatorRenjaSubKegiatanOpdIdAndKodeTargetAndTahunAndBulan(
-                                        indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
-                                .flatMap(existing -> targetSubKegiatanOpdRepo.save(new RenjaSubKegiatanOpd(
-                                        existing.id(), existing.indikatorRenjaSubKegiatanOpdId(),
-                                        existing.kodeTarget(), existing.tahun(), existing.bulan(),
-                                        BigDecimal.valueOf(req.realisasi()),
-                                        existing.faktorPenunjang(), existing.faktorPenghambat(),
-                                        existing.createdDate(), null, existing.createdBy(), null)))
-                                .switchIfEmpty(Mono.defer(() -> targetSubKegiatanOpdRepo.save(new RenjaSubKegiatanOpd(
-                                        null, indikator.id(),
-                                        req.kodeTarget(),
-                                        req.tahun(), req.bulan(), BigDecimal.valueOf(req.realisasi()),
-                                        "", "",
-                                        null, null, null, null))))
-                                .then()));
+        return targetSubKegiatanOpdRepo.findByKodeOpdAndKodeSubkegiatanAndKodeIndikatorAndKodeTargetAndTahun(
+                        req.kodeOpd(), req.kodeSubKegiatan(), req.kodeIndikator(), req.kodeTarget(), req.tahun())
+                .flatMap(existing -> targetSubKegiatanOpdRepo.save(new RenjaSubKegiatanOpd(
+                        existing.id(), existing.kodeOpd(), existing.tahun(), existing.bulan(),
+                        existing.kodeSubkegiatan(), existing.kodeIndikator(), existing.kodeTarget(),
+                        existing.kodePagu(), BigDecimal.valueOf(req.realisasi()), existing.jenisRealisasi(),
+                        existing.faktorPenunjang(), existing.faktorPenghambat(),
+                        existing.createdDate(), null, existing.createdBy(), null)))
+                .switchIfEmpty(Mono.defer(() -> targetSubKegiatanOpdRepo.save(new RenjaSubKegiatanOpd(
+                        null, req.kodeOpd(), req.tahun(), req.bulan(),
+                        req.kodeSubKegiatan(), req.kodeIndikator(), req.kodeTarget(),
+                        "", BigDecimal.valueOf(req.realisasi()), "",
+                        "", "",
+                        null, null, null, null))))
+                .then();
     }
 
     public Mono<TargetRenjaProgramIndividu> updateFaktorPenunjangProgram(FaktorPenunjangTargetRenjaProgramRequest req) {

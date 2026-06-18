@@ -2,18 +2,13 @@ package cc.kertaskerja.realisasi_opd_service.renja.domain;
 
 import cc.kertaskerja.integration.penetapan.PenetapanRenjaOpdClient;
 import cc.kertaskerja.integration.penetapan.renja.PenetapanRenjaOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.IndikatorRenjaKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpdHeaderRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.IndikatorRenjaProgramOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpdHeaderRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.IndikatorRenjaSubKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpdHeaderRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaKegiatanOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaKegiatanOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaProgramOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaProgramOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaSubKegiatanOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaSubKegiatanOpdRepository;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,18 +34,6 @@ class RenjaOpdServiceTest {
     private RenjaKegiatanOpdRepository targetKegiatanRepo;
     @Mock
     private RenjaSubKegiatanOpdRepository targetSubKegiatanRepo;
-    @Mock
-    private RenjaProgramOpdHeaderRepository programHeaderRepo;
-    @Mock
-    private IndikatorRenjaProgramOpdRepository indikatorProgramRepo;
-    @Mock
-    private RenjaKegiatanOpdHeaderRepository kegiatanHeaderRepo;
-    @Mock
-    private IndikatorRenjaKegiatanOpdRepository indikatorKegiatanRepo;
-    @Mock
-    private RenjaSubKegiatanOpdHeaderRepository subKegiatanHeaderRepo;
-    @Mock
-    private IndikatorRenjaSubKegiatanOpdRepository indikatorSubKegiatanRepo;
 
     @InjectMocks
     private RenjaOpdService renjaOpdService;
@@ -115,15 +98,21 @@ class RenjaOpdServiceTest {
                 .thenReturn(Mono.just(penetapanRoot));
         when(targetProgramRepo.findAllByTahunAndBulan("2026", "1"))
                 .thenReturn(Flux.just(
-                        new RenjaProgramOpd(1L, 1L, "TGT-001", "2026", "1", BigDecimal.valueOf(70), "", "", Instant.now(), Instant.now(), null, null)
+                        new RenjaProgramOpd(1L, "5.01.5.05.0.00.01.0000", "2026", "1",
+                                "5.01.02", "IND-001", "TGT-001", "", BigDecimal.valueOf(70), "", "", "",
+                                Instant.now(), Instant.now(), null, null)
                 ));
         when(targetKegiatanRepo.findAllByTahunAndBulan("2026", "1"))
                 .thenReturn(Flux.just(
-                        new RenjaKegiatanOpd(2L, 2L, "TGT-002", "2026", "1", BigDecimal.valueOf(70), "", "", Instant.now(), Instant.now(), null, null)
+                        new RenjaKegiatanOpd(2L, "5.01.5.05.0.00.01.0000", "2026", "1",
+                                "5.01.02.2.01", "IND-002", "TGT-002", "", BigDecimal.valueOf(70), "", "", "",
+                                Instant.now(), Instant.now(), null, null)
                 ));
         when(targetSubKegiatanRepo.findAllByTahunAndBulan("2026", "1"))
                 .thenReturn(Flux.just(
-                        new RenjaSubKegiatanOpd(3L, 3L, "TGT-003", "2026", "1", BigDecimal.valueOf(70), "", "", Instant.now(), Instant.now(), null, null)
+                        new RenjaSubKegiatanOpd(3L, "5.01.5.05.0.00.01.0000", "2026", "1",
+                                "5.01.02.2.01.0005", "IND-003", "TGT-003", "", BigDecimal.valueOf(70), "", "", "",
+                                Instant.now(), Instant.now(), null, null)
                 ));
 
         StepVerifier.create(renjaOpdService.getPenetapanWithRealisasi("5.01.5.05.0.00.01.0000", 2026, "1"))

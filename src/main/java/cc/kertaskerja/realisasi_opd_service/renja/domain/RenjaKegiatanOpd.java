@@ -1,4 +1,4 @@
-package cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan;
+package cc.kertaskerja.realisasi_opd_service.renja.domain;
 
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Column;
@@ -7,19 +7,32 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.Instant;
 
-@Table("target_renja_kegiatan_opd")
+@Table("realisasi_target_renja_kegiatan_opd")
 public record RenjaKegiatanOpd(
         @Id Long id,
 
-        @Column("indikator_renja_kegiatan_opd_id")
-        Long indikatorRenjaKegiatanOpdId,
+        @Column("kode_opd")
+        String kodeOpd,
+
+        String tahun,
+        String bulan,
+
+        @Column("kode_kegiatan")
+        String kodeKegiatan,
+
+        @Column("kode_indikator")
+        String kodeIndikator,
 
         @Column("kode_target")
         String kodeTarget,
 
-        String tahun,
-        String bulan,
+        @Column("kode_pagu")
+        String kodePagu,
+
         BigDecimal realisasi,
+
+        @Column("jenis_realisasi")
+        String jenisRealisasi,
 
         @Column("faktor_penunjang")
         String faktorPenunjang,
@@ -34,16 +47,16 @@ public record RenjaKegiatanOpd(
 ) {
     public RenjaKegiatanOpd withFaktorPenunjang(String faktorPenunjang) {
         return new RenjaKegiatanOpd(
-                id, indikatorRenjaKegiatanOpdId, kodeTarget, tahun, bulan, realisasi,
-                faktorPenunjang, faktorPenghambat,
+                id, kodeOpd, tahun, bulan, kodeKegiatan, kodeIndikator, kodeTarget, kodePagu,
+                realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat,
                 createdDate, lastModifiedDate, createdBy, lastModifiedBy
         );
     }
 
     public RenjaKegiatanOpd withFaktorPenghambat(String faktorPenghambat) {
         return new RenjaKegiatanOpd(
-                id, indikatorRenjaKegiatanOpdId, kodeTarget, tahun, bulan, realisasi,
-                faktorPenunjang, faktorPenghambat,
+                id, kodeOpd, tahun, bulan, kodeKegiatan, kodeIndikator, kodeTarget, kodePagu,
+                realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat,
                 createdDate, lastModifiedDate, createdBy, lastModifiedBy
         );
     }
