@@ -7,8 +7,8 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.Instant;
 
-@Table("realisasi_target_renja_subkegiatan_opd")
-public record RenjaSubKegiatanOpd(
+@Table("realisasi_target_renja_subkegiatan_individu")
+public record RenjaSubKegiatanIndividu(
         @Id Long id,
 
         @Column("kode_opd")
@@ -31,7 +31,17 @@ public record RenjaSubKegiatanOpd(
         @Column("kode_pagu")
         String kodePagu,
 
-        BigDecimal realisasi,
+        @Column("target_realisasi")
+        BigDecimal targetRealisasi,
+
+        @Column("target_pagu")
+        BigDecimal targetPagu,
+
+        @Column("realisasi_target")
+        BigDecimal realisasiTarget,
+
+        @Column("realisasi_pagu")
+        BigDecimal realisasiPagu,
 
         @Column("jenis_realisasi")
         String jenisRealisasi,
@@ -47,18 +57,18 @@ public record RenjaSubKegiatanOpd(
         @CreatedBy String createdBy,
         @LastModifiedBy String lastModifiedBy
 ) {
-    public RenjaSubKegiatanOpd withFaktorPenunjang(String faktorPenunjang) {
-        return new RenjaSubKegiatanOpd(
+    public RenjaSubKegiatanIndividu withFaktorPenunjang(String faktorPenunjang) {
+        return new RenjaSubKegiatanIndividu(
                 id, kodeOpd, nip, tahun, bulan, kodeSubKegiatan, kodeIndikator, kodeTarget, kodePagu,
-                realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat,
+                targetRealisasi, targetPagu, realisasiTarget, realisasiPagu, jenisRealisasi, faktorPenunjang, faktorPenghambat,
                 createdDate, lastModifiedDate, createdBy, lastModifiedBy
         );
     }
 
-    public RenjaSubKegiatanOpd withFaktorPenghambat(String faktorPenghambat) {
-        return new RenjaSubKegiatanOpd(
+    public RenjaSubKegiatanIndividu withFaktorPenghambat(String faktorPenghambat) {
+        return new RenjaSubKegiatanIndividu(
                 id, kodeOpd, nip, tahun, bulan, kodeSubKegiatan, kodeIndikator, kodeTarget, kodePagu,
-                realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat,
+                targetRealisasi, targetPagu, realisasiTarget, realisasiPagu, jenisRealisasi, faktorPenunjang, faktorPenghambat,
                 createdDate, lastModifiedDate, createdBy, lastModifiedBy
         );
     }

@@ -41,8 +41,24 @@ public record RenjaIndividuSubKegiatanRequest(
         String kodePagu,
 
         @NotNull @PositiveOrZero
+        @JsonProperty("target_realisasi")
+        @Schema(example = "100")
+        Double targetRealisasi,
+
+        @NotNull @PositiveOrZero
+        @JsonProperty("target_pagu")
+        @Schema(example = "50000000")
+        Double targetPagu,
+
+        @NotNull @PositiveOrZero
+        @JsonProperty("realisasi_target")
         @Schema(example = "70")
-        Double realisasi,
+        Double realisasiTarget,
+
+        @NotNull @PositiveOrZero
+        @JsonProperty("realisasi_pagu")
+        @Schema(example = "10000000")
+        Double realisasiPagu,
 
         @Schema(hidden = true)
         String jenisRealisasi

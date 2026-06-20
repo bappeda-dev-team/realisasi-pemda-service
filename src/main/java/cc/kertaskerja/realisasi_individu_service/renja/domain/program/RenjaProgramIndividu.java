@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Table("realisasi_target_renja_program_individu")
-public record RenjaProgramOpd(
+public record RenjaProgramIndividu(
         @Id Long id,
 
         @Column("kode_opd")
@@ -31,6 +31,8 @@ public record RenjaProgramOpd(
         @Column("kode_pagu")
         String kodePagu,
 
+        BigDecimal target,
+
         BigDecimal realisasi,
 
         @Column("jenis_realisasi")
@@ -47,18 +49,18 @@ public record RenjaProgramOpd(
         @CreatedBy String createdBy,
         @LastModifiedBy String lastModifiedBy
 ) {
-    public RenjaProgramOpd withFaktorPenunjang(String faktorPenunjang) {
-        return new RenjaProgramOpd(
+    public RenjaProgramIndividu withFaktorPenunjang(String faktorPenunjang) {
+        return new RenjaProgramIndividu(
                 id, kodeOpd, nip, tahun, bulan, kodeProgram, kodeIndikator, kodeTarget, kodePagu,
-                realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat,
+                target, realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat,
                 createdDate, lastModifiedDate, createdBy, lastModifiedBy
         );
     }
 
-    public RenjaProgramOpd withFaktorPenghambat(String faktorPenghambat) {
-        return new RenjaProgramOpd(
+    public RenjaProgramIndividu withFaktorPenghambat(String faktorPenghambat) {
+        return new RenjaProgramIndividu(
                 id, kodeOpd, nip, tahun, bulan, kodeProgram, kodeIndikator, kodeTarget, kodePagu,
-                realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat,
+                target, realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat,
                 createdDate, lastModifiedDate, createdBy, lastModifiedBy
         );
     }

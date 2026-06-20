@@ -28,7 +28,8 @@ public class SecurityConfig {
     );
     private static final List<String> INDIVIDU_ALLOWED_GET_PREFIXES = List.of(
             "/renaksi_individu",
-            "/rekin"
+            "/rekin",
+            "/renja_individu"
     );
     private static final List<String> OPD_ALLOWED_GET_PREFIXES = List.of(
             "/tujuan_opd",
