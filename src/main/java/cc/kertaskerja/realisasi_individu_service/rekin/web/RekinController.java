@@ -1,8 +1,7 @@
 package cc.kertaskerja.realisasi_individu_service.rekin.web;
 
+import cc.kertaskerja.realisasi_individu_service.rekin.domain.RekinIndividu;
 import cc.kertaskerja.realisasi_individu_service.rekin.domain.RekinService;
-import cc.kertaskerja.realisasi_individu_service.rekin.domain.RekinWithDetails;
-import cc.kertaskerja.realisasi_individu_service.rekin.domain.target.TargetIndikatorRekin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,44 +50,44 @@ public class RekinController {
     }
 
     @PostMapping
-    @Operation(summary = "Buat rekin baru (dengan upsert)", description = "Menyimpan satu data rekin beserta indikator dan target. Jika `id` disertakan akan memperbarui data yang sudah ada (upsert).")
+    @Operation(summary = "Buat realisasi target rekin individu (upsert)", description = "Menyimpan realisasi target rekin individu. Jika data dengan composite key yang sama sudah ada, akan diperbarui.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Rekin tersimpan dengan indikator dan target", content = @Content(schema = @Schema(implementation = RekinWithDetails.class))),
+            @ApiResponse(responseCode = "200", description = "Realisasi tersimpan", content = @Content(schema = @Schema(implementation = RekinIndividu.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
-    public Mono<RekinWithDetails> createRekin(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload rekin dengan indikator dan target", required = true,
+    public Mono<RekinIndividu> createRekin(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload realisasi target rekin", required = true,
                     content = @Content(schema = @Schema(implementation = RekinRequest.class)))
             @RequestBody @Valid RekinRequest request) {
         return rekinService.createRekin(request);
     }
 
     @PostMapping("/faktor-penunjang")
-    @Operation(summary = "Perbarui faktor penunjang rekin", description = "Memperbarui hanya field faktor_penunjang pada target indikator rekin yang cocok dengan composite key.")
+    @Operation(summary = "Perbarui faktor penunjang realisasi", description = "Memperbarui faktor_penunjang pada data realisasi yang cocok dengan composite key.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = TargetIndikatorRekin.class))),
+            @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RekinIndividu.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
             @ApiResponse(responseCode = "404", description = "Data tidak ditemukan", content = @Content)
     })
-    public Mono<TargetIndikatorRekin> updateFaktorPenunjang(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload faktor penunjang rekin", required = true,
+    public Mono<RekinIndividu> updateFaktorPenunjang(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload faktor penunjang", required = true,
                     content = @Content(schema = @Schema(implementation = FaktorPenunjangRekinRequest.class)))
             @RequestBody @Valid FaktorPenunjangRekinRequest request) {
         return rekinService.updateFaktorPenunjang(request);
     }
 
     @PostMapping("/faktor-penghambat")
-    @Operation(summary = "Perbarui faktor penghambat rekin", description = "Memperbarui hanya field faktor_penghambat pada target indikator rekin yang cocok dengan composite key.")
+    @Operation(summary = "Perbarui faktor penghambat realisasi", description = "Memperbarui faktor_penghambat pada data realisasi yang cocok dengan composite key.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = TargetIndikatorRekin.class))),
+            @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RekinIndividu.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
             @ApiResponse(responseCode = "404", description = "Data tidak ditemukan", content = @Content)
     })
-    public Mono<TargetIndikatorRekin> updateFaktorPenghambat(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload faktor penghambat rekin", required = true,
+    public Mono<RekinIndividu> updateFaktorPenghambat(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload faktor penghambat", required = true,
                     content = @Content(schema = @Schema(implementation = FaktorPenghambatRekinRequest.class)))
             @RequestBody @Valid FaktorPenghambatRekinRequest request) {
         return rekinService.updateFaktorPenghambat(request);

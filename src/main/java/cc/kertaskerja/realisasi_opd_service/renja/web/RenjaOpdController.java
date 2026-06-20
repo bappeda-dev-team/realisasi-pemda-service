@@ -1,9 +1,9 @@
 package cc.kertaskerja.realisasi_opd_service.renja.web;
 
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaKegiatanOpd;
 import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaOpdService;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaProgramOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaSubKegiatanOpd;
 import cc.kertaskerja.realisasi_opd_service.renja.web.kegiatan.FaktorPenghambatTargetRenjaKegiatanOpdRequest;
 import cc.kertaskerja.realisasi_opd_service.renja.web.kegiatan.FaktorPenunjangTargetRenjaKegiatanOpdRequest;
 import cc.kertaskerja.realisasi_opd_service.renja.web.program.FaktorPenghambatTargetRenjaProgramOpdRequest;
@@ -46,7 +46,7 @@ public class RenjaOpdController {
     }
 
     @PostMapping("/program/faktor-penunjang")
-    @Operation(summary = "Perbarui faktor penunjang target renja program OPD", description = "Memperbarui field faktor_penunjang pada semua record target_renja_program_opd yang cocok dengan kode_opd, kode_program, tahun, dan bulan.")
+    @Operation(summary = "Perbarui faktor penunjang target renja program OPD", description = "Memperbarui field faktor_penunjang pada semua record realisasi_target_renja_program_opd yang cocok dengan kode_opd, kode_program, tahun, dan bulan.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RenjaProgramOpd.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
@@ -61,7 +61,7 @@ public class RenjaOpdController {
     }
 
     @PostMapping("/program/faktor-penghambat")
-    @Operation(summary = "Perbarui faktor penghambat target renja program OPD", description = "Memperbarui field faktor_penghambat pada semua record target_renja_program_opd yang cocok dengan kode_opd, kode_program, tahun, dan bulan.")
+    @Operation(summary = "Perbarui faktor penghambat target renja program OPD", description = "Memperbarui field faktor_penghambat pada semua record realisasi_target_renja_program_opd yang cocok dengan kode_opd, kode_program, tahun, dan bulan.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RenjaProgramOpd.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
@@ -76,7 +76,7 @@ public class RenjaOpdController {
     }
 
     @PostMapping("/kegiatan/faktor-penunjang")
-    @Operation(summary = "Perbarui faktor penunjang target renja kegiatan OPD", description = "Memperbarui field faktor_penunjang pada semua record target_renja_kegiatan_opd yang cocok dengan kode_opd, kode_kegiatan, tahun, dan bulan.")
+    @Operation(summary = "Perbarui faktor penunjang target renja kegiatan OPD", description = "Memperbarui field faktor_penunjang pada semua record realisasi_target_renja_kegiatan_opd yang cocok dengan kode_opd, kode_kegiatan, tahun, dan bulan.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RenjaKegiatanOpd.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
@@ -91,7 +91,7 @@ public class RenjaOpdController {
     }
 
     @PostMapping("/kegiatan/faktor-penghambat")
-    @Operation(summary = "Perbarui faktor penghambat target renja kegiatan OPD", description = "Memperbarui field faktor_penghambat pada semua record target_renja_kegiatan_opd yang cocok dengan kode_opd, kode_kegiatan, tahun, dan bulan.")
+    @Operation(summary = "Perbarui faktor penghambat target renja kegiatan OPD", description = "Memperbarui field faktor_penghambat pada semua record realisasi_target_renja_kegiatan_opd yang cocok dengan kode_opd, kode_kegiatan, tahun, dan bulan.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RenjaKegiatanOpd.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
@@ -106,7 +106,7 @@ public class RenjaOpdController {
     }
 
     @PostMapping("/subkegiatan/faktor-penunjang")
-    @Operation(summary = "Perbarui faktor penunjang target renja subkegiatan OPD", description = "Memperbarui field faktor_penunjang pada semua record target_renja_subkegiatan_opd yang cocok dengan kode_opd, kode_subkegiatan, tahun, dan bulan.")
+    @Operation(summary = "Perbarui faktor penunjang target renja subkegiatan OPD", description = "Memperbarui field faktor_penunjang pada semua record realisasi_target_renja_subkegiatan_opd yang cocok dengan kode_opd, kode_subkegiatan, tahun, dan bulan.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RenjaSubKegiatanOpd.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
@@ -121,7 +121,7 @@ public class RenjaOpdController {
     }
 
     @PostMapping("/subkegiatan/faktor-penghambat")
-    @Operation(summary = "Perbarui faktor penghambat target renja subkegiatan OPD", description = "Memperbarui field faktor_penghambat pada semua record target_renja_subkegiatan_opd yang cocok dengan kode_opd, kode_subkegiatan, tahun, dan bulan.")
+    @Operation(summary = "Perbarui faktor penghambat target renja subkegiatan OPD", description = "Memperbarui field faktor_penghambat pada semua record realisasi_target_renja_subkegiatan_opd yang cocok dengan kode_opd, kode_subkegiatan, tahun, dan bulan.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RenjaSubKegiatanOpd.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),

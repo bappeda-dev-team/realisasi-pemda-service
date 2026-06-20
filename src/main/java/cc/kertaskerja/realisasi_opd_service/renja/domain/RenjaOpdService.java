@@ -2,29 +2,22 @@ package cc.kertaskerja.realisasi_opd_service.renja.domain;
 
 import cc.kertaskerja.integration.penetapan.PenetapanRenjaOpdClient;
 import cc.kertaskerja.integration.penetapan.renja.PenetapanRenjaOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.IndikatorRenjaKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpdHeaderRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.kegiatan.RenjaKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.IndikatorRenjaProgramOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpdHeaderRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.program.RenjaProgramOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.IndikatorRenjaSubKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpd;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpdHeaderRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.domain.subkegiatan.RenjaSubKegiatanOpdRepository;
-import cc.kertaskerja.realisasi_opd_service.renja.web.kegiatan.FaktorPenghambatTargetRenjaKegiatanOpdRequest;
-import cc.kertaskerja.realisasi_opd_service.renja.web.program.FaktorPenghambatTargetRenjaProgramOpdRequest;
-import cc.kertaskerja.realisasi_opd_service.renja.web.subkegiatan.FaktorPenghambatTargetRenjaSubKegiatanOpdRequest;
-import cc.kertaskerja.realisasi_opd_service.renja.web.kegiatan.FaktorPenunjangTargetRenjaKegiatanOpdRequest;
-import cc.kertaskerja.realisasi_opd_service.renja.web.program.FaktorPenunjangTargetRenjaProgramOpdRequest;
-import cc.kertaskerja.realisasi_opd_service.renja.web.subkegiatan.FaktorPenunjangTargetRenjaSubKegiatanOpdRequest;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaKegiatanOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaKegiatanOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaProgramOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaProgramOpdRepository;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaSubKegiatanOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaSubKegiatanOpdRepository;
 import cc.kertaskerja.realisasi_opd_service.renja.web.RenjaOpdPenetapanResponse;
+import cc.kertaskerja.realisasi_opd_service.renja.web.kegiatan.FaktorPenghambatTargetRenjaKegiatanOpdRequest;
+import cc.kertaskerja.realisasi_opd_service.renja.web.kegiatan.FaktorPenunjangTargetRenjaKegiatanOpdRequest;
+import cc.kertaskerja.realisasi_opd_service.renja.web.program.FaktorPenghambatTargetRenjaProgramOpdRequest;
+import cc.kertaskerja.realisasi_opd_service.renja.web.program.FaktorPenunjangTargetRenjaProgramOpdRequest;
+import cc.kertaskerja.realisasi_opd_service.renja.web.subkegiatan.FaktorPenghambatTargetRenjaSubKegiatanOpdRequest;
+import cc.kertaskerja.realisasi_opd_service.renja.web.subkegiatan.FaktorPenunjangTargetRenjaSubKegiatanOpdRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -37,12 +30,6 @@ public class RenjaOpdService {
     private final RenjaProgramOpdRepository targetProgramRepo;
     private final RenjaKegiatanOpdRepository targetKegiatanRepo;
     private final RenjaSubKegiatanOpdRepository targetSubKegiatanRepo;
-    private final RenjaProgramOpdHeaderRepository programHeaderRepo;
-    private final IndikatorRenjaProgramOpdRepository indikatorProgramRepo;
-    private final RenjaKegiatanOpdHeaderRepository kegiatanHeaderRepo;
-    private final IndikatorRenjaKegiatanOpdRepository indikatorKegiatanRepo;
-    private final RenjaSubKegiatanOpdHeaderRepository subKegiatanHeaderRepo;
-    private final IndikatorRenjaSubKegiatanOpdRepository indikatorSubKegiatanRepo;
 
     record RealisasiData(Double realisasi, String faktorPenunjang, String faktorPenghambat) {}
 
@@ -52,24 +39,12 @@ public class RenjaOpdService {
             PenetapanRenjaOpdClient penetapanClient,
             RenjaProgramOpdRepository targetProgramRepo,
             RenjaKegiatanOpdRepository targetKegiatanRepo,
-            RenjaSubKegiatanOpdRepository targetSubKegiatanRepo,
-            RenjaProgramOpdHeaderRepository programHeaderRepo,
-            IndikatorRenjaProgramOpdRepository indikatorProgramRepo,
-            RenjaKegiatanOpdHeaderRepository kegiatanHeaderRepo,
-            IndikatorRenjaKegiatanOpdRepository indikatorKegiatanRepo,
-            RenjaSubKegiatanOpdHeaderRepository subKegiatanHeaderRepo,
-            IndikatorRenjaSubKegiatanOpdRepository indikatorSubKegiatanRepo
+            RenjaSubKegiatanOpdRepository targetSubKegiatanRepo
     ) {
         this.penetapanClient = penetapanClient;
         this.targetProgramRepo = targetProgramRepo;
         this.targetKegiatanRepo = targetKegiatanRepo;
         this.targetSubKegiatanRepo = targetSubKegiatanRepo;
-        this.programHeaderRepo = programHeaderRepo;
-        this.indikatorProgramRepo = indikatorProgramRepo;
-        this.kegiatanHeaderRepo = kegiatanHeaderRepo;
-        this.indikatorKegiatanRepo = indikatorKegiatanRepo;
-        this.subKegiatanHeaderRepo = subKegiatanHeaderRepo;
-        this.indikatorSubKegiatanRepo = indikatorSubKegiatanRepo;
     }
 
     public Mono<RenjaOpdPenetapanResponse> getPenetapanWithRealisasi(String kodeOpd, int tahun, String bulan) {
@@ -91,80 +66,44 @@ public class RenjaOpdService {
     }
 
     public Mono<RenjaProgramOpd> updateFaktorPenunjangProgram(FaktorPenunjangTargetRenjaProgramOpdRequest req) {
-        return programHeaderRepo.findByKodeOpdAndKodeProgramAndTahunAndBulan(
-                        req.kodeOpd(), req.kodeProgram(), req.tahun(), req.bulan())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Program OPD tidak ditemukan")))
-                .flatMap(header -> indikatorProgramRepo.findByRenjaProgramOpdIdAndKodeIndikatorAndTahunAndBulan(
-                        header.id(), req.kodeIndikator(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Indikator program OPD tidak ditemukan"))))
-                .flatMap(indikator -> targetProgramRepo.findByIndikatorRenjaProgramOpdIdAndKodeTargetAndTahunAndBulan(
-                        indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target program OPD tidak ditemukan"))))
+        return targetProgramRepo.findByKodeOpdAndKodeProgramAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                        req.kodeOpd(), req.kodeProgram(), req.kodeIndikator(), req.kodeTarget(), req.tahun(), req.bulan())
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target program OPD tidak ditemukan")))
                 .flatMap(existing -> targetProgramRepo.save(existing.withFaktorPenunjang(req.faktorPenunjang())));
     }
 
     public Mono<RenjaProgramOpd> updateFaktorPenghambatProgram(FaktorPenghambatTargetRenjaProgramOpdRequest req) {
-        return programHeaderRepo.findByKodeOpdAndKodeProgramAndTahunAndBulan(
-                        req.kodeOpd(), req.kodeProgram(), req.tahun(), req.bulan())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Program OPD tidak ditemukan")))
-                .flatMap(header -> indikatorProgramRepo.findByRenjaProgramOpdIdAndKodeIndikatorAndTahunAndBulan(
-                        header.id(), req.kodeIndikator(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Indikator program OPD tidak ditemukan"))))
-                .flatMap(indikator -> targetProgramRepo.findByIndikatorRenjaProgramOpdIdAndKodeTargetAndTahunAndBulan(
-                        indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target program OPD tidak ditemukan"))))
+        return targetProgramRepo.findByKodeOpdAndKodeProgramAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                        req.kodeOpd(), req.kodeProgram(), req.kodeIndikator(), req.kodeTarget(), req.tahun(), req.bulan())
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target program OPD tidak ditemukan")))
                 .flatMap(existing -> targetProgramRepo.save(existing.withFaktorPenghambat(req.faktorPenghambat())));
     }
 
     public Mono<RenjaKegiatanOpd> updateFaktorPenunjangKegiatan(FaktorPenunjangTargetRenjaKegiatanOpdRequest req) {
-        return kegiatanHeaderRepo.findByKodeOpdAndKodeKegiatanAndTahunAndBulan(
-                        req.kodeOpd(), req.kodeKegiatan(), req.tahun(), req.bulan())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Kegiatan OPD tidak ditemukan")))
-                .flatMap(header -> indikatorKegiatanRepo.findByRenjaKegiatanOpdIdAndKodeIndikatorAndTahunAndBulan(
-                        header.id(), req.kodeIndikator(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Indikator kegiatan OPD tidak ditemukan"))))
-                .flatMap(indikator -> targetKegiatanRepo.findByIndikatorRenjaKegiatanOpdIdAndKodeTargetAndTahunAndBulan(
-                        indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target kegiatan OPD tidak ditemukan"))))
+        return targetKegiatanRepo.findByKodeOpdAndKodeKegiatanAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                        req.kodeOpd(), req.kodeKegiatan(), req.kodeIndikator(), req.kodeTarget(), req.tahun(), req.bulan())
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target kegiatan OPD tidak ditemukan")))
                 .flatMap(existing -> targetKegiatanRepo.save(existing.withFaktorPenunjang(req.faktorPenunjang())));
     }
 
     public Mono<RenjaKegiatanOpd> updateFaktorPenghambatKegiatan(FaktorPenghambatTargetRenjaKegiatanOpdRequest req) {
-        return kegiatanHeaderRepo.findByKodeOpdAndKodeKegiatanAndTahunAndBulan(
-                        req.kodeOpd(), req.kodeKegiatan(), req.tahun(), req.bulan())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Kegiatan OPD tidak ditemukan")))
-                .flatMap(header -> indikatorKegiatanRepo.findByRenjaKegiatanOpdIdAndKodeIndikatorAndTahunAndBulan(
-                        header.id(), req.kodeIndikator(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Indikator kegiatan OPD tidak ditemukan"))))
-                .flatMap(indikator -> targetKegiatanRepo.findByIndikatorRenjaKegiatanOpdIdAndKodeTargetAndTahunAndBulan(
-                        indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target kegiatan OPD tidak ditemukan"))))
+        return targetKegiatanRepo.findByKodeOpdAndKodeKegiatanAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                        req.kodeOpd(), req.kodeKegiatan(), req.kodeIndikator(), req.kodeTarget(), req.tahun(), req.bulan())
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target kegiatan OPD tidak ditemukan")))
                 .flatMap(existing -> targetKegiatanRepo.save(existing.withFaktorPenghambat(req.faktorPenghambat())));
     }
 
     public Mono<RenjaSubKegiatanOpd> updateFaktorPenunjangSubKegiatan(FaktorPenunjangTargetRenjaSubKegiatanOpdRequest req) {
-        return subKegiatanHeaderRepo.findByKodeOpdAndKodeSubKegiatanAndTahunAndBulan(
-                        req.kodeOpd(), req.kodeSubkegiatan(), req.tahun(), req.bulan())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Subkegiatan OPD tidak ditemukan")))
-                .flatMap(header -> indikatorSubKegiatanRepo.findByRenjaSubKegiatanOpdIdAndKodeIndikatorAndTahunAndBulan(
-                        header.id(), req.kodeIndikator(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Indikator subkegiatan OPD tidak ditemukan"))))
-                .flatMap(indikator -> targetSubKegiatanRepo.findByIndikatorRenjaSubKegiatanOpdIdAndKodeTargetAndTahunAndBulan(
-                        indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target subkegiatan OPD tidak ditemukan"))))
+        return targetSubKegiatanRepo.findByKodeOpdAndKodeSubkegiatanAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                        req.kodeOpd(), req.kodeSubkegiatan(), req.kodeIndikator(), req.kodeTarget(), req.tahun(), req.bulan())
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target subkegiatan OPD tidak ditemukan")))
                 .flatMap(existing -> targetSubKegiatanRepo.save(existing.withFaktorPenunjang(req.faktorPenunjang())));
     }
 
     public Mono<RenjaSubKegiatanOpd> updateFaktorPenghambatSubKegiatan(FaktorPenghambatTargetRenjaSubKegiatanOpdRequest req) {
-        return subKegiatanHeaderRepo.findByKodeOpdAndKodeSubKegiatanAndTahunAndBulan(
-                        req.kodeOpd(), req.kodeSubkegiatan(), req.tahun(), req.bulan())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Subkegiatan OPD tidak ditemukan")))
-                .flatMap(header -> indikatorSubKegiatanRepo.findByRenjaSubKegiatanOpdIdAndKodeIndikatorAndTahunAndBulan(
-                        header.id(), req.kodeIndikator(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Indikator subkegiatan OPD tidak ditemukan"))))
-                .flatMap(indikator -> targetSubKegiatanRepo.findByIndikatorRenjaSubKegiatanOpdIdAndKodeTargetAndTahunAndBulan(
-                        indikator.id(), req.kodeTarget(), req.tahun(), req.bulan())
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target subkegiatan OPD tidak ditemukan"))))
+        return targetSubKegiatanRepo.findByKodeOpdAndKodeSubkegiatanAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                        req.kodeOpd(), req.kodeSubkegiatan(), req.kodeIndikator(), req.kodeTarget(), req.tahun(), req.bulan())
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Target subkegiatan OPD tidak ditemukan")))
                 .flatMap(existing -> targetSubKegiatanRepo.save(existing.withFaktorPenghambat(req.faktorPenghambat())));
     }
 
@@ -176,25 +115,21 @@ public class RenjaOpdService {
             PenetapanRenjaOpd.PenetapanRenjaOpdRoot root,
             String kodeOpd, int tahun, String bulan
     ) {
-        Mono<Map<String, RealisasiData>> programRealisasiMap = targetProgramRepo.findAllByTahunAndBulan(
-                        String.valueOf(tahun), bulan
-                )
+        String tahunStr = String.valueOf(tahun);
+
+        Mono<Map<String, RealisasiData>> programRealisasiMap = targetProgramRepo.findAllByTahunAndBulan(tahunStr, bulan)
                 .collectMap(RenjaProgramOpd::kodeTarget,
                         t -> new RealisasiData(
                                 t.realisasi() != null ? t.realisasi().doubleValue() : null,
                                 t.faktorPenunjang(), t.faktorPenghambat()));
 
-        Mono<Map<String, RealisasiData>> kegiatanRealisasiMap = targetKegiatanRepo.findAllByTahunAndBulan(
-                        String.valueOf(tahun), bulan
-                )
+        Mono<Map<String, RealisasiData>> kegiatanRealisasiMap = targetKegiatanRepo.findAllByTahunAndBulan(tahunStr, bulan)
                 .collectMap(RenjaKegiatanOpd::kodeTarget,
                         t -> new RealisasiData(
                                 t.realisasi() != null ? t.realisasi().doubleValue() : null,
                                 t.faktorPenunjang(), t.faktorPenghambat()));
 
-        Mono<Map<String, RealisasiData>> subKegiatanRealisasiMap = targetSubKegiatanRepo.findAllByTahunAndBulan(
-                        String.valueOf(tahun), bulan
-                )
+        Mono<Map<String, RealisasiData>> subKegiatanRealisasiMap = targetSubKegiatanRepo.findAllByTahunAndBulan(tahunStr, bulan)
                 .collectMap(RenjaSubKegiatanOpd::kodeTarget,
                         t -> new RealisasiData(
                                 t.realisasi() != null ? t.realisasi().doubleValue() : null,

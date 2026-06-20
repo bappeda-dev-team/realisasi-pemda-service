@@ -1,15 +1,14 @@
 package cc.kertaskerja.realisasi_individu_service.rekin.web;
 
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
-import io.micrometer.common.lang.Nullable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Null;
 
 import java.math.BigDecimal;
 
-@Schema(name = "RekinRequest", description = "Payload untuk membuat/memperbarui rekin beserta indikator dan target")
+@Schema(name = "RekinRequest", description = "Payload untuk membuat/memperbarui realisasi target rekin individu")
 public record RekinRequest(
 
         @NotNull(message = "Kode OPD tidak boleh kosong")
@@ -27,32 +26,24 @@ public record RekinRequest(
         @Schema(description = "Kode PK rekin", example = "REKIN-PEG-2026-33475")
         String kodePkRekin,
 
-        @NotNull(message = "Kode sasaran OPD tidak boleh kosong")
-        @NotEmpty(message = "Kode sasaran OPD tidak boleh kosong")
-        @Schema(description = "Kode sasaran OPD", example = "SAS-001")
+        @Schema(description = "Kode sasaran OPD (digunakan untuk sync ke sasaran OPD)", example = "SAS-001")
         String kodeSasaranOpd,
 
         @NotNull(message = "Kode indikator PK rekin tidak boleh kosong")
         @NotEmpty(message = "Kode indikator PK rekin tidak boleh kosong")
-        @Schema(description = "Kode indikato pk rekinr", example = "IND-REKIN-87169")
+        @Schema(description = "Kode indikator pk rekin", example = "IND-REKIN-87169")
         String kodeIndikatorPKrekin,
 
-        @NotNull(message = "Kode PK target rekin tidak boleh kosong")
+        @NotNull(message = "Kode target PK rekin tidak boleh kosong")
         @NotEmpty(message = "Kode target tidak boleh kosong")
         @Schema(description = "Kode target", example = "TRGT-IND-REKIN-66602")
         String kodeTargetPKrekin,
 
-        @NotNull(message = "Target harus terdefinisi")
-        @Schema(description = "Nilai target yang ditetapkan", example = "100.0")
-        BigDecimal target,
-
         @NotNull(message = "Realisasi harus terdefinisi")
-        @PositiveOrZero(message = "Realisasi tidak boleh negatif")
-        @Schema(description = "Nilai realisasi aktual", example = "70", minimum = "0")
+        @Schema(description = "Nilai realisasi aktual", example = "70")
         BigDecimal realisasi,
 
-        @NotNull(message = "Pilih jenis NAIK atau TURUN")
-        @Schema(description = "Jenis perhitungan capaian", example = "NAIK", allowableValues = {"NAIK", "TURUN"})
+        @Schema(hidden = true)
         JenisRealisasi jenisRealisasi,
 
         @NotNull(message = "Tahun harus terdefinisi")
