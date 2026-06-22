@@ -70,8 +70,7 @@ public class TujuanService {
                 existing.createdBy(),
                 existing.createdDate(),
                 existing.lastModifiedDate(),
-                existing.lastModifiedBy(),
-                existing.version()
+                existing.lastModifiedBy()
         );
     }
 
@@ -103,8 +102,7 @@ public class TujuanService {
                                             existing.createdBy(),
                                             existing.createdDate(),
                                             existing.lastModifiedDate(),
-                                            existing.lastModifiedBy(),
-                                            existing.version()
+                                            existing.lastModifiedBy()
                                     );
                                     return tujuanRepository.save(updated);
                                 })
@@ -190,8 +188,7 @@ public class TujuanService {
                             existing.createdBy(),
                             existing.createdDate(),
                             existing.lastModifiedDate(),
-                            existing.lastModifiedBy(),
-                            existing.version()
+                            existing.lastModifiedBy()
                     );
                     return tujuanRepository.save(updated);
                 });
@@ -224,8 +221,7 @@ public class TujuanService {
                             existing.createdBy(),
                             existing.createdDate(),
                             existing.lastModifiedDate(),
-                            existing.lastModifiedBy(),
-                            existing.version()
+                            existing.lastModifiedBy()
                     );
                     return tujuanRepository.save(updated);
                 });

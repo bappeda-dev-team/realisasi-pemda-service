@@ -40,7 +40,7 @@ public class RekinControllerWebFluxTests {
                 "198012312005011001", "MATILDA DEW -, S.Sos",
                 "8.01.0.00.0.00.01.0000", 2026, null,
                 List.of(new PenetapanRekinIndividuResponse.RekinPenetapanResponse(
-                        1L, "REKIN-PEG-2026-33475",
+                        1L, null, "REKIN-PEG-2026-33475",
                         "Peningkatan Pembinaan", 5,
                         List.of(new PenetapanRekinIndividuResponse.IndikatorPenetapanResponse(
                                 1L, "IND-REKIN-87169", "Persentase terlaksananya",
@@ -84,7 +84,7 @@ public class RekinControllerWebFluxTests {
                 "198012312005011001", "MATILDA DEW -, S.Sos",
                 "8.01.0.00.0.00.01.0000", 2026, 1,
                 List.of(new PenetapanRekinIndividuResponse.RekinPenetapanResponse(
-                        1L, "REKIN-PEG-2026-33475",
+                        1L, null, "REKIN-PEG-2026-33475",
                         "Peningkatan Pembinaan", 5,
                         List.of(new PenetapanRekinIndividuResponse.IndikatorPenetapanResponse(
                                 1L, "IND-REKIN-87169", "Persentase terlaksananya",

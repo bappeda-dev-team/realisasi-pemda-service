@@ -158,7 +158,7 @@ public class RekinService {
                 .map(this::mapIndikatorToResponse)
                 .toList();
         return new PenetapanRekinIndividuResponse.RekinPenetapanResponse(
-                rekin.id(), rekin.kodePk(), rekin.rekin(), rekin.versi(), indikators
+                rekin.id(), rekin.kodeSasaranOpd(), rekin.kodePk(), rekin.rekin(), rekin.versi(), indikators
         );
     }
 
@@ -215,7 +215,7 @@ public class RekinService {
                 .map(ind -> mergeIndikatorWithRealisasi(rekin.kodePk(), ind, localTargetMap))
                 .toList();
         return new PenetapanRekinIndividuResponse.RekinPenetapanResponse(
-                rekin.id(), rekin.kodePk(), rekin.rekin(),
+                rekin.id(), rekin.kodeSasaranOpd(), rekin.kodePk(), rekin.rekin(),
                 rekin.versi(), indikators
         );
     }

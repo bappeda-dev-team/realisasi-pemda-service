@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
 
-@Table("tujuans")
+@Table("realisasi_target_tujuan_pemda")
 public record Tujuan(
         @Id Long id,
 
@@ -43,9 +43,7 @@ public record Tujuan(
         @LastModifiedDate Instant lastModifiedDate,
         @LastModifiedBy
         @Column("last_modified_by")
-        String lastModifiedBy,
-
-        @Version int version
+        String lastModifiedBy
 ) {
     public static Tujuan of(
             String tujuanId,
@@ -69,7 +67,7 @@ public record Tujuan(
         return new Tujuan(null,
                 tujuanId, tujuan, indikatorId, indikator,
                 targetId, target, realisasi, satuan, tahun, bulan, visiMisi, rumusPerhitungan, sumberData, faktorPenunjang, faktorPenghambat, jenisRealisasi, status,
-                null, null, null, null, 0);
+                null, null, null, null);
     }
 
     @JsonProperty("capaian")

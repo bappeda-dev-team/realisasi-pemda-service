@@ -74,8 +74,7 @@ public class SasaranService {
                 existing.createdBy(),
                 existing.createdDate(),
                 existing.lastModifiedDate(),
-                existing.lastModifiedBy(),
-                existing.version()
+                existing.lastModifiedBy()
         );
     }
 
@@ -121,8 +120,7 @@ public class SasaranService {
                                             existing.createdBy(),
                                             existing.createdDate(),
                                             existing.lastModifiedDate(),
-                                            existing.lastModifiedBy(),
-                                            existing.version()
+                                            existing.lastModifiedBy()
                                     );
                                     return sasaranRepository.save(updated);
                                 })
@@ -188,8 +186,7 @@ public class SasaranService {
                             existing.createdBy(),
                             existing.createdDate(),
                             existing.lastModifiedDate(),
-                            existing.lastModifiedBy(),
-                            existing.version()
+                            existing.lastModifiedBy()
                     );
                     return sasaranRepository.save(updated);
                 });
@@ -221,8 +218,7 @@ public class SasaranService {
                             existing.createdBy(),
                             existing.createdDate(),
                             existing.lastModifiedDate(),
-                            existing.lastModifiedBy(),
-                            existing.version()
+                            existing.lastModifiedBy()
                     );
                     return sasaranRepository.save(updated);
                 });
