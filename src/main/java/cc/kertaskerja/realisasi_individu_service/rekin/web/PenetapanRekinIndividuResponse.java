@@ -14,6 +14,7 @@ public record PenetapanRekinIndividuResponse(
 ) {
     public record RekinPenetapanResponse(
             Long id,
+            @JsonProperty("kode_sasaran_opd") String kodeSasaranOpd,
             @JsonProperty("kode_pk") String kodePk,
             String rekin,
             Integer versi,

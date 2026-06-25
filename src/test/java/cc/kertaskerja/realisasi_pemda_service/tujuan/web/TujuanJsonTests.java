@@ -21,7 +21,8 @@ public class TujuanJsonTests {
 var realisasiTujuan = new Tujuan(304L, "T1", "TUJ-1",
                 "I1", "IND-1",
                 "TAR-1", "10.0", 10.0, "%",
-                "2025", "01", "Visi Misi 1", "(realisasi/target)*100", "BPS", "", "", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED, null, Instant.now(), Instant.now(), null, 1);
+                "2025", "01", "Visi Misi 1", "(realisasi/target)*100", "BPS", "", "", JenisRealisasi.NAIK, TujuanStatus.UNCHECKED,
+                null, Instant.now(), Instant.now(), null);
        var jsonContent = json.write(realisasiTujuan);
        assertThat(jsonContent).extractingJsonPathNumberValue("@.id")
                .isEqualTo(realisasiTujuan.id().intValue());
@@ -47,9 +48,7 @@ var realisasiTujuan = new Tujuan(304L, "T1", "TUJ-1",
                .isEqualTo(realisasiTujuan.jenisRealisasi().toString());
        assertThat(jsonContent).extractingJsonPathStringValue("@.status")
                .isEqualTo(realisasiTujuan.status().toString());
-       assertThat(jsonContent).extractingJsonPathNumberValue("@.version")
-               .isEqualTo(realisasiTujuan.version());
-       assertThat(jsonContent).extractingJsonPathStringValue("@.createdDate")
+        assertThat(jsonContent).extractingJsonPathStringValue("@.createdDate")
                .isEqualTo(realisasiTujuan.createdDate().toString());
        assertThat(jsonContent).extractingJsonPathStringValue("@.lastModifiedDate")
                .isEqualTo(realisasiTujuan.lastModifiedDate().toString());

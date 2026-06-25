@@ -8,13 +8,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
 
-@Table("sasarans")
+@Table("realisasi_target_sasaran_pemda")
 public record Sasaran(
         @Id Long id,
 
@@ -46,8 +45,7 @@ public record Sasaran(
         @LastModifiedDate Instant lastModifiedDate,
         @LastModifiedBy
         @Column("last_modified_by")
-        String lastModifiedBy,
-        @Version int version
+        String lastModifiedBy
 ) {
     public static Sasaran of(
             String sasaranId,
@@ -71,7 +69,7 @@ public record Sasaran(
                 sasaranId, sasaran, indikatorId, indikator,
                 targetId, target,
                 realisasi, satuan, tahun, bulan, rumusPerhitungan, sumberData, faktorPenunjang, faktorPenghambat, jenisRealisasi, status,
-                null, null, null, null, 0);
+                null, null, null, null);
     }
 
     @JsonProperty("capaian")

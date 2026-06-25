@@ -17,6 +17,7 @@ public class PenetapanRekinIndividu {
     public record RekinData(
             Long id,
             @JsonProperty("level_pk") Integer levelPk,
+            @JsonProperty("kode_sasaran_opd") String kodeSasaranOpd,
             @JsonProperty("kode_pk") String kodePk,
             String rekin,
             @JsonProperty("nama_pemilik_pk") String namaPemilikPk,
