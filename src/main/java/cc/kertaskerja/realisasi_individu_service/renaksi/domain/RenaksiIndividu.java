@@ -1,6 +1,5 @@
 package cc.kertaskerja.realisasi_individu_service.renaksi.domain;
 
-import cc.kertaskerja.capaian.domain.Capaian;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.CreatedBy;
@@ -122,10 +121,11 @@ public record RenaksiIndividu(
     }
 
     public Double capaianTarget() {
-        if (paguAnggaran == null || paguAnggaran.compareTo(BigDecimal.ZERO) == 0) {
+        if (target == null || target.compareTo(BigDecimal.ZERO) == 0 || realisasi == null) {
             return 0.0;
         }
-        Capaian capaian = new Capaian(realisasi.doubleValue(), paguAnggaran.toString(), jenisRealisasi);
-        return capaian.hasilCapaian();
+        double realisasiVal = realisasi.doubleValue();
+        double targetVal = target.doubleValue();
+        return realisasiVal / targetVal * 100;
     }
 }
