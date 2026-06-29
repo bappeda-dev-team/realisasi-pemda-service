@@ -61,7 +61,7 @@ public record RekinIndividu(
     public record CapaianResult(Double capaian, String keteranganCapaian) {}
 
     public static CapaianResult hitungCapaian(Double realisasi, Double target) {
-        if (realisasi == null || target == null || target == 0) {
+        if (target == null || target == 0 || realisasi == null || realisasi == 0) {
             return new CapaianResult(0.0, null);
         }
         double calculatedCapaian = realisasi / target * 100;
