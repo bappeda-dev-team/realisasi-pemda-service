@@ -35,7 +35,6 @@ public record FaktorPenunjangTargetRenjaProgramRequest(
         @Schema(example = "1")
         String bulan,
 
-        @NotNull @NotEmpty
         @Schema(description = "Faktor penunjang target program", example = "Kerjasama tim yang baik")
         String faktorPenunjang
 ) {}

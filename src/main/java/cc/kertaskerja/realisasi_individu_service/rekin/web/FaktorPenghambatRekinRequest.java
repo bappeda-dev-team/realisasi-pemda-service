@@ -41,8 +41,6 @@ public record FaktorPenghambatRekinRequest(
         @Schema(description = "Kode target", example = "TAR-1")
         String kodeTarget,
 
-        @NotNull(message = "Faktor penghambat tidak boleh kosong")
-        @NotEmpty(message = "Faktor penghambat tidak boleh kosong")
         @Schema(description = "Faktor penghambat rekin", example = "Perubahan prioritas")
         String faktorPenghambat
 ) {}

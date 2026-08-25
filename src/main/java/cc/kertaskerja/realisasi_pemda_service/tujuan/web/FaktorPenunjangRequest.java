@@ -31,8 +31,6 @@ public record FaktorPenunjangRequest(
         @Schema(description = "Bulan realisasi", example = "1")
         String bulan,
 
-        @NotNull(message = "Faktor penunjang tidak boleh kosong")
-        @NotEmpty(message = "Faktor penunjang tidak boleh kosong")
         @Schema(description = "Faktor penunjang tujuan pemda", example = "Kerjasama antar daerah")
         String faktorPenunjang
 ) {}
