@@ -35,7 +35,6 @@ public record FaktorPenghambatTargetRenjaSubKegiatanRequest(
         @Schema(example = "1")
         String bulan,
 
-        @NotNull @NotEmpty
         @Schema(description = "Faktor penghambat target subkegiatan", example = "Keterbatasan anggaran")
         String faktorPenghambat
 ) {}

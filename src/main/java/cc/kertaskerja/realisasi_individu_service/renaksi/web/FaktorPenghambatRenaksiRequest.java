@@ -43,8 +43,6 @@ public record FaktorPenghambatRenaksiRequest(
         @Schema(description = "Kode pelaksanaan", example = "PEL-1")
         String kodePelaksanaan,
 
-        @NotNull(message = "Faktor penghambat tidak boleh kosong")
-        @NotEmpty(message = "Faktor penghambat tidak boleh kosong")
         @Schema(description = "Faktor penghambat renaksi", example = "Perubahan prioritas")
         String faktorPenghambat
 ) {}

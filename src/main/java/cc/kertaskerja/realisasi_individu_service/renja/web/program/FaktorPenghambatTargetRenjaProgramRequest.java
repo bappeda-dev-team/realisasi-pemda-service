@@ -35,7 +35,6 @@ public record FaktorPenghambatTargetRenjaProgramRequest(
         @Schema(example = "1")
         String bulan,
 
-        @NotNull @NotEmpty
         @Schema(description = "Faktor penghambat target program", example = "Keterbatasan anggaran")
         String faktorPenghambat
 ) {}

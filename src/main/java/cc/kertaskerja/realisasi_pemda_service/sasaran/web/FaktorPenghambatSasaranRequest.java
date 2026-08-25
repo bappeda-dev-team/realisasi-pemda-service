@@ -31,8 +31,6 @@ public record FaktorPenghambatSasaranRequest(
         @Schema(description = "Bulan realisasi", example = "1")
         String bulan,
 
-        @NotNull(message = "Faktor penghambat tidak boleh kosong")
-        @NotEmpty(message = "Faktor penghambat tidak boleh kosong")
         @Schema(description = "Faktor penghambat sasaran pemda", example = "Keterbatasan anggaran")
         String faktorPenghambat
 ) {}

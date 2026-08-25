@@ -35,7 +35,6 @@ public record FaktorPenunjangTargetRenjaSubKegiatanRequest(
         @Schema(example = "1")
         String bulan,
 
-        @NotNull @NotEmpty
         @Schema(description = "Faktor penunjang target subkegiatan", example = "Kerjasama tim yang baik")
         String faktorPenunjang
 ) {}

@@ -43,8 +43,6 @@ public record FaktorPenunjangRenaksiRequest(
         @Schema(description = "Kode pelaksanaan", example = "PEL-1")
         String kodePelaksanaan,
 
-        @NotNull(message = "Faktor penunjang tidak boleh kosong")
-        @NotEmpty(message = "Faktor penunjang tidak boleh kosong")
         @Schema(description = "Faktor penunjang renaksi", example = "Kerjasama tim")
         String faktorPenunjang
 ) {}

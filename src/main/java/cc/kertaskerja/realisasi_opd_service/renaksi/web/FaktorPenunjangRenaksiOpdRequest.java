@@ -36,8 +36,6 @@ public record FaktorPenunjangRenaksiOpdRequest(
         @Schema(description = "ID target", example = "TAR-1")
         String targetId,
 
-        @NotNull(message = "Faktor penunjang tidak boleh kosong")
-        @NotEmpty(message = "Faktor penunjang tidak boleh kosong")
         @Schema(description = "Faktor penunjang renaksi", example = "Kerjasama tim")
         String faktorPenunjang
 ) {}
