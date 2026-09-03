@@ -37,9 +37,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -290,7 +290,10 @@ public class RenjaIndividuService {
                                 item -> item.realisasi() != null ? item.realisasi().doubleValue() : null);
                         Double totalRealisasi = (jenisLaporan == JenisLaporan.TRIWULAN
                                 || jenisLaporan == JenisLaporan.TAHUNAN)
-                                        ? listData.values().stream().mapToDouble(Double::doubleValue).sum()
+                                        ? listData.entrySet().stream()
+                                                .max(java.util.Map.Entry.comparingByKey())
+                                                .map(java.util.Map.Entry::getValue)
+                                                .orElse(0.0)
                                         : null;
                         return new LaporanRealisasiRenjaProgramIndividuResponse(tahun, kodeOpd, nip, null,
                                 null, jenisLaporan, listData,
@@ -312,7 +315,10 @@ public class RenjaIndividuService {
                                 item -> item.realisasi() != null ? item.realisasi().doubleValue() : null);
                         Double totalRealisasi = (jenisLaporan == JenisLaporan.TRIWULAN
                                 || jenisLaporan == JenisLaporan.TAHUNAN)
-                                        ? listData.values().stream().mapToDouble(Double::doubleValue).sum()
+                                        ? listData.entrySet().stream()
+                                                .max(java.util.Map.Entry.comparingByKey())
+                                                .map(java.util.Map.Entry::getValue)
+                                                .orElse(0.0)
                                         : null;
                         return new LaporanRealisasiRenjaKegiatanIndividuResponse(tahun, kodeOpd, nip, null,
                                 null, jenisLaporan, listData,
@@ -334,7 +340,10 @@ public class RenjaIndividuService {
                                 item -> item.realisasiTarget() != null ? item.realisasiTarget().doubleValue() : null);
                         Double totalRealisasi = (jenisLaporan == JenisLaporan.TRIWULAN
                                 || jenisLaporan == JenisLaporan.TAHUNAN)
-                                        ? listData.values().stream().mapToDouble(Double::doubleValue).sum()
+                                        ? listData.entrySet().stream()
+                                                .max(java.util.Map.Entry.comparingByKey())
+                                                .map(java.util.Map.Entry::getValue)
+                                                .orElse(0.0)
                                         : null;
                         return new LaporanRealisasiRenjaSubKegiatanIndividuResponse(tahun, kodeOpd, nip,
                                 null,
@@ -366,7 +375,10 @@ public class RenjaIndividuService {
                                             item -> item.realisasi() != null ? item.realisasi().doubleValue() : null);
                                     Double totalRealisasi = (jenisLaporan == JenisLaporan.TRIWULAN
                                             || jenisLaporan == JenisLaporan.TAHUNAN)
-                                                    ? listData.values().stream().mapToDouble(Double::doubleValue).sum()
+                                                    ? listData.entrySet().stream()
+                                                            .max(java.util.Map.Entry.comparingByKey())
+                                                            .map(java.util.Map.Entry::getValue)
+                                                            .orElse(0.0)
                                                     : null;
                                     return new LaporanRealisasiRenjaProgramIndividuResponse(tahun, kodeOpd, first.nip(),
                                             null, null,
@@ -398,7 +410,10 @@ public class RenjaIndividuService {
                                             item -> item.realisasi() != null ? item.realisasi().doubleValue() : null);
                                     Double totalRealisasi = (jenisLaporan == JenisLaporan.TRIWULAN
                                             || jenisLaporan == JenisLaporan.TAHUNAN)
-                                                    ? listData.values().stream().mapToDouble(Double::doubleValue).sum()
+                                                    ? listData.entrySet().stream()
+                                                            .max(java.util.Map.Entry.comparingByKey())
+                                                            .map(java.util.Map.Entry::getValue)
+                                                            .orElse(0.0)
                                                     : null;
                                     return new LaporanRealisasiRenjaKegiatanIndividuResponse(tahun, kodeOpd, first.nip(),
                                             null, null,
@@ -430,7 +445,10 @@ public class RenjaIndividuService {
                                             item -> item.realisasiTarget() != null ? item.realisasiTarget().doubleValue() : null);
                                     Double totalRealisasi = (jenisLaporan == JenisLaporan.TRIWULAN
                                             || jenisLaporan == JenisLaporan.TAHUNAN)
-                                                    ? listData.values().stream().mapToDouble(Double::doubleValue).sum()
+                                                    ? listData.entrySet().stream()
+                                                            .max(java.util.Map.Entry.comparingByKey())
+                                                            .map(java.util.Map.Entry::getValue)
+                                                            .orElse(0.0)
                                                     : null;
                                     return new LaporanRealisasiRenjaSubKegiatanIndividuResponse(tahun, kodeOpd, first.nip(),
                                             null,
@@ -716,36 +734,8 @@ public class RenjaIndividuService {
                         .sum();
                 yield Map.of(bulan, total);
             }
-            case TRIWULAN -> {
-                Map<String, Double> triwulanMap = new HashMap<>();
-                for (int i = 1; i <= 4; i++) {
-                    triwulanMap.put(String.valueOf(i), 0.0);
-                }
-                for (T item : list) {
-                    Double nilai = nilaiExtractor.apply(item);
-                    if (nilai == null) {
-                        continue;
-                    }
-                    int noBulan = Integer.parseInt(extractBulan(item));
-                    String triwulan = String.valueOf((noBulan - 1) / 3 + 1);
-                    triwulanMap.merge(triwulan, nilai, Double::sum);
-                }
-                yield triwulanMap;
-            }
-            case TAHUNAN -> {
-                Map<String, Double> bulanMap = new HashMap<>();
-                for (int i = 1; i <= 12; i++) {
-                    bulanMap.put(String.valueOf(i), 0.0);
-                }
-                for (T item : list) {
-                    Double nilai = nilaiExtractor.apply(item);
-                    if (nilai == null) {
-                        continue;
-                    }
-                    bulanMap.merge(extractBulan(item), nilai, Double::sum);
-                }
-                yield bulanMap;
-            }
+            case TRIWULAN -> hitungTriwulanKumulatif(list, nilaiExtractor);
+            case TAHUNAN -> hitungBulanKumulatif(list, nilaiExtractor);
         };
     }
 
@@ -760,6 +750,52 @@ public class RenjaIndividuService {
             return subKegiatan.bulan();
         }
         throw new IllegalArgumentException("Tipe data laporan tidak didukung");
+    }
+
+    private <T> Map<String, Double> hitungTriwulanKumulatif(
+            java.util.List<T> list,
+            Function<T, Double> nilaiExtractor) {
+        Map<String, Double> triwulanMap = new TreeMap<>();
+        for (int triwulan = 1; triwulan <= 4; triwulan++) {
+            int awalBulan = (triwulan - 1) * 3 + 1;
+            int akhirBulan = triwulan * 3;
+            boolean adaData = list.stream()
+                    .filter(item -> nilaiExtractor.apply(item) != null)
+                    .anyMatch(item -> {
+                        int b = Integer.parseInt(extractBulan(item));
+                        return b >= awalBulan && b <= akhirBulan;
+                    });
+            if (adaData) {
+                double kumulatif = list.stream()
+                        .filter(item -> nilaiExtractor.apply(item) != null)
+                        .filter(item -> Integer.parseInt(extractBulan(item)) <= akhirBulan)
+                        .mapToDouble(nilaiExtractor::apply)
+                        .sum();
+                triwulanMap.put(String.valueOf(triwulan), kumulatif);
+            }
+        }
+        return triwulanMap;
+    }
+
+    private <T> Map<String, Double> hitungBulanKumulatif(
+            java.util.List<T> list,
+            Function<T, Double> nilaiExtractor) {
+        TreeMap<Integer, Double> bulanMap = new TreeMap<>();
+        for (T item : list) {
+            Double nilai = nilaiExtractor.apply(item);
+            if (nilai == null) {
+                continue;
+            }
+            int noBulan = Integer.parseInt(extractBulan(item));
+            bulanMap.merge(noBulan, nilai, Double::sum);
+        }
+        double akumulasi = 0.0;
+        Map<String, Double> result = new TreeMap<>();
+        for (var entry : bulanMap.entrySet()) {
+            akumulasi += entry.getValue();
+            result.put(String.valueOf(entry.getKey()), akumulasi);
+        }
+        return result;
     }
 
     public Mono<String> uploadFile(FilePart file) {
