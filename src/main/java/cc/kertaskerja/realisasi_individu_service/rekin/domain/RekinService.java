@@ -263,6 +263,7 @@ public class RekinService {
                     return reactor.core.publisher.Flux.fromIterable(grouped.values()).map(groupList -> {
                         RekinIndividu first = groupList.get(0);
 
+                        String rekin = first.kodeIndikatorPkRekin();
                         String indikatorName = first.kodeIndikatorPkRekin();
                         String targetName = first.kodeTargetPkRekin();
 
@@ -271,6 +272,9 @@ public class RekinService {
                                 if (r.indikatorPk() != null) {
                                     for (var ind : r.indikatorPk()) {
                                         if (ind.kodeIndikatorPk().equals(first.kodeIndikatorPkRekin())) {
+                                            if (r.rekin() != null) {
+                                                rekin = r.rekin();
+                                            }
                                             indikatorName = ind.namaIndikatorPk();
                                             if (ind.targetPk() != null) {
                                                 for (var tgt : ind.targetPk()) {
@@ -305,13 +309,12 @@ public class RekinService {
 
                         Double totalRealisasi = null;
                         if (jenisLaporan == JenisLaporan.TRIWULAN || jenisLaporan == JenisLaporan.TAHUNAN) {
-                            totalRealisasi = listData.entrySet().stream()
-                                    .max(java.util.Map.Entry.comparingByKey())
-                                    .map(java.util.Map.Entry::getValue)
-                                    .orElse(0.0);
+                            totalRealisasi = listData.values().stream()
+                                    .mapToDouble(Double::doubleValue)
+                                    .sum();
                         }
 
-                        return new LaporanRealisasiRekinIndividuResponse(tahun, kodeOpd, nip, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
+                        return new LaporanRealisasiRekinIndividuResponse(tahun, kodeOpd, nip, rekin, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
                     });
                 });
     }
@@ -327,16 +330,49 @@ public class RekinService {
         return pegawaiClient.findPegawaiByNip(nip)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Pegawai dengan NIP tersebut tidak ditemukan di service Kepegawaian")))
                 .flatMapMany(pegawai -> {
-                    return repository.findAllByKodeOpdAndNipAndTahun(kodeOpd, nip, tahun).collectList()
-                            .flatMapMany(list -> {
+                    Mono<cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData> penetapanMono =
+                            penetapanClient.fetchRekinIndividu(nip, kodeOpd, Integer.parseInt(tahun))
+                            .onErrorResume(e -> Mono.empty());
+
+                    return Mono.zip(repository.findAllByKodeOpdAndNipAndTahun(kodeOpd, nip, tahun).collectList(),
+                                    penetapanMono.defaultIfEmpty(new cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData(null, null, null, null, List.of())))
+                            .flatMapMany(tuple -> {
+                                List<RekinIndividu> list = tuple.getT1();
+                                cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData penetapanData = tuple.getT2();
+
                                 Map<String, List<RekinIndividu>> grouped = list.stream()
                                         .collect(Collectors.groupingBy(t -> t.nip() + "|" + t.kodeIndikatorPkRekin() + "|" + t.kodeTargetPkRekin()));
 
                                 return reactor.core.publisher.Flux.fromIterable(grouped.values()).map(groupList -> {
                                     RekinIndividu first = groupList.get(0);
 
+                                    String rekin = first.kodeIndikatorPkRekin();
                                     String indikatorName = first.kodeIndikatorPkRekin();
                                     String targetName = first.kodeTargetPkRekin();
+
+                                    if (penetapanData.rekins() != null) {
+                                        for (var r : penetapanData.rekins()) {
+                                            if (r.indikatorPk() != null) {
+                                                for (var ind : r.indikatorPk()) {
+                                                    if (ind.kodeIndikatorPk().equals(first.kodeIndikatorPkRekin())) {
+                                                        if (r.rekin() != null) {
+                                                            rekin = r.rekin();
+                                                        }
+                                                        indikatorName = ind.namaIndikatorPk();
+                                                        if (ind.targetPk() != null) {
+                                                            for (var tgt : ind.targetPk()) {
+                                                                if (tgt.kodeTargetPk().equals(first.kodeTargetPkRekin())) {
+                                                                    targetName = tgt.target() != null ? String.valueOf(tgt.target()) : first.kodeTargetPkRekin();
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
 
                                     Map<String, Double> listData = switch (jenisLaporan) {
                                         case BULANAN -> {
@@ -356,13 +392,12 @@ public class RekinService {
 
                                     Double totalRealisasi = null;
                                     if (jenisLaporan == JenisLaporan.TRIWULAN || jenisLaporan == JenisLaporan.TAHUNAN) {
-                                        totalRealisasi = listData.entrySet().stream()
-                                                .max(java.util.Map.Entry.comparingByKey())
-                                                .map(java.util.Map.Entry::getValue)
-                                                .orElse(0.0);
+                                        totalRealisasi = listData.values().stream()
+                                                .mapToDouble(Double::doubleValue)
+                                                .sum();
                                     }
 
-                                    return new LaporanRealisasiRekinIndividuResponse(tahun, kodeOpd, first.nip(), indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
+                                    return new LaporanRealisasiRekinIndividuResponse(tahun, kodeOpd, first.nip(), rekin, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
                                 });
                             });
                 });
@@ -398,11 +433,9 @@ public class RekinService {
             int noBulan = Integer.parseInt(t.bulan());
             bulanMap.merge(noBulan, t.realisasi().doubleValue(), Double::sum);
         }
-        double akumulasi = 0.0;
         Map<String, Double> result = new TreeMap<>();
         for (var entry : bulanMap.entrySet()) {
-            akumulasi += entry.getValue();
-            result.put(String.valueOf(entry.getKey()), akumulasi);
+            result.put(String.valueOf(entry.getKey()), entry.getValue());
         }
         return result;
     }

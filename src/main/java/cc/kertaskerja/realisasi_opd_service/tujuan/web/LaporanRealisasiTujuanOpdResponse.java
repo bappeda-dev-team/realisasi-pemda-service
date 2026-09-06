@@ -14,6 +14,10 @@ public record LaporanRealisasiTujuanOpdResponse(
         @JsonProperty("kode_opd")
         @Schema(description = "Kode OPD", example = "5.01.5.05.0.00.01.0000")
         String kodeOpd,
+
+        @JsonProperty("nama_tujuan")
+        @Schema(description = "Nama tujuan OPD", example = "Meningkatkan kualitas pendidikan")
+        String namaTujuan,
         
         @Schema(description = "Indikator laporan", example = "Indikator A")
         String indikator,

@@ -18,6 +18,9 @@ public record LaporanRealisasiRenjaKegiatanIndividuResponse(
         @Schema(description = "NIP pegawai", example = "198012312005011001")
         String nip,
 
+        @Schema(description = "Nama kegiatan", example = "Kegiatan A")
+        String kegiatan,
+
         @Schema(description = "Indikator laporan", example = "Indikator A")
         String indikator,
 

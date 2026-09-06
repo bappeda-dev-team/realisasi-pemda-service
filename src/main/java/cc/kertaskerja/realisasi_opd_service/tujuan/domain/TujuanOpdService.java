@@ -112,10 +112,14 @@ public class TujuanOpdService {
                     return Flux.fromIterable(grouped.values()).map(groupList -> {
                         TujuanOpd first = groupList.get(0);
                         
+                        String namaTujuan = first.kodeTujuanOpd();
                         String indikatorName = first.kodeIndikator();
                         String targetName = first.kodeTarget();
 
                         for (var p : penetapanList) {
+                            if (p.kodeTujuanOpd().equals(first.kodeTujuanOpd())) {
+                                namaTujuan = p.tujuanOpd();
+                            }
                             for (var ind : p.indikators()) {
                                 if (ind.kodeIndikator().equals(first.kodeIndikator())) {
                                     indikatorName = ind.indikator();
@@ -149,13 +153,12 @@ public class TujuanOpdService {
 
                         Double totalRealisasi = null;
                         if (jenisLaporan == JenisLaporan.TRIWULAN || jenisLaporan == JenisLaporan.TAHUNAN) {
-                            totalRealisasi = listData.entrySet().stream()
-                                    .max(java.util.Map.Entry.comparingByKey())
-                                    .map(java.util.Map.Entry::getValue)
-                                    .orElse(0.0);
+                            totalRealisasi = listData.values().stream()
+                                    .mapToDouble(Double::doubleValue)
+                                    .sum();
                         }
                         
-                        return new LaporanRealisasiTujuanOpdResponse(tahun, kodeOpd, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
+                        return new LaporanRealisasiTujuanOpdResponse(tahun, kodeOpd, namaTujuan, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
                     });
                 });
     }
@@ -190,11 +193,9 @@ public class TujuanOpdService {
             int noBulan = Integer.parseInt(t.bulan());
             bulanMap.merge(noBulan, t.realisasi().doubleValue(), Double::sum);
         }
-        double akumulasi = 0.0;
         Map<String, Double> result = new TreeMap<>();
         for (var entry : bulanMap.entrySet()) {
-            akumulasi += entry.getValue();
-            result.put(String.valueOf(entry.getKey()), akumulasi);
+            result.put(String.valueOf(entry.getKey()), entry.getValue());
         }
         return result;
     }

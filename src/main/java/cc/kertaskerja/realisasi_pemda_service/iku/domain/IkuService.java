@@ -1,8 +1,10 @@
 package cc.kertaskerja.realisasi_pemda_service.iku.domain;
 
+import cc.kertaskerja.realisasi.domain.JenisLaporan;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_pemda_service.iku.web.FaktorPenghambatIkuRequest;
 import cc.kertaskerja.realisasi_pemda_service.iku.web.FaktorPenunjangIkuRequest;
+import cc.kertaskerja.realisasi_pemda_service.iku.web.LaporanRealisasiIkuResponse;
 import cc.kertaskerja.realisasi_pemda_service.sasaran.domain.SasaranRepository;
 import cc.kertaskerja.realisasi_pemda_service.sasaran.domain.SasaranService;
 import cc.kertaskerja.realisasi_pemda_service.sasaran.web.FaktorPenghambatSasaranRequest;
@@ -156,6 +158,20 @@ public class IkuService {
                 }).flatMapIterable(list -> list);
 
         return Flux.merge(ikuTujuan, ikuSasaran);
+    }
+
+    public Flux<LaporanRealisasiIkuResponse> getLaporanRealisasi(String tahun, JenisLaporan jenisLaporan, String bulan) {
+        Flux<LaporanRealisasiIkuResponse> laporanTujuan = tujuanService.getLaporanRealisasi(tahun, jenisLaporan, bulan)
+                .map(r -> new LaporanRealisasiIkuResponse(
+                        r.tahun(), JenisIku.TUJUAN, r.namaTujuan(), r.indikator(), r.target(),
+                        r.jenisLaporan(), r.listData(), r.totalRealisasi()));
+
+        Flux<LaporanRealisasiIkuResponse> laporanSasaran = sasaranService.getLaporanRealisasi(tahun, jenisLaporan, bulan)
+                .map(r -> new LaporanRealisasiIkuResponse(
+                        r.tahun(), JenisIku.SASARAN, r.namaSasaran(), r.indikator(), r.target(),
+                        r.jenisLaporan(), r.listData(), r.totalRealisasi()));
+
+        return Flux.merge(laporanTujuan, laporanSasaran);
     }
 
     public static Iku buildIkuTujuan(String indikatorId, String indikator, String targetId, String target,

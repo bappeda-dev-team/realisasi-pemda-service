@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Service
 public class RenjaOpdService {
@@ -42,6 +43,8 @@ public class RenjaOpdService {
     record RealisasiData(Double realisasi, String faktorPenunjang, String faktorPenghambat, String buktiPendukung) {}
 
     record CapaianResult(Double capaian, String keteranganCapaian) {}
+
+    record PeriodeRealisasi(String bulan, BigDecimal realisasi) {}
 
     public RenjaOpdService(
             PenetapanRenjaOpdClient penetapanClient,
@@ -120,7 +123,8 @@ public class RenjaOpdService {
     }
 
     public Flux<LaporanRealisasiRenjaOpdResponse> getLaporanRealisasi(String kodeOpd, String tahun, JenisLaporan jenisLaporan, String bulan) {
-        record PeriodeRealisasi(String bulan, BigDecimal realisasi) {}
+        Mono<PenetapanRenjaOpd.PenetapanRenjaOpdRoot> penetapanMono = penetapanClient.fetchRenjaOpd(kodeOpd, Integer.parseInt(tahun))
+                .onErrorReturn(new PenetapanRenjaOpd.PenetapanRenjaOpdRoot(kodeOpd, Integer.parseInt(tahun), null, List.of(), List.of(), List.of()));
 
         Flux<PeriodeRealisasi> programFlux = targetProgramRepo.findAllByKodeOpdAndTahun(kodeOpd, tahun)
                 .map(t -> new PeriodeRealisasi(t.bulan(), t.realisasi()));
@@ -144,31 +148,15 @@ public class RenjaOpdService {
                                     .sum();
                             yield Map.of(bulan, total);
                         }
-                        case TRIWULAN -> {
-                            Map<String, Double> triwulanMap = new HashMap<>();
-                            for (int i = 1; i <= 4; i++) triwulanMap.put(String.valueOf(i), 0.0);
-                            for (PeriodeRealisasi p : list) {
-                                if (p.realisasi() == null) continue;
-                                int noBulan = Integer.parseInt(p.bulan());
-                                String triwulan = String.valueOf((noBulan - 1) / 3 + 1);
-                                triwulanMap.merge(triwulan, p.realisasi().doubleValue(), Double::sum);
-                            }
-                            yield triwulanMap;
-                        }
-                        case TAHUNAN -> {
-                            Map<String, Double> bulanMap = new HashMap<>();
-                            for (int i = 1; i <= 12; i++) bulanMap.put(String.valueOf(i), 0.0);
-                            for (PeriodeRealisasi p : list) {
-                                if (p.realisasi() == null) continue;
-                                bulanMap.merge(p.bulan(), p.realisasi().doubleValue(), Double::sum);
-                            }
-                            yield bulanMap;
-                        }
+                        case TRIWULAN -> hitungTriwulanKumulatif(list);
+                        case TAHUNAN -> hitungBulanKumulatif(list);
                     };
                     
                     Double totalRealisasi = null;
                     if (jenisLaporan == JenisLaporan.TRIWULAN || jenisLaporan == JenisLaporan.TAHUNAN) {
-                        totalRealisasi = listData.values().stream().mapToDouble(Double::doubleValue).sum();
+                        totalRealisasi = listData.values().stream()
+                                .mapToDouble(Double::doubleValue)
+                                .sum();
                     }
                     
                     return Flux.just(new LaporanRealisasiRenjaOpdResponse(tahun, kodeOpd, null, null, jenisLaporan, listData, totalRealisasi));
@@ -505,5 +493,42 @@ public class RenjaOpdService {
 
         return file.transferTo(targetPath)
                 .thenReturn("/uploads/" + filename);
+    }
+
+    private Map<String, Double> hitungTriwulanKumulatif(List<PeriodeRealisasi> groupList) {
+        Map<String, Double> triwulanMap = new TreeMap<>();
+        for (int triwulan = 1; triwulan <= 4; triwulan++) {
+            int awalBulan = (triwulan - 1) * 3 + 1;
+            int akhirBulan = triwulan * 3;
+            boolean adaData = groupList.stream()
+                    .filter(p -> p.realisasi() != null)
+                    .anyMatch(p -> {
+                        int b = Integer.parseInt(p.bulan());
+                        return b >= awalBulan && b <= akhirBulan;
+                    });
+            if (adaData) {
+                double kumulatif = groupList.stream()
+                        .filter(p -> p.realisasi() != null)
+                        .filter(p -> Integer.parseInt(p.bulan()) <= akhirBulan)
+                        .mapToDouble(p -> p.realisasi().doubleValue())
+                        .sum();
+                triwulanMap.put(String.valueOf(triwulan), kumulatif);
+            }
+        }
+        return triwulanMap;
+    }
+
+    private Map<String, Double> hitungBulanKumulatif(List<PeriodeRealisasi> groupList) {
+        TreeMap<Integer, Double> bulanMap = new TreeMap<>();
+        for (PeriodeRealisasi p : groupList) {
+            if (p.realisasi() == null) continue;
+            int noBulan = Integer.parseInt(p.bulan());
+            bulanMap.merge(noBulan, p.realisasi().doubleValue(), Double::sum);
+        }
+        Map<String, Double> result = new TreeMap<>();
+        for (var entry : bulanMap.entrySet()) {
+            result.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        return result;
     }
 }

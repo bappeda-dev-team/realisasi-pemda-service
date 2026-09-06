@@ -10,7 +10,10 @@ public record LaporanRealisasiTujuanResponse(
         @Schema(description = "Tahun laporan", example = "2026")
         String tahun,
 
-        @Schema(description = "Indikator laporan", example = "Indikator A")
+        @Schema(description = "Nama tujuan pemda", example = "Meningkatkan kualitas pendidikan")
+        String namaTujuan,
+
+        @Schema(description = "Nama indikator", example = "Angka partisipasi murni")
         String indikator,
 
         @Schema(description = "Target laporan", example = "100")

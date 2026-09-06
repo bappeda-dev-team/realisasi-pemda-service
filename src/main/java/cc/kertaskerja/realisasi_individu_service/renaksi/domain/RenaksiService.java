@@ -140,15 +140,26 @@ public class RenaksiService {
 
     public Flux<LaporanRealisasiRenaksiIndividuResponse> getLaporanRealisasi(
             String nip, String kodeOpd, String tahun, JenisLaporan jenisLaporan, String bulan) {
-        return renaksiIndividuRepository.findAllByKodeOpdAndNipAndTahun(kodeOpd, nip, tahun)
-                .collectList()
-                .flatMapMany(list -> {
+        Mono<cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData> penetapanMono =
+                penetapanClient.fetchRekinIndividu(nip, kodeOpd, Integer.parseInt(tahun))
+                        .onErrorResume(e -> Mono.empty());
+
+        return Mono.zip(
+                        renaksiIndividuRepository.findAllByKodeOpdAndNipAndTahun(kodeOpd, nip, tahun).collectList(),
+                        penetapanMono.defaultIfEmpty(new cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData(null, null, null, null, List.of())))
+                .flatMapMany(tuple -> {
+                    List<RenaksiIndividu> list = tuple.getT1();
+                    cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData penetapanData = tuple.getT2();
+
                     Map<String, List<RenaksiIndividu>> grouped = list.stream()
                             .collect(java.util.stream.Collectors.groupingBy(t -> t.kodeRenaksi() + "|" + t.kodePelaksanaan()));
 
                     return Flux.fromIterable(grouped.values()).map(groupList -> {
                         RenaksiIndividu first = groupList.get(0);
-                        
+
+                        String namaRenaksi = findNamaRenaksi(penetapanData, first.kodeRekin(), first.kodeRenaksi());
+                        String bobotPelaksanaan = findBobotPelaksanaan(penetapanData, first.kodeRekin(), first.kodeRenaksi(), first.kodePelaksanaan());
+
                         Map<String, Double> listData = switch (jenisLaporan) {
                             case BULANAN -> {
                                 if (bulan == null || bulan.isBlank()) {
@@ -164,7 +175,7 @@ public class RenaksiService {
                             case TRIWULAN -> hitungTriwulanKumulatif(groupList);
                             case TAHUNAN -> hitungBulanKumulatif(groupList);
                         };
-                        
+
                         Double totalRealisasi = null;
                         if (jenisLaporan == JenisLaporan.TRIWULAN || jenisLaporan == JenisLaporan.TAHUNAN) {
                             totalRealisasi = listData.entrySet().stream()
@@ -172,8 +183,9 @@ public class RenaksiService {
                                     .map(java.util.Map.Entry::getValue)
                                     .orElse(0.0);
                         }
-                        
-                        return new LaporanRealisasiRenaksiIndividuResponse(tahun, kodeOpd, nip, first.kodeRenaksi(), null, jenisLaporan, listData, totalRealisasi);
+
+                        return new LaporanRealisasiRenaksiIndividuResponse(tahun, kodeOpd, nip,
+                                namaRenaksi != null ? namaRenaksi : first.kodeRenaksi(), bobotPelaksanaan, jenisLaporan, listData, totalRealisasi);
                     });
                 });
     }
@@ -188,15 +200,26 @@ public class RenaksiService {
         return pegawaiClient.findPegawaiByNip(nip)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Pegawai dengan NIP tersebut tidak ditemukan di service Kepegawaian")))
                 .flatMapMany(pegawai -> {
-                    return renaksiIndividuRepository.findAllByKodeOpdAndNipAndTahun(kodeOpd, nip, tahun)
-                            .collectList()
-                            .flatMapMany(list -> {
+                    Mono<cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData> penetapanMono =
+                            penetapanClient.fetchRekinIndividu(nip, kodeOpd, Integer.parseInt(tahun))
+                                    .onErrorResume(e -> Mono.empty());
+
+                    return Mono.zip(
+                                    renaksiIndividuRepository.findAllByKodeOpdAndNipAndTahun(kodeOpd, nip, tahun).collectList(),
+                                    penetapanMono.defaultIfEmpty(new cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData(null, null, null, null, List.of())))
+                            .flatMapMany(tuple -> {
+                                List<RenaksiIndividu> list = tuple.getT1();
+                                cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData penetapanData = tuple.getT2();
+
                                 Map<String, List<RenaksiIndividu>> grouped = list.stream()
                                         .collect(java.util.stream.Collectors.groupingBy(t -> t.nip() + "|" + t.kodeRenaksi() + "|" + t.kodePelaksanaan()));
 
                                 return Flux.fromIterable(grouped.values()).map(groupList -> {
                                     RenaksiIndividu first = groupList.get(0);
-                                    
+
+                                    String namaRenaksi = findNamaRenaksi(penetapanData, first.kodeRekin(), first.kodeRenaksi());
+                                    String bobotPelaksanaan = findBobotPelaksanaan(penetapanData, first.kodeRekin(), first.kodeRenaksi(), first.kodePelaksanaan());
+
                                     Map<String, Double> listData = switch (jenisLaporan) {
                                         case BULANAN -> {
                                             if (bulan == null || bulan.isBlank()) {
@@ -212,7 +235,7 @@ public class RenaksiService {
                                         case TRIWULAN -> hitungTriwulanKumulatif(groupList);
                                         case TAHUNAN -> hitungBulanKumulatif(groupList);
                                     };
-                                    
+
                                     Double totalRealisasi = null;
                                     if (jenisLaporan == JenisLaporan.TRIWULAN || jenisLaporan == JenisLaporan.TAHUNAN) {
                                         totalRealisasi = listData.entrySet().stream()
@@ -220,11 +243,64 @@ public class RenaksiService {
                                                 .map(java.util.Map.Entry::getValue)
                                                 .orElse(0.0);
                                     }
-                                    
-                                    return new LaporanRealisasiRenaksiIndividuResponse(tahun, kodeOpd, first.nip(), first.kodeRenaksi(), null, jenisLaporan, listData, totalRealisasi);
+
+                                    return new LaporanRealisasiRenaksiIndividuResponse(tahun, kodeOpd, first.nip(),
+                                            namaRenaksi != null ? namaRenaksi : first.kodeRenaksi(), bobotPelaksanaan, jenisLaporan, listData, totalRealisasi);
                                 });
                             });
                 });
+    }
+
+    private String findNamaRenaksi(
+            cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData data,
+            String kodeRekin, String kodeRenaksi) {
+        if (data.rekins() == null) {
+            return null;
+        }
+        for (cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinData rekin : data.rekins()) {
+            if (!kodeRekin.equals(rekin.kodePk())) {
+                continue;
+            }
+            if (rekin.renaksis() == null) {
+                continue;
+            }
+            for (cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RenaksiRekinData renaksi : rekin.renaksis()) {
+                if (kodeRenaksi.equals(renaksi.kodeRenaksi())) {
+                    return renaksi.namaRenaksi();
+                }
+            }
+        }
+        return null;
+    }
+
+    private String findBobotPelaksanaan(
+            cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData data,
+            String kodeRekin, String kodeRenaksi, String kodePelaksanaan) {
+        if (data.rekins() == null) {
+            return null;
+        }
+        for (cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinData rekin : data.rekins()) {
+            if (!kodeRekin.equals(rekin.kodePk())) {
+                continue;
+            }
+            if (rekin.renaksis() == null) {
+                continue;
+            }
+            for (cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RenaksiRekinData renaksi : rekin.renaksis()) {
+                if (!kodeRenaksi.equals(renaksi.kodeRenaksi())) {
+                    continue;
+                }
+                if (renaksi.pelaksanaans() == null) {
+                    continue;
+                }
+                for (cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.PelaksanaanRekinData pelaksanaan : renaksi.pelaksanaans()) {
+                    if (kodePelaksanaan.equals(pelaksanaan.kodePelaksanaan())) {
+                        return pelaksanaan.bobotPelaksanaan() != null ? String.valueOf(pelaksanaan.bobotPelaksanaan()) : null;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private Map<String, Double> hitungTriwulanKumulatif(List<RenaksiIndividu> groupList) {

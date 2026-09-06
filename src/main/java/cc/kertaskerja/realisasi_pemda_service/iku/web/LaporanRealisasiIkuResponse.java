@@ -1,37 +1,31 @@
-package cc.kertaskerja.realisasi_individu_service.rekin.web;
+package cc.kertaskerja.realisasi_pemda_service.iku.web;
 
 import cc.kertaskerja.realisasi.domain.JenisLaporan;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import cc.kertaskerja.realisasi_pemda_service.iku.domain.JenisIku;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Map;
 
-@Schema(name = "LaporanRealisasiRekinIndividuResponse", description = "Response laporan realisasi rekin individu per periode")
-public record LaporanRealisasiRekinIndividuResponse(
+@Schema(name = "LaporanRealisasiIkuResponse", description = "Response laporan realisasi IKU pemda per periode")
+public record LaporanRealisasiIkuResponse(
         @Schema(description = "Tahun laporan", example = "2026")
         String tahun,
 
-        @JsonProperty("kode_opd")
-        @Schema(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000")
-        String kodeOpd,
+        @Schema(description = "Jenis IKU (TUJUAN atau SASARAN)", example = "TUJUAN")
+        JenisIku jenisIku,
 
-        @Schema(description = "NIP pegawai", example = "198012312005011001")
-        String nip,
+        @Schema(description = "Nama tujuan atau sasaran pemda", example = "Meningkatkan kualitas pendidikan")
+        String namaInduk,
 
-        @Schema(description = "Nama rekin", example = "Rekin A")
-        String rekin,
-
-        @Schema(description = "Indikator laporan", example = "Indikator A")
-        String indikator,
+        @Schema(description = "Nama indikator", example = "Angka partisipasi murni")
+        String namaIndikator,
 
         @Schema(description = "Target laporan", example = "100")
         String target,
 
-        @JsonProperty("jenis_laporan")
         @Schema(description = "Jenis periode laporan", example = "TAHUNAN")
         JenisLaporan jenisLaporan,
 
-        @JsonProperty("list_data")
         @Schema(description = "Data realisasi per periode. Key = nomor periode (bulan/triwulan), Value = total realisasi",
                 example = "{\"1\": 120.0, \"2\": 95.0}")
         Map<String, Double> listData,
@@ -39,5 +33,4 @@ public record LaporanRealisasiRekinIndividuResponse(
         @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
         @Schema(description = "Total realisasi (hanya untuk TRIWULAN dan TAHUNAN)", example = "215.0")
         Double totalRealisasi
-) {
-}
+) {}

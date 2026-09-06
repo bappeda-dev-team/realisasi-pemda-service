@@ -22,6 +22,7 @@ import cc.kertaskerja.realisasi_pemda_service.sasaran.web.SasaranPemdaPenetapanR
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Service
 public class SasaranService {
@@ -104,14 +105,43 @@ public class SasaranService {
     }
 
     public Flux<LaporanRealisasiSasaranResponse> getLaporanRealisasi(String tahun, JenisLaporan jenisLaporan, String bulan) {
-        return sasaranRepository.findAllByTahun(tahun)
-                .collectList()
-                .flatMapMany(list -> {
+        Mono<List<PenetapanSasaranPemda.SasaranPenetapanPemdaData>> penetapanMono =
+                penetapanClient.fetchSasaranPemda(Integer.parseInt(tahun))
+                        .onErrorReturn(List.of());
+
+        return Mono.zip(sasaranRepository.findAllByTahun(tahun).collectList(), penetapanMono)
+                .flatMapMany(tuple -> {
+                    List<Sasaran> list = tuple.getT1();
+                    List<PenetapanSasaranPemda.SasaranPenetapanPemdaData> penetapanList = tuple.getT2();
+
                     Map<String, List<Sasaran>> grouped = list.stream()
                             .collect(java.util.stream.Collectors.groupingBy(s -> s.kodeIndikator() + "|" + s.kodeTarget()));
                     
                     return Flux.fromIterable(grouped.values()).map(groupList -> {
                         Sasaran first = groupList.get(0);
+
+                        String namaSasaran = first.kodeSasaranPemda();
+                        String indikatorName = first.kodeIndikator();
+                        String targetName = first.kodeTarget();
+
+                        for (var p : penetapanList) {
+                            if (p.kodeSasaranPemda().equals(first.kodeSasaranPemda())) {
+                                namaSasaran = p.sasaranPemda();
+                            }
+                            for (var ind : p.indikators()) {
+                                if (ind.kodeIndikator().equals(first.kodeIndikator())) {
+                                    indikatorName = ind.indikator();
+                                    for (var tgt : ind.targets()) {
+                                        if (tgt.kodeTarget().equals(first.kodeTarget())) {
+                                            targetName = tgt.target() != null ? String.valueOf(tgt.target()) : first.kodeTarget();
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+
                         Map<String, Double> listData = switch (jenisLaporan) {
                             case BULANAN -> {
                                 if (bulan == null || bulan.isBlank()) {
@@ -124,33 +154,16 @@ public class SasaranService {
                                         .sum();
                                 yield Map.of(bulan, total);
                             }
-                            case TRIWULAN -> {
-                                Map<String, Double> triwulanMap = new HashMap<>();
-                                for (int i = 1; i <= 4; i++) triwulanMap.put(String.valueOf(i), 0.0);
-                                for (Sasaran s : groupList) {
-                                    if (s.realisasi() == null) continue;
-                                    int noBulan = Integer.parseInt(s.bulan());
-                                    String triwulan = String.valueOf((noBulan - 1) / 3 + 1);
-                                    triwulanMap.merge(triwulan, s.realisasi(), Double::sum);
-                                }
-                                yield triwulanMap;
-                            }
-                            case TAHUNAN -> {
-                                Map<String, Double> bulanMap = new HashMap<>();
-                                for (int i = 1; i <= 12; i++) bulanMap.put(String.valueOf(i), 0.0);
-                                for (Sasaran s : groupList) {
-                                    if (s.realisasi() == null) continue;
-                                    String key = s.bulan();
-                                    bulanMap.merge(key, s.realisasi(), Double::sum);
-                                }
-                                yield bulanMap;
-                            }
+                            case TRIWULAN -> hitungTriwulanKumulatif(groupList);
+                            case TAHUNAN -> hitungBulanKumulatif(groupList);
                         };
                         Double totalRealisasi = null;
                         if (jenisLaporan == JenisLaporan.TRIWULAN || jenisLaporan == JenisLaporan.TAHUNAN) {
-                            totalRealisasi = listData.values().stream().mapToDouble(Double::doubleValue).sum();
+                            totalRealisasi = listData.values().stream()
+                                    .mapToDouble(Double::doubleValue)
+                                    .sum();
                         }
-                        return new LaporanRealisasiSasaranResponse(tahun, first.kodeIndikator(), first.kodeTarget(), jenisLaporan, listData, totalRealisasi);
+                        return new LaporanRealisasiSasaranResponse(tahun, namaSasaran, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
                     });
                 });
     }
@@ -336,5 +349,42 @@ public class SasaranService {
 
     private Integer parseInteger(String value) {
         return value == null ? null : Integer.parseInt(value);
+    }
+
+    private Map<String, Double> hitungTriwulanKumulatif(List<Sasaran> groupList) {
+        Map<String, Double> triwulanMap = new TreeMap<>();
+        for (int triwulan = 1; triwulan <= 4; triwulan++) {
+            int awalBulan = (triwulan - 1) * 3 + 1;
+            int akhirBulan = triwulan * 3;
+            boolean adaData = groupList.stream()
+                    .filter(s -> s.realisasi() != null)
+                    .anyMatch(s -> {
+                        int b = Integer.parseInt(s.bulan());
+                        return b >= awalBulan && b <= akhirBulan;
+                    });
+            if (adaData) {
+                double kumulatif = groupList.stream()
+                        .filter(s -> s.realisasi() != null)
+                        .filter(s -> Integer.parseInt(s.bulan()) <= akhirBulan)
+                        .mapToDouble(Sasaran::realisasi)
+                        .sum();
+                triwulanMap.put(String.valueOf(triwulan), kumulatif);
+            }
+        }
+        return triwulanMap;
+    }
+
+    private Map<String, Double> hitungBulanKumulatif(List<Sasaran> groupList) {
+        TreeMap<Integer, Double> bulanMap = new TreeMap<>();
+        for (Sasaran s : groupList) {
+            if (s.realisasi() == null) continue;
+            int noBulan = Integer.parseInt(s.bulan());
+            bulanMap.merge(noBulan, s.realisasi(), Double::sum);
+        }
+        Map<String, Double> result = new TreeMap<>();
+        for (var entry : bulanMap.entrySet()) {
+            result.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        return result;
     }
 }

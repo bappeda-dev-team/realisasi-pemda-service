@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.UnaryOperator;
 
 @Service
@@ -111,10 +112,14 @@ public class SasaranOpdService {
                     return Flux.fromIterable(grouped.values()).map(groupList -> {
                         SasaranOpd first = groupList.get(0);
                         
+                        String namaSasaran = first.kodeSasaranOpd();
                         String indikatorName = first.kodeIndikator();
                         String targetName = first.kodeTarget();
 
                         for (var p : penetapanList) {
+                            if (p.kodeSasaranOpd().equals(first.kodeSasaranOpd())) {
+                                namaSasaran = p.sasaranOpd();
+                            }
                             for (var ind : p.indikators()) {
                                 if (ind.kodeIndikator().equals(first.kodeIndikator())) {
                                     indikatorName = ind.indikator();
@@ -142,33 +147,50 @@ public class SasaranOpdService {
                                 yield Map.of(bulan, total);
                             }
                             case TRIWULAN -> {
-                                Map<String, Double> triwulanMap = new HashMap<>();
-                                for (int i = 1; i <= 4; i++) triwulanMap.put(String.valueOf(i), 0.0);
-                                for (SasaranOpd t : groupList) {
-                                    if (t.realisasi() == null) continue;
-                                    int noBulan = Integer.parseInt(t.bulan());
-                                    String triwulan = String.valueOf((noBulan - 1) / 3 + 1);
-                                    triwulanMap.merge(triwulan, t.realisasi().doubleValue(), Double::sum);
+                                TreeMap<String, Double> triwulanMap = new TreeMap<>();
+                                for (int triwulan = 1; triwulan <= 4; triwulan++) {
+                                    int awalBulan = (triwulan - 1) * 3 + 1;
+                                    int akhirBulan = triwulan * 3;
+                                    boolean adaData = groupList.stream()
+                                            .filter(t -> t.realisasi() != null)
+                                            .anyMatch(t -> {
+                                                int b = Integer.parseInt(t.bulan());
+                                                return b >= awalBulan && b <= akhirBulan;
+                                            });
+                                    if (adaData) {
+                                        double kumulatif = groupList.stream()
+                                                .filter(t -> t.realisasi() != null)
+                                                .filter(t -> Integer.parseInt(t.bulan()) <= akhirBulan)
+                                                .mapToDouble(t -> t.realisasi().doubleValue())
+                                                .sum();
+                                        triwulanMap.put(String.valueOf(triwulan), kumulatif);
+                                    }
                                 }
                                 yield triwulanMap;
                             }
                             case TAHUNAN -> {
-                                Map<String, Double> bulanMap = new HashMap<>();
-                                for (int i = 1; i <= 12; i++) bulanMap.put(String.valueOf(i), 0.0);
+                                TreeMap<Integer, Double> tempMap = new TreeMap<>();
                                 for (SasaranOpd t : groupList) {
                                     if (t.realisasi() == null) continue;
-                                    bulanMap.merge(t.bulan(), t.realisasi().doubleValue(), Double::sum);
+                                    int noBulan = Integer.parseInt(t.bulan());
+                                    tempMap.merge(noBulan, t.realisasi().doubleValue(), Double::sum);
                                 }
-                                yield bulanMap;
+                                TreeMap<String, Double> result = new TreeMap<>();
+                                for (var entry : tempMap.entrySet()) {
+                                    result.put(String.valueOf(entry.getKey()), entry.getValue());
+                                }
+                                yield result;
                             }
                         };
 
                         Double totalRealisasi = null;
                         if (jenisLaporan == JenisLaporan.TRIWULAN || jenisLaporan == JenisLaporan.TAHUNAN) {
-                            totalRealisasi = listData.values().stream().mapToDouble(Double::doubleValue).sum();
+                            totalRealisasi = listData.values().stream()
+                                    .mapToDouble(Double::doubleValue)
+                                    .sum();
                         }
                         
-                        return new LaporanRealisasiSasaranOpdResponse(tahun, kodeOpd, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
+                        return new LaporanRealisasiSasaranOpdResponse(tahun, kodeOpd, namaSasaran, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
                     });
                 });
     }
