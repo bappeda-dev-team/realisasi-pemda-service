@@ -36,6 +36,18 @@ public class PegawaiClient {
             @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY) List<PegawaiData> data
     ) {}
 
+    public Mono<List<PegawaiData>> fetchAllPegawai() {
+        return webClient.get()
+                .uri("/pegawai")
+                .retrieve()
+                .bodyToMono(PegawaiResponse.class)
+                .map(PegawaiResponse::data)
+                .onErrorResume(e -> {
+                    log.warn("Failed to fetch pegawai list from kepegawaian service", e);
+                    return Mono.empty();
+                });
+    }
+
     public Mono<PegawaiData> findPegawaiByNip(String nip) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/pegawai/findByNip")

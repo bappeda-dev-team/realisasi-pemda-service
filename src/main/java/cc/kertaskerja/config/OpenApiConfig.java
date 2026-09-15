@@ -48,7 +48,16 @@ public class OpenApiConfig {
                         "/sasaran_opd/**",
                         "/iku_opd/**",
                         "/renaksi_opd/**",
-                        "/renja_opd/**")
+                        "/renja_opd/**",
+                        "/opd/**")
+                .build();
+    }
+
+    @Bean
+    GroupedOpenApi pegawaiApiGroup() {
+        return GroupedOpenApi.builder()
+                .group("pegawai")
+                .pathsToMatch("/pegawai/**")
                 .build();
     }
 
