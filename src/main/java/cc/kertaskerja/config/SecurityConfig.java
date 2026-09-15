@@ -42,7 +42,8 @@ public class SecurityConfig {
             "/sasaran_opd",
             "/iku_opd",
             "/renaksi_opd",
-            "/renja_opd"
+            "/renja_opd",
+            "/opd"
     );
     private static final List<String> INDIVIDU_ALLOWED_GET_PREFIXES = List.of(
             "/renaksi_individu",
@@ -51,7 +52,8 @@ public class SecurityConfig {
     );
     private static final List<String> OPD_ALLOWED_GET_PREFIXES = List.of(
             "/tujuan_opd",
-            "/sasaran_opd"
+            "/sasaran_opd",
+            "/opd"
     );
     private static final List<String> INDIVIDU_CORE_FULL_ACCESS_PREFIXES = List.of(
             "/renaksi_individu",
@@ -72,6 +74,9 @@ public class SecurityConfig {
     private static final List<String> INDIVIDU_RENJA_KEGIATAN_SUBKEGIATAN_FULL_ACCESS_PREFIXES = List.of(
             "/renja_individu/kegiatan",
             "/renja_individu/subkegiatan"
+    );
+    private static final List<String> PEGAWAI_ENDPOINT_PREFIXES = List.of(
+            "/pegawai"
     );
     @Bean
     SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
@@ -152,6 +157,9 @@ public class SecurityConfig {
     private boolean isAuthorized(Authentication authentication, ServerWebExchange exchange) {
         if (!authentication.isAuthenticated()) {
             return false;
+        }
+        if (matchesAnyPrefix(exchange.getRequest().getPath().pathWithinApplication().value(), PEGAWAI_ENDPOINT_PREFIXES)) {
+            return true;
         }
         if (hasSuperAdminAuthority(authentication)) {
             return isSuperAdminAllowed(exchange);

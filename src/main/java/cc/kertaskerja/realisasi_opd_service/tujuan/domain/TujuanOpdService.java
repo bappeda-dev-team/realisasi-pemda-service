@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.UnaryOperator;
 
 @Service
@@ -111,10 +112,14 @@ public class TujuanOpdService {
                     return Flux.fromIterable(grouped.values()).map(groupList -> {
                         TujuanOpd first = groupList.get(0);
                         
+                        String namaTujuan = first.kodeTujuanOpd();
                         String indikatorName = first.kodeIndikator();
                         String targetName = first.kodeTarget();
 
                         for (var p : penetapanList) {
+                            if (p.kodeTujuanOpd().equals(first.kodeTujuanOpd())) {
+                                namaTujuan = p.tujuanOpd();
+                            }
                             for (var ind : p.indikators()) {
                                 if (ind.kodeIndikator().equals(first.kodeIndikator())) {
                                     indikatorName = ind.indikator();
@@ -142,37 +147,57 @@ public class TujuanOpdService {
                                         .sum();
                                 yield Map.of(bulan, total);
                             }
-                            case TRIWULAN -> {
-                                Map<String, Double> triwulanMap = new HashMap<>();
-                                for (int i = 1; i <= 4; i++) triwulanMap.put(String.valueOf(i), 0.0);
-                                for (TujuanOpd t : groupList) {
-                                    if (t.realisasi() == null) continue;
-                                    int noBulan = Integer.parseInt(t.bulan());
-                                    String triwulan = String.valueOf((noBulan - 1) / 3 + 1);
-                                    triwulanMap.merge(triwulan, t.realisasi().doubleValue(), Double::sum);
-                                }
-                                yield triwulanMap;
-                            }
-                            case TAHUNAN -> {
-                                Map<String, Double> bulanMap = new HashMap<>();
-                                for (int i = 1; i <= 12; i++) bulanMap.put(String.valueOf(i), 0.0);
-                                for (TujuanOpd t : groupList) {
-                                    if (t.realisasi() == null) continue;
-                                    String key = t.bulan();
-                                    bulanMap.merge(key, t.realisasi().doubleValue(), Double::sum);
-                                }
-                                yield bulanMap;
-                            }
+                            case TRIWULAN -> hitungTriwulanKumulatif(groupList);
+                            case TAHUNAN -> hitungBulanKumulatif(groupList);
                         };
 
                         Double totalRealisasi = null;
                         if (jenisLaporan == JenisLaporan.TRIWULAN || jenisLaporan == JenisLaporan.TAHUNAN) {
-                            totalRealisasi = listData.values().stream().mapToDouble(Double::doubleValue).sum();
+                            totalRealisasi = listData.values().stream()
+                                    .mapToDouble(Double::doubleValue)
+                                    .sum();
                         }
                         
-                        return new LaporanRealisasiTujuanOpdResponse(tahun, kodeOpd, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
+                        return new LaporanRealisasiTujuanOpdResponse(tahun, kodeOpd, namaTujuan, indikatorName, targetName, jenisLaporan, listData, totalRealisasi);
                     });
                 });
+    }
+
+    private Map<String, Double> hitungTriwulanKumulatif(List<TujuanOpd> groupList) {
+        Map<String, Double> triwulanMap = new TreeMap<>();
+        for (int triwulan = 1; triwulan <= 4; triwulan++) {
+            int awalBulan = (triwulan - 1) * 3 + 1;
+            int akhirBulan = triwulan * 3;
+            boolean adaData = groupList.stream()
+                    .filter(t -> t.realisasi() != null)
+                    .anyMatch(t -> {
+                        int b = Integer.parseInt(t.bulan());
+                        return b >= awalBulan && b <= akhirBulan;
+                    });
+            if (adaData) {
+                double kumulatif = groupList.stream()
+                        .filter(t -> t.realisasi() != null)
+                        .filter(t -> Integer.parseInt(t.bulan()) <= akhirBulan)
+                        .mapToDouble(t -> t.realisasi().doubleValue())
+                        .sum();
+                triwulanMap.put(String.valueOf(triwulan), kumulatif);
+            }
+        }
+        return triwulanMap;
+    }
+
+    private Map<String, Double> hitungBulanKumulatif(List<TujuanOpd> groupList) {
+        TreeMap<Integer, Double> bulanMap = new TreeMap<>();
+        for (TujuanOpd t : groupList) {
+            if (t.realisasi() == null) continue;
+            int noBulan = Integer.parseInt(t.bulan());
+            bulanMap.merge(noBulan, t.realisasi().doubleValue(), Double::sum);
+        }
+        Map<String, Double> result = new TreeMap<>();
+        for (var entry : bulanMap.entrySet()) {
+            result.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        return result;
     }
 
     private Mono<TujuanOpd> upsert(TujuanOpdRequest req) {

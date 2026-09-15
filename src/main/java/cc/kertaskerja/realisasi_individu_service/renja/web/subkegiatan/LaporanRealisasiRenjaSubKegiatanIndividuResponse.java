@@ -18,6 +18,10 @@ public record LaporanRealisasiRenjaSubKegiatanIndividuResponse(
         @Schema(description = "NIP pegawai", example = "198012312005011001")
         String nip,
 
+        @JsonProperty("sub_kegiatan")
+        @Schema(description = "Nama subkegiatan", example = "Subkegiatan A")
+        String subKegiatan,
+
         @Schema(description = "Indikator laporan", example = "Indikator A")
         String indikator,
 
