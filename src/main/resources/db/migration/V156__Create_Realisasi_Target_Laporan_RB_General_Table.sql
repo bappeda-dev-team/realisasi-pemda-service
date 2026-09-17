@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS realisasi_target_laporan_rb_general (
+    id                          BIGSERIAL PRIMARY KEY NOT NULL,
+    kode_opd                    VARCHAR(255)          NOT NULL,
+    nip                         VARCHAR(255)          NOT NULL,
+    tahun                       VARCHAR(255)          NOT NULL,
+    bulan                       VARCHAR(255)          NOT NULL,
+    id_rb_general               VARCHAR(255)          NOT NULL,
+    id_indikator_rb_general     VARCHAR(255)          NOT NULL,
+    id_target_rb_general        VARCHAR(255)          NOT NULL UNIQUE,
+    realisasi                   NUMERIC(20,5)         NOT NULL,
+    jenis_realisasi             VARCHAR(255)          NOT NULL,
+    faktor_penunjang            VARCHAR(255)          NOT NULL,
+    faktor_penghambat           VARCHAR(255)          NOT NULL,
+    bukti_pendukung             VARCHAR(255),
+    keterangan_bukti_pendukung  TEXT,
+    created_by                  VARCHAR(100)          NOT NULL,
+    last_modified_by            VARCHAR(100)          NOT NULL,
+    created_date                TIMESTAMP,
+    last_modified_date          TIMESTAMP
+);

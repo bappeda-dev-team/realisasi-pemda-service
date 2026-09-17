@@ -78,6 +78,10 @@ public class SecurityConfig {
     private static final List<String> PEGAWAI_ENDPOINT_PREFIXES = List.of(
             "/pegawai"
     );
+    private static final List<String> LAPORAN_RB_ENDPOINT_PREFIXES = List.of(
+            "/laporanrbgeneral",
+            "/laporanrbtematik"
+    );
     @Bean
     SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
         return http
@@ -159,6 +163,9 @@ public class SecurityConfig {
             return false;
         }
         if (matchesAnyPrefix(exchange.getRequest().getPath().pathWithinApplication().value(), PEGAWAI_ENDPOINT_PREFIXES)) {
+            return true;
+        }
+        if (matchesAnyPrefix(exchange.getRequest().getPath().pathWithinApplication().value(), LAPORAN_RB_ENDPOINT_PREFIXES)) {
             return true;
         }
         if (hasSuperAdminAuthority(authentication)) {

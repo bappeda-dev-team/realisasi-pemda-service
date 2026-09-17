@@ -71,4 +71,12 @@ public class OpenApiConfig {
                         "/renaksi_individu/**")
                 .build();
     }
+
+    @Bean
+    GroupedOpenApi laporanRbApiGroup() {
+        return GroupedOpenApi.builder()
+                .group("laporan_rb")
+                .pathsToMatch("/laporanrbgeneral/**", "/laporanrbtematik/**")
+                .build();
+    }
 }
