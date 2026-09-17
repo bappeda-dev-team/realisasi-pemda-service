@@ -1,0 +1,2 @@
+ALTER TABLE realisasi_target_laporan_rb_general
+DROP CONSTRAINT IF EXISTS realisasi_target_laporan_rb_general_id_target_rb_general_key;

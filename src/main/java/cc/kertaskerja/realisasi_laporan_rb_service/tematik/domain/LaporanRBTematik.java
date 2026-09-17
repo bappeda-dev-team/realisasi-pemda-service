@@ -1,4 +1,4 @@
-package cc.kertaskerja.realisasi_laporan_rb_service.general.domain;
+package cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain;
 
 import cc.kertaskerja.capaian.domain.Capaian;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
@@ -12,8 +12,8 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
 
-@Table("realisasi_target_laporan_rb_general")
-public record LaporanRBGeneral(
+@Table("realisasi_target_laporan_rb_tematik")
+public record LaporanRBTematik(
         @Id Long id,
 
         @Column("kode_opd")
@@ -23,14 +23,14 @@ public record LaporanRBGeneral(
         String tahun,
         String bulan,
 
-        @Column("id_rb_general")
-        String idRbGeneral,
+        @Column("id_rb_tematik")
+        String idRbTematik,
 
-        @Column("id_indikator_rb_general")
-        String idIndikatorRbGeneral,
+        @Column("id_indikator_rb_tematik")
+        String idIndikatorRbTematik,
 
-        @Column("id_target_rb_general")
-        String idTargetRbGeneral,
+        @Column("id_target_rb_tematik")
+        String idTargetRbTematik,
 
         Double realisasi,
 
@@ -60,14 +60,14 @@ public record LaporanRBGeneral(
         @CreatedDate Instant createdDate,
         @LastModifiedDate Instant lastModifiedDate
 ) {
-    public static LaporanRBGeneral of(
+    public static LaporanRBTematik of(
             String kodeOpd,
             String nip,
             String tahun,
             String bulan,
-            String idRbGeneral,
-            String idIndikatorRbGeneral,
-            String idTargetRbGeneral,
+            String idRbTematik,
+            String idIndikatorRbTematik,
+            String idTargetRbTematik,
             Double realisasi,
             JenisRealisasi jenisRealisasi,
             String faktorPenunjang,
@@ -75,8 +75,8 @@ public record LaporanRBGeneral(
             String buktiPendukung,
             String keteranganBuktiPendukung
     ) {
-        return new LaporanRBGeneral(null,
-                kodeOpd, nip, tahun, bulan, idRbGeneral, idIndikatorRbGeneral, idTargetRbGeneral,
+        return new LaporanRBTematik(null,
+                kodeOpd, nip, tahun, bulan, idRbTematik, idIndikatorRbTematik, idTargetRbTematik,
                 realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat, buktiPendukung, keteranganBuktiPendukung,
                 null, null, null, null);
     }

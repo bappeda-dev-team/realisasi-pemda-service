@@ -1,15 +1,15 @@
-package cc.kertaskerja.realisasi_laporan_rb_service.general.domain;
+package cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain;
 
 import cc.kertaskerja.capaian.domain.Capaian;
-import cc.kertaskerja.integration.perencanaan.LaporanRBGeneralClient;
+import cc.kertaskerja.integration.perencanaan.LaporanRBTematikClient;
+import cc.kertaskerja.integration.perencanaan.laporanrbtematik.LaporanRBTematik;
 import cc.kertaskerja.integration.upload.UploadClient;
-import cc.kertaskerja.integration.perencanaan.laporanrbgeneral.LaporanRBGeneral;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
-import cc.kertaskerja.realisasi_laporan_rb_service.general.web.FaktorPenghambatLaporanRBGeneralRequest;
-import cc.kertaskerja.realisasi_laporan_rb_service.general.web.FaktorPenunjangLaporanRBGeneralRequest;
-import cc.kertaskerja.realisasi_laporan_rb_service.general.web.LaporanRBGeneralRequest;
-import cc.kertaskerja.realisasi_laporan_rb_service.general.web.LaporanRBGeneralResponse;
-import cc.kertaskerja.realisasi_laporan_rb_service.general.web.PerencanaanLaporanRBGeneralResponse;
+import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.FaktorPenghambatLaporanRBTematikRequest;
+import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.FaktorPenunjangLaporanRBTematikRequest;
+import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.LaporanRBTematikRequest;
+import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.LaporanRBTematikResponse;
+import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.PerencanaanLaporanRBTematikResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,40 +23,40 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class LaporanRBGeneralService {
-    private static final Logger log = LoggerFactory.getLogger(LaporanRBGeneralService.class);
-    private final LaporanRBGeneralRepository repository;
-    private final LaporanRBGeneralClient laporanRBGeneralClient;
+public class LaporanRBTematikService {
+    private static final Logger log = LoggerFactory.getLogger(LaporanRBTematikService.class);
+    private final LaporanRBTematikRepository repository;
+    private final LaporanRBTematikClient laporanRBTematikClient;
     private final UploadClient uploadClient;
 
-    public LaporanRBGeneralService(
-            LaporanRBGeneralRepository repository,
-            LaporanRBGeneralClient laporanRBGeneralClient,
+    public LaporanRBTematikService(
+            LaporanRBTematikRepository repository,
+            LaporanRBTematikClient laporanRBTematikClient,
             UploadClient uploadClient
     ) {
         this.repository = repository;
-        this.laporanRBGeneralClient = laporanRBGeneralClient;
+        this.laporanRBTematikClient = laporanRBTematikClient;
         this.uploadClient = uploadClient;
     }
 
-    public Mono<LaporanRBGeneralResponse> createLaporanRBGeneral(LaporanRBGeneralRequest req) {
+    public Mono<LaporanRBTematikResponse> createLaporanRBTematik(LaporanRBTematikRequest req) {
         return upsert(req)
-                .map(entity -> LaporanRBGeneralResponse.from(entity, null, null, null))
+                .map(entity -> LaporanRBTematikResponse.from(entity, null, null, null))
                 .flatMap(response -> enrichWithPerencanaan(Mono.just(response), req));
     }
 
-    public Mono<LaporanRBGeneralResponse> updateFaktorPenunjang(FaktorPenunjangLaporanRBGeneralRequest req) {
+    public Mono<LaporanRBTematikResponse> updateFaktorPenunjang(FaktorPenunjangLaporanRBTematikRequest req) {
         return repository
-                .findFirstByKodeOpdAndNipAndTahunAndBulanAndIdRbGeneralAndIdIndikatorRbGeneralAndIdTargetRbGeneral(
+                .findFirstByKodeOpdAndNipAndTahunAndBulanAndIdRbTematikAndIdIndikatorRbTematikAndIdTargetRbTematik(
                         req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
-                        req.idRbGeneral(), req.idIndikatorRbGeneral(), req.idTargetRbGeneral())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Laporan RB general tidak ditemukan")))
+                        req.idRbTematik(), req.idIndikatorRbTematik(), req.idTargetRbTematik())
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Laporan RB tematik tidak ditemukan")))
                 .flatMap(existing -> {
-                    cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral updated =
-                            new cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral(
+                    cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik updated =
+                            new cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik(
                             existing.id(),
                             existing.kodeOpd(), existing.nip(), existing.tahun(), existing.bulan(),
-                            existing.idRbGeneral(), existing.idIndikatorRbGeneral(), existing.idTargetRbGeneral(),
+                            existing.idRbTematik(), existing.idIndikatorRbTematik(), existing.idTargetRbTematik(),
                             existing.realisasi(), existing.jenisRealisasi(),
                             req.faktorPenunjang(), existing.faktorPenghambat(),
                             existing.buktiPendukung(), existing.keteranganBuktiPendukung(),
@@ -65,22 +65,22 @@ public class LaporanRBGeneralService {
                     );
                     return repository.save(updated);
                 })
-                .map(entity -> LaporanRBGeneralResponse.from(entity, null, null, null))
+                .map(entity -> LaporanRBTematikResponse.from(entity, null, null, null))
                 .flatMap(response -> enrichWithPerencanaan(Mono.just(response), toRequest(req)));
     }
 
-    public Mono<LaporanRBGeneralResponse> updateFaktorPenghambat(FaktorPenghambatLaporanRBGeneralRequest req) {
+    public Mono<LaporanRBTematikResponse> updateFaktorPenghambat(FaktorPenghambatLaporanRBTematikRequest req) {
         return repository
-                .findFirstByKodeOpdAndNipAndTahunAndBulanAndIdRbGeneralAndIdIndikatorRbGeneralAndIdTargetRbGeneral(
+                .findFirstByKodeOpdAndNipAndTahunAndBulanAndIdRbTematikAndIdIndikatorRbTematikAndIdTargetRbTematik(
                         req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
-                        req.idRbGeneral(), req.idIndikatorRbGeneral(), req.idTargetRbGeneral())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Laporan RB general tidak ditemukan")))
+                        req.idRbTematik(), req.idIndikatorRbTematik(), req.idTargetRbTematik())
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Laporan RB tematik tidak ditemukan")))
                 .flatMap(existing -> {
-                    cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral updated =
-                            new cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral(
+                    cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik updated =
+                            new cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik(
                             existing.id(),
                             existing.kodeOpd(), existing.nip(), existing.tahun(), existing.bulan(),
-                            existing.idRbGeneral(), existing.idIndikatorRbGeneral(), existing.idTargetRbGeneral(),
+                            existing.idRbTematik(), existing.idIndikatorRbTematik(), existing.idTargetRbTematik(),
                             existing.realisasi(), existing.jenisRealisasi(),
                             existing.faktorPenunjang(), req.faktorPenghambat(),
                             existing.buktiPendukung(), existing.keteranganBuktiPendukung(),
@@ -89,37 +89,37 @@ public class LaporanRBGeneralService {
                     );
                     return repository.save(updated);
                 })
-                .map(entity -> LaporanRBGeneralResponse.from(entity, null, null, null))
+                .map(entity -> LaporanRBTematikResponse.from(entity, null, null, null))
                 .flatMap(response -> enrichWithPerencanaan(Mono.just(response), toRequest(req)));
     }
 
-    private LaporanRBGeneralRequest toRequest(FaktorPenunjangLaporanRBGeneralRequest req) {
-        return new LaporanRBGeneralRequest(
+    private LaporanRBTematikRequest toRequest(FaktorPenunjangLaporanRBTematikRequest req) {
+        return new LaporanRBTematikRequest(
                 req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
-                req.idRbGeneral(), req.idIndikatorRbGeneral(), req.idTargetRbGeneral(),
+                req.idRbTematik(), req.idIndikatorRbTematik(), req.idTargetRbTematik(),
                 null, null, null);
     }
 
-    private LaporanRBGeneralRequest toRequest(FaktorPenghambatLaporanRBGeneralRequest req) {
-        return new LaporanRBGeneralRequest(
+    private LaporanRBTematikRequest toRequest(FaktorPenghambatLaporanRBTematikRequest req) {
+        return new LaporanRBTematikRequest(
                 req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
-                req.idRbGeneral(), req.idIndikatorRbGeneral(), req.idTargetRbGeneral(),
+                req.idRbTematik(), req.idIndikatorRbTematik(), req.idTargetRbTematik(),
                 null, null, null);
     }
 
-    private Mono<cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral> upsert(LaporanRBGeneralRequest req) {
+    private Mono<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik> upsert(LaporanRBTematikRequest req) {
         JenisRealisasi jenisRealisasi = JenisRealisasi.NAIK;
         String bukti = req.buktiPendukung() != null ? req.buktiPendukung() : "";
         return repository
-                .findFirstByKodeOpdAndNipAndTahunAndBulanAndIdRbGeneralAndIdIndikatorRbGeneralAndIdTargetRbGeneral(
+                .findFirstByKodeOpdAndNipAndTahunAndBulanAndIdRbTematikAndIdIndikatorRbTematikAndIdTargetRbTematik(
                         req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
-                        req.idRbGeneral(), req.idIndikatorRbGeneral(), req.idTargetRbGeneral())
+                        req.idRbTematik(), req.idIndikatorRbTematik(), req.idTargetRbTematik())
                 .flatMap(existing -> {
-                    cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral updated =
-                            new cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral(
+                    cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik updated =
+                            new cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik(
                             existing.id(),
                             existing.kodeOpd(), existing.nip(), existing.tahun(), existing.bulan(),
-                            existing.idRbGeneral(), existing.idIndikatorRbGeneral(), existing.idTargetRbGeneral(),
+                            existing.idRbTematik(), existing.idIndikatorRbTematik(), existing.idTargetRbTematik(),
                             req.realisasi(), jenisRealisasi,
                             existing.faktorPenunjang(), existing.faktorPenghambat(),
                             bukti != null && !bukti.isBlank() ? bukti : existing.buktiPendukung(),
@@ -130,22 +130,22 @@ public class LaporanRBGeneralService {
                     return repository.save(updated);
                 })
                 .switchIfEmpty(Mono.defer(() -> {
-                    cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral newEntity =
-                            cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral.of(
+                    cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik newEntity =
+                            cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik.of(
                             req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
-                            req.idRbGeneral(), req.idIndikatorRbGeneral(), req.idTargetRbGeneral(),
+                            req.idRbTematik(), req.idIndikatorRbTematik(), req.idTargetRbTematik(),
                             req.realisasi(), jenisRealisasi,
                             "", "", bukti, req.keteranganBuktiPendukung());
                     return repository.save(newEntity);
                 }));
     }
 
-    private Mono<LaporanRBGeneralResponse> enrichWithPerencanaan(
-            Mono<LaporanRBGeneralResponse> responseMono,
-            LaporanRBGeneralRequest req
+    private Mono<LaporanRBTematikResponse> enrichWithPerencanaan(
+            Mono<LaporanRBTematikResponse> responseMono,
+            LaporanRBTematikRequest req
     ) {
-        Mono<List<LaporanRBGeneral.LaporanRBGeneralData>> perencanaanMono =
-                laporanRBGeneralClient.fetchLaporanByTahun(Integer.parseInt(req.tahun()));
+        Mono<List<LaporanRBTematik.LaporanRBTematikData>> perencanaanMono =
+                laporanRBTematikClient.fetchLaporanByTahun(Integer.parseInt(req.tahun()));
 
         return responseMono.flatMap(response -> perencanaanMono
                 .map(data -> enrichWithPerencanaan(response, data))
@@ -157,29 +157,29 @@ public class LaporanRBGeneralService {
         });
     }
 
-    private LaporanRBGeneralResponse enrichWithPerencanaan(
-            LaporanRBGeneralResponse response,
-            List<LaporanRBGeneral.LaporanRBGeneralData> laporans
+    private LaporanRBTematikResponse enrichWithPerencanaan(
+            LaporanRBTematikResponse response,
+            List<LaporanRBTematik.LaporanRBTematikData> laporans
     ) {
         if (laporans == null) {
             return response;
         }
-        LaporanRBGeneral.LaporanRBGeneralData matchingLaporan = laporans.stream()
-                .filter(l -> l.id() != null && String.valueOf(l.id()).equals(response.idRbGeneral()))
+        LaporanRBTematik.LaporanRBTematikData matchingLaporan = laporans.stream()
+                .filter(l -> l.id() != null && String.valueOf(l.id()).equals(response.idRbTematik()))
                 .findFirst()
                 .orElse(null);
         if (matchingLaporan == null) {
             return response;
         }
-        LaporanRBGeneral.IndikatorRBData matchingIndikator = matchingLaporan.indikator().stream()
-                .filter(i -> i.id().equals(response.idIndikatorRbGeneral()))
+        LaporanRBTematik.IndikatorRBData matchingIndikator = matchingLaporan.indikator().stream()
+                .filter(i -> i.id().equals(response.idIndikatorRbTematik()))
                 .findFirst()
                 .orElse(null);
         if (matchingIndikator == null) {
             return response;
         }
-        LaporanRBGeneral.TargetIndikatorRBData matchingTarget = matchingIndikator.target().stream()
-                .filter(t -> t.id().equals(response.idTargetRbGeneral()))
+        LaporanRBTematik.TargetIndikatorRBData matchingTarget = matchingIndikator.target().stream()
+                .filter(t -> t.id().equals(response.idTargetRbTematik()))
                 .findFirst()
                 .orElse(null);
         if (matchingTarget == null) {
@@ -191,9 +191,9 @@ public class LaporanRBGeneralService {
         Double capaian = hitungCapaian(response.realisasi(), targetStr, response.jenisRealisasi());
         String keteranganCapaian = keteranganCapaian(response.realisasi(), targetStr, response.jenisRealisasi());
 
-        return new LaporanRBGeneralResponse(
+        return new LaporanRBTematikResponse(
                 response.id(), response.kodeOpd(), response.nip(), response.tahun(), response.bulan(),
-                response.idRbGeneral(), response.idIndikatorRbGeneral(), response.idTargetRbGeneral(),
+                response.idRbTematik(), response.idIndikatorRbTematik(), response.idTargetRbTematik(),
                 response.realisasi(), response.jenisRealisasi(),
                 response.faktorPenunjang(), response.faktorPenghambat(), response.buktiPendukung(),
                 response.createdBy(), response.lastModifiedBy(),
@@ -213,11 +213,11 @@ public class LaporanRBGeneralService {
         }
     }
 
-    public Mono<PerencanaanLaporanRBGeneralResponse> getPerencanaanByNip(String nip, String kodeOpd, int tahun, String bulan) {
+    public Mono<PerencanaanLaporanRBTematikResponse> getPerencanaanByNip(String nip, String kodeOpd, int tahun, String bulan) {
         String tahunStr = String.valueOf(tahun);
-        Mono<List<LaporanRBGeneral.LaporanRBGeneralData>> perencanaanMono =
-                laporanRBGeneralClient.fetchLaporanByTahun(tahun);
-        Mono<List<cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral>> realisasiMono =
+        Mono<List<LaporanRBTematik.LaporanRBTematikData>> perencanaanMono =
+                laporanRBTematikClient.fetchLaporanByTahun(tahun);
+        Mono<List<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik>> realisasiMono =
                 (bulan == null || bulan.isBlank())
                         ? repository.findAllByKodeOpdAndNipAndTahun(kodeOpd, nip, tahunStr).collectList()
                         : repository.findAllByKodeOpdAndNipAndTahunAndBulan(kodeOpd, nip, tahunStr, bulan).collectList();
@@ -228,71 +228,71 @@ public class LaporanRBGeneralService {
                         tuple.getT1(), tuple.getT2()));
     }
 
-    private PerencanaanLaporanRBGeneralResponse buildResponse(
+    private PerencanaanLaporanRBTematikResponse buildResponse(
             String nip,
             String kodeOpd,
             int tahun,
             Integer bulan,
-            List<LaporanRBGeneral.LaporanRBGeneralData> laporans,
-            List<cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral> realisasiList
+            List<LaporanRBTematik.LaporanRBTematikData> laporans,
+            List<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik> realisasiList
     ) {
-        Map<String, List<cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral>> localByTarget =
+        Map<String, List<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik>> localByTarget =
                 realisasiList.stream()
                         .collect(Collectors.groupingBy(r ->
-                                buildTargetKey(r.idRbGeneral(), r.idIndikatorRbGeneral(), r.idTargetRbGeneral())));
+                                buildTargetKey(r.idRbTematik(), r.idIndikatorRbTematik(), r.idTargetRbTematik())));
 
-        List<PerencanaanLaporanRBGeneralResponse.LaporanPerencanaanResponse> responseLaporans =
+        List<PerencanaanLaporanRBTematikResponse.LaporanPerencanaanResponse> responseLaporans =
                 laporans.stream()
                         .filter(l -> l.id() != null)
                         .map(l -> mapLaporan(l, localByTarget))
                         .collect(Collectors.toList());
 
-        return new PerencanaanLaporanRBGeneralResponse(
+        return new PerencanaanLaporanRBTematikResponse(
                 nip, null, kodeOpd, tahun, bulan, responseLaporans);
     }
 
-    private PerencanaanLaporanRBGeneralResponse.LaporanPerencanaanResponse mapLaporan(
-            LaporanRBGeneral.LaporanRBGeneralData laporan,
-            Map<String, List<cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral>> localByTarget
+    private PerencanaanLaporanRBTematikResponse.LaporanPerencanaanResponse mapLaporan(
+            LaporanRBTematik.LaporanRBTematikData laporan,
+            Map<String, List<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik>> localByTarget
     ) {
-        List<PerencanaanLaporanRBGeneralResponse.IndikatorPerencanaanResponse> indikators =
+        List<PerencanaanLaporanRBTematikResponse.IndikatorPerencanaanResponse> indikators =
                 laporan.indikator().stream()
                         .map(ind -> mapIndikator(laporan.id(), ind, localByTarget))
                         .collect(Collectors.toList());
 
-        List<PerencanaanLaporanRBGeneralResponse.RencanaAksiPerencanaanResponse> rencanaAksis =
+        List<PerencanaanLaporanRBTematikResponse.RencanaAksiPerencanaanResponse> rencanaAksis =
                 laporan.rencanaAksis().stream()
                         .map(this::mapRencanaAksi)
                         .collect(Collectors.toList());
 
-        return new PerencanaanLaporanRBGeneralResponse.LaporanPerencanaanResponse(
+        return new PerencanaanLaporanRBTematikResponse.LaporanPerencanaanResponse(
                 laporan.id(), laporan.jenisRb(), laporan.kegiatanUtama(), laporan.keterangan(),
                 laporan.tahunBaseline(), laporan.tahunNext(),
                 indikators, rencanaAksis);
     }
 
-    private PerencanaanLaporanRBGeneralResponse.IndikatorPerencanaanResponse mapIndikator(
+    private PerencanaanLaporanRBTematikResponse.IndikatorPerencanaanResponse mapIndikator(
             Long idRb,
-            LaporanRBGeneral.IndikatorRBData indikator,
-            Map<String, List<cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral>> localByTarget
+            LaporanRBTematik.IndikatorRBData indikator,
+            Map<String, List<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik>> localByTarget
     ) {
-        List<PerencanaanLaporanRBGeneralResponse.TargetPerencanaanResponse> targets =
+        List<PerencanaanLaporanRBTematikResponse.TargetPerencanaanResponse> targets =
                 indikator.target().stream()
                         .map(t -> mapTarget(idRb, indikator, t, localByTarget))
                         .collect(Collectors.toList());
 
-        return new PerencanaanLaporanRBGeneralResponse.IndikatorPerencanaanResponse(
+        return new PerencanaanLaporanRBTematikResponse.IndikatorPerencanaanResponse(
                 indikator.id(), idRb, indikator.indikator(), targets);
     }
 
-    private PerencanaanLaporanRBGeneralResponse.TargetPerencanaanResponse mapTarget(
+    private PerencanaanLaporanRBTematikResponse.TargetPerencanaanResponse mapTarget(
             Long idRb,
-            LaporanRBGeneral.IndikatorRBData indikator,
-            LaporanRBGeneral.TargetIndikatorRBData target,
-            Map<String, List<cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral>> localByTarget
+            LaporanRBTematik.IndikatorRBData indikator,
+            LaporanRBTematik.TargetIndikatorRBData target,
+            Map<String, List<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik>> localByTarget
     ) {
         String key = buildTargetKey(String.valueOf(idRb), indikator.id(), target.id());
-        List<cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral> locals = localByTarget.get(key);
+        List<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik> locals = localByTarget.get(key);
 
         Double realisasi = null;
         Double capaian = null;
@@ -306,11 +306,11 @@ public class LaporanRBGeneralService {
         if (locals != null && !locals.isEmpty()) {
             Double totalRealisasi = locals.stream()
                     .filter(r -> r.realisasi() != null)
-                    .mapToDouble(cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral::realisasi)
+                    .mapToDouble(cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik::realisasi)
                     .sum();
             realisasi = totalRealisasi == 0 ? null : totalRealisasi;
 
-            cc.kertaskerja.realisasi_laporan_rb_service.general.domain.LaporanRBGeneral first = locals.get(0);
+            cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik first = locals.get(0);
             faktorPenunjang = first.faktorPenunjang();
             faktorPenghambat = first.faktorPenghambat();
             buktiPendukung = first.buktiPendukung();
@@ -321,7 +321,7 @@ public class LaporanRBGeneralService {
             keteranganCapaian = keteranganCapaian(realisasi, target.targetNext(), first.jenisRealisasi());
         }
 
-        return new PerencanaanLaporanRBGeneralResponse.TargetPerencanaanResponse(
+        return new PerencanaanLaporanRBTematikResponse.TargetPerencanaanResponse(
                 target.id(), target.idIndikator(),
                 target.tahunBaseline(), target.targetBaseline(), target.satuanBaseline(),
                 target.tahunNext(), target.targetNext(), target.satuanNext(),
@@ -330,20 +330,20 @@ public class LaporanRBGeneralService {
                 jenisRealisasi);
     }
 
-    private PerencanaanLaporanRBGeneralResponse.RencanaAksiPerencanaanResponse mapRencanaAksi(
-            LaporanRBGeneral.RencanaAksiData rencanaAksi
+    private PerencanaanLaporanRBTematikResponse.RencanaAksiPerencanaanResponse mapRencanaAksi(
+            LaporanRBTematik.RencanaAksiData rencanaAksi
     ) {
-        List<PerencanaanLaporanRBGeneralResponse.IndikatorRencanaAksiPerencanaanResponse> indikatorRencanaAksis =
+        List<PerencanaanLaporanRBTematikResponse.IndikatorRencanaAksiPerencanaanResponse> indikatorRencanaAksis =
                 rencanaAksi.indikatorRencanaAksis().stream()
                         .map(this::mapIndikatorRencanaAksi)
                         .collect(Collectors.toList());
 
-        List<PerencanaanLaporanRBGeneralResponse.OpdCrosscuttingPerencanaanResponse> opdCrosscuttings =
+        List<PerencanaanLaporanRBTematikResponse.OpdCrosscuttingPerencanaanResponse> opdCrosscuttings =
                 rencanaAksi.opdCrosscuttings().stream()
                         .map(this::mapOpdCrosscutting)
                         .collect(Collectors.toList());
 
-        return new PerencanaanLaporanRBGeneralResponse.RencanaAksiPerencanaanResponse(
+        return new PerencanaanLaporanRBTematikResponse.RencanaAksiPerencanaanResponse(
                 rencanaAksi.idRencanaAksi(), rencanaAksi.rencanaAksi(),
                 indikatorRencanaAksis,
                 rencanaAksi.anggaran(), rencanaAksi.realisasiAnggaran(), rencanaAksi.capaianAnggaran(),
@@ -351,36 +351,36 @@ public class LaporanRBGeneralService {
                 opdCrosscuttings);
     }
 
-    private PerencanaanLaporanRBGeneralResponse.IndikatorRencanaAksiPerencanaanResponse mapIndikatorRencanaAksi(
-            LaporanRBGeneral.IndikatorRencanaAksiData indikatorRencanaAksi
+    private PerencanaanLaporanRBTematikResponse.IndikatorRencanaAksiPerencanaanResponse mapIndikatorRencanaAksi(
+            LaporanRBTematik.IndikatorRencanaAksiData indikatorRencanaAksi
     ) {
-        List<PerencanaanLaporanRBGeneralResponse.TargetRencanaAksiPerencanaanResponse> targets =
-                (indikatorRencanaAksi.targets() == null ? List.<LaporanRBGeneral.TargetRencanaAksiData>of() : indikatorRencanaAksi.targets())
+        List<PerencanaanLaporanRBTematikResponse.TargetRencanaAksiPerencanaanResponse> targets =
+                (indikatorRencanaAksi.targets() == null ? List.<LaporanRBTematik.TargetRencanaAksiData>of() : indikatorRencanaAksi.targets())
                         .stream()
-                        .map(t -> new PerencanaanLaporanRBGeneralResponse.TargetRencanaAksiPerencanaanResponse(
+                        .map(t -> new PerencanaanLaporanRBTematikResponse.TargetRencanaAksiPerencanaanResponse(
                                 t.target(), t.realisasi(), t.satuan(), t.capaian(), t.tahun()))
                         .collect(Collectors.toList());
 
-        return new PerencanaanLaporanRBGeneralResponse.IndikatorRencanaAksiPerencanaanResponse(
+        return new PerencanaanLaporanRBTematikResponse.IndikatorRencanaAksiPerencanaanResponse(
                 indikatorRencanaAksi.indikator(), targets);
     }
 
-    private PerencanaanLaporanRBGeneralResponse.OpdCrosscuttingPerencanaanResponse mapOpdCrosscutting(
-            LaporanRBGeneral.OpdCrosscuttingData opdCrosscutting
+    private PerencanaanLaporanRBTematikResponse.OpdCrosscuttingPerencanaanResponse mapOpdCrosscutting(
+            LaporanRBTematik.OpdCrosscuttingData opdCrosscutting
     ) {
-        List<PerencanaanLaporanRBGeneralResponse.PelaksanaCrosscuttingPerencanaanResponse> pelaksanaCrosscuttings =
+        List<PerencanaanLaporanRBTematikResponse.PelaksanaCrosscuttingPerencanaanResponse> pelaksanaCrosscuttings =
                 opdCrosscutting.pelaksanaCrosscuttings().stream()
-                        .map(p -> new PerencanaanLaporanRBGeneralResponse.PelaksanaCrosscuttingPerencanaanResponse(
+                        .map(p -> new PerencanaanLaporanRBTematikResponse.PelaksanaCrosscuttingPerencanaanResponse(
                                 p.nipPelaksana(), p.namaPelaksana()))
                         .collect(Collectors.toList());
 
-        return new PerencanaanLaporanRBGeneralResponse.OpdCrosscuttingPerencanaanResponse(
+        return new PerencanaanLaporanRBTematikResponse.OpdCrosscuttingPerencanaanResponse(
                 opdCrosscutting.idPohon(), opdCrosscutting.kodeOpd(), opdCrosscutting.namaOpd(),
                 pelaksanaCrosscuttings);
     }
 
-    private String buildTargetKey(String idRbGeneral, String idIndikatorRbGeneral, String idTargetRbGeneral) {
-        return idRbGeneral + "|" + idIndikatorRbGeneral + "|" + idTargetRbGeneral;
+    private String buildTargetKey(String idRbTematik, String idIndikatorRbTematik, String idTargetRbTematik) {
+        return idRbTematik + "|" + idIndikatorRbTematik + "|" + idTargetRbTematik;
     }
 
     private Double hitungCapaian(Double realisasi, String target, JenisRealisasi jenisRealisasi) {
