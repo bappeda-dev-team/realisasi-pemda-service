@@ -50,8 +50,8 @@ public class RekinServiceTests {
     );
 
     private PenetapanRekinIndividu.RekinIndividuData createPenetapanData(Double targetValue) {
-        var target = new PenetapanRekinIndividu.TargetRekinData(1L, "TAR-1", 2026, targetValue, "%");
-        var indikator = new PenetapanRekinIndividu.IndikatorRekinData(1L, "IND-REKIN-001", "Indikator test", List.of(target));
+        var target = new PenetapanRekinIndividu.TargetRekinData(1L, "KTSO-SAS-001", "TAR-1", 2026, targetValue, "%");
+        var indikator = new PenetapanRekinIndividu.IndikatorRekinData(1L, "KISO-SAS-001", "IND-REKIN-001", "Indikator test", List.of(target));
         var rekin = new PenetapanRekinIndividu.RekinData(1L, 1, null, "REKIN-001", "Rekin test", null, 1000L, 1, List.of(indikator), List.of());
         return new PenetapanRekinIndividu.RekinIndividuData("198012312005011001", "Test User", "1.01.0.00.0.00.01.0000", 2026, List.of(rekin));
     }

@@ -58,6 +58,7 @@ public class PenetapanRekinIndividu {
 
     public record IndikatorRekinData(
             Long id,
+            @JsonProperty("kode_indikator_sasaran_opd") String kodeIndikatorSasaranOpd,
             @JsonProperty("kode_indikator_pk") String kodeIndikatorPk,
             @JsonProperty("nama_indikator_pk") String namaIndikatorPk,
             @JsonProperty("target_pk") List<TargetRekinData> targetPk
@@ -69,6 +70,7 @@ public class PenetapanRekinIndividu {
 
     public record TargetRekinData(
             Long id,
+            @JsonProperty("kode_target_sasaran_opd") String kodeTargetSasaranOpd,
             @JsonProperty("kode_target_pk") String kodeTargetPk,
             Integer tahun,
             Double target,

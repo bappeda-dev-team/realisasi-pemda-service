@@ -42,9 +42,9 @@ public class RekinControllerWebFluxTests {
                         1L, null, "REKIN-PEG-2026-33475",
                         "Peningkatan Pembinaan", null, 5,
                         List.of(new PenetapanRekinIndividuResponse.IndikatorPenetapanResponse(
-                                1L, "IND-REKIN-87169", "Persentase terlaksananya",
+                                1L, "IND-SAS-OPD-1", "IND-REKIN-87169", "Persentase terlaksananya",
                                 List.of(new PenetapanRekinIndividuResponse.TargetPenetapanResponse(
-                                        1L, "TRGT-IND-REKIN-66602", 2026, 100.0, "%",
+                                        1L, "TRGT-SAS-OPD-1", "TRGT-IND-REKIN-66602", 2026, 100.0, "%",
                                         null, null, null, null, null, null, null, null
                                 ))
                         )),
@@ -75,6 +75,8 @@ public class RekinControllerWebFluxTests {
                     Assertions.assertNotNull(body.rekins());
                     Assertions.assertEquals(1, body.rekins().size());
                     Assertions.assertEquals("REKIN-PEG-2026-33475", body.rekins().getFirst().kodePk());
+                    Assertions.assertEquals("IND-SAS-OPD-1", body.rekins().getFirst().indikatorPk().getFirst().kodeIndikatorSasaranOpd());
+                    Assertions.assertEquals("TRGT-SAS-OPD-1", body.rekins().getFirst().indikatorPk().getFirst().targetPk().getFirst().kodeTargetSasaranOpd());
                 });
     }
 
@@ -87,9 +89,9 @@ public class RekinControllerWebFluxTests {
                         1L, null, "REKIN-PEG-2026-33475",
                         "Peningkatan Pembinaan", null, 5,
                         List.of(new PenetapanRekinIndividuResponse.IndikatorPenetapanResponse(
-                                1L, "IND-REKIN-87169", "Persentase terlaksananya",
+                                1L, "IND-SAS-OPD-1", "IND-REKIN-87169", "Persentase terlaksananya",
                                 List.of(new PenetapanRekinIndividuResponse.TargetPenetapanResponse(
-                                        1L, "TRGT-IND-REKIN-66602", 2026, 100.0, "%",
+                                        1L, "TRGT-SAS-OPD-1", "TRGT-IND-REKIN-66602", 2026, 100.0, "%",
                                         75.5, 75.5, null, null, null, null, null, null
                                 ))
                         )),

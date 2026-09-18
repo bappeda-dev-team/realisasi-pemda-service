@@ -432,12 +432,12 @@ public class RenaksiService {
     ) {
         List<cc.kertaskerja.realisasi_individu_service.rekin.web.PenetapanRekinIndividuResponse.TargetPenetapanResponse> targets = indikator.targetPk().stream()
                 .map(t -> new cc.kertaskerja.realisasi_individu_service.rekin.web.PenetapanRekinIndividuResponse.TargetPenetapanResponse(
-                        t.id(), t.kodeTargetPk(), t.tahun(), t.target(), t.satuan(),
+                        t.id(), t.kodeTargetSasaranOpd(), t.kodeTargetPk(), t.tahun(), t.target(), t.satuan(),
                         null, null, null, null, null, null, null, null
                 ))
                 .toList();
         return new cc.kertaskerja.realisasi_individu_service.rekin.web.PenetapanRekinIndividuResponse.IndikatorPenetapanResponse(
-                indikator.id(), indikator.kodeIndikatorPk(), indikator.namaIndikatorPk(), targets
+                indikator.id(), indikator.kodeIndikatorSasaranOpd(), indikator.kodeIndikatorPk(), indikator.namaIndikatorPk(), targets
         );
     }
 
