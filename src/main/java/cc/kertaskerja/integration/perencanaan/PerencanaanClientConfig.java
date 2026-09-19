@@ -6,8 +6,6 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.ClientRequest;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -17,10 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class PerencanaanClientConfig {
 
     @Bean("perencanaanWebClient")
-    public WebClient perencanaanWebClient(
-            PerencanaanProperties properties,
-            PerencanaanTokenProvider tokenProvider
-    ) {
+    public WebClient perencanaanWebClient(PerencanaanProperties properties) {
         var httpClient = HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,
                         (int) properties.connectTimeout().toMillis())
@@ -33,14 +28,6 @@ public class PerencanaanClientConfig {
         return WebClient.builder()
                 .baseUrl(properties.baseUrl())
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .filter(sessionAuthFilter(tokenProvider))
                 .build();
-    }
-
-    private ExchangeFilterFunction sessionAuthFilter(PerencanaanTokenProvider tokenProvider) {
-        return (request, next) -> tokenProvider.getToken()
-                .flatMap(token -> next.exchange(ClientRequest.from(request)
-                        .headers(headers -> headers.set("X-Session-Id", token))
-                        .build()));
     }
 }

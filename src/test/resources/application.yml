@@ -30,3 +30,9 @@ integration:
     read-through-enabled: false
     connect-timeout: 5s
     read-timeout: 10s
+
+  perencanaan:
+    base-url: ${PERENCANAAN_SERVICE_URL}
+    read-through-enabled: true
+    connect-timeout: 5s
+    read-timeout: 10s
