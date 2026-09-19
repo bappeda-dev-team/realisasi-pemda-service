@@ -33,9 +33,6 @@ integration:
 
   perencanaan:
     base-url: ${PERENCANAAN_SERVICE_URL}
-    auth-base-url: ${PERENCANAAN_AUTH_URL}
-    username: ${PERENCANAAN_AUTH_USERNAME}
-    password: ${PERENCANAAN_AUTH_PASSWORD}
     read-through-enabled: true
     connect-timeout: 5s
     read-timeout: 10s
