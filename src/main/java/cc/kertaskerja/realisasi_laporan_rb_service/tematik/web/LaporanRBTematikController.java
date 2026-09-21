@@ -54,6 +54,25 @@ public class LaporanRBTematikController {
         return laporanRBTematikService.getPerencanaanByNip(nip, kodeOpd, Integer.parseInt(tahun), bulan);
     }
 
+    @GetMapping("/nip/{nip}/kodeOpd/{kodeOpd}/tahun/{tahun}/laporan")
+    @Operation(summary = "Laporan realisasi RB tematik per target", description = "Mengembalikan baris laporan flat (satu baris per target indikator dengan tahun_next = tahun) yang sudah digabung dengan realisasi terakhir per target (record dengan id terbesar). Target tanpa realisasi tetap muncul dengan realisasi null. Parameter bulan bersifat opsional; jika tidak dikirim, dipakai seluruh realisasi pada tahun berjalan.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Laporan per target berhasil dibuat",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LaporanRBTematikPerTargetResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
+    public Mono<LaporanRBTematikPerTargetResponse> getLaporanPerTarget(
+            @Parameter(description = "NIP pelaksana", example = "198012312005011001", required = true) @PathVariable String nip,
+            @Parameter(description = "Kode OPD", example = "1.01.0.00.0.00.01.0000", required = true) @PathVariable String kodeOpd,
+            @Parameter(description = "Tahun laporan", example = "2026", required = true) @PathVariable String tahun,
+            @Parameter(description = "Bulan realisasi (opsional)", example = "1", required = false) @RequestParam(required = false) String bulan) {
+        if (nip == null || nip.isBlank() || kodeOpd == null || kodeOpd.isBlank() || tahun == null || tahun.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter nip, kodeOpd, dan tahun tidak boleh kosong");
+        }
+        return laporanRBTematikService.getLaporanPerTarget(nip, kodeOpd, Integer.parseInt(tahun), bulan);
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Buat realisasi target laporan RB tematik (upsert)", description = "Menyimpan realisasi target laporan RB tematik. Jika data dengan composite key yang sama sudah ada, akan diperbarui.")
     @ApiResponses(value = {
