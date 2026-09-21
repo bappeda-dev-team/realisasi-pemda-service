@@ -7,6 +7,7 @@ import cc.kertaskerja.integration.upload.UploadClient;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.FaktorPenghambatLaporanRBTematikRequest;
 import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.FaktorPenunjangLaporanRBTematikRequest;
+import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.LaporanRBTematikPerTargetResponse;
 import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.LaporanRBTematikRequest;
 import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.LaporanRBTematikResponse;
 import cc.kertaskerja.realisasi_laporan_rb_service.tematik.web.PerencanaanLaporanRBTematikResponse;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -249,6 +251,89 @@ public class LaporanRBTematikService {
 
         return new PerencanaanLaporanRBTematikResponse(
                 nip, null, kodeOpd, tahun, bulan, responseLaporans);
+    }
+
+    /**
+     * Laporan realisasi RB tematik per target (baris flat): master perencanaan di-join
+     * dengan realisasi lokal per id_target. Hanya target dengan tahun_next = tahun yang
+     * diikutkan; untuk tiap target diambil satu record realisasi dengan id terbesar
+     * (terbaru). Target tanpa realisasi tetap muncul dengan realisasi = null.
+     */
+    public Mono<LaporanRBTematikPerTargetResponse> getLaporanPerTarget(String nip, String kodeOpd, int tahun, String bulan) {
+        String tahunStr = String.valueOf(tahun);
+        Mono<List<LaporanRBTematik.LaporanRBTematikData>> perencanaanMono =
+                laporanRBTematikClient.fetchLaporanByTahun(tahun);
+        Mono<List<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik>> realisasiMono =
+                (bulan == null || bulan.isBlank())
+                        ? repository.findAllByKodeOpdAndNipAndTahun(kodeOpd, nip, tahunStr).collectList()
+                        : repository.findAllByKodeOpdAndNipAndTahunAndBulan(kodeOpd, nip, tahunStr, bulan).collectList();
+
+        return Mono.zip(perencanaanMono, realisasiMono)
+                .map(tuple -> buildLaporanPerTargetResponse(
+                        nip, kodeOpd, tahun, parseInteger(bulan),
+                        tuple.getT1(), tuple.getT2()));
+    }
+
+    private LaporanRBTematikPerTargetResponse buildLaporanPerTargetResponse(
+            String nip,
+            String kodeOpd,
+            int tahun,
+            Integer bulan,
+            List<LaporanRBTematik.LaporanRBTematikData> laporans,
+            List<cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik> realisasiList
+    ) {
+        Map<String, cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik> latestByTarget =
+                realisasiList.stream()
+                        .collect(Collectors.toMap(
+                                r -> buildTargetKey(r.idRbTematik(), r.idIndikatorRbTematik(), r.idTargetRbTematik()),
+                                r -> r,
+                                (a, b) -> a.id() != null && b.id() != null && a.id() > b.id() ? a : b));
+
+        List<LaporanRBTematikPerTargetResponse.BarisLaporanResponse> baris = laporans.stream()
+                .filter(l -> l.id() != null)
+                .flatMap(laporan -> laporan.indikator().stream()
+                        .flatMap(ind -> ind.target().stream()
+                                .filter(t -> t.tahunNext() != null && t.tahunNext() == tahun)
+                                .map(t -> buildBarisLaporan(laporan, ind, t, latestByTarget))))
+                .sorted(Comparator
+                        .comparing((LaporanRBTematikPerTargetResponse.BarisLaporanResponse b) ->
+                                b.kegiatanUtama() == null ? "" : b.kegiatanUtama())
+                        .thenComparing(b -> b.indikator() == null ? "" : b.indikator()))
+                .collect(Collectors.toList());
+
+        return new LaporanRBTematikPerTargetResponse(nip, kodeOpd, tahun, bulan, baris);
+    }
+
+    private LaporanRBTematikPerTargetResponse.BarisLaporanResponse buildBarisLaporan(
+            LaporanRBTematik.LaporanRBTematikData laporan,
+            LaporanRBTematik.IndikatorRBData indikator,
+            LaporanRBTematik.TargetIndikatorRBData target,
+            Map<String, cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik> latestByTarget
+    ) {
+        String key = buildTargetKey(String.valueOf(laporan.id()), indikator.id(), target.id());
+        cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik realisasi = latestByTarget.get(key);
+
+        return new LaporanRBTematikPerTargetResponse.BarisLaporanResponse(
+                laporan.id(), indikator.id(), target.id(),
+                laporan.kegiatanUtama(), indikator.indikator(), laporan.keterangan(),
+                target.tahunBaseline(), target.targetBaseline(), target.satuanBaseline(),
+                target.tahunNext(), target.targetNext(), target.satuanNext(),
+                realisasi == null ? null : toRealisasiTargetResponse(realisasi, target.targetNext()));
+    }
+
+    private LaporanRBTematikPerTargetResponse.RealisasiTargetResponse toRealisasiTargetResponse(
+            cc.kertaskerja.realisasi_laporan_rb_service.tematik.domain.LaporanRBTematik r,
+            String targetNext
+    ) {
+        Double capaian = hitungCapaian(r.realisasi(), targetNext, r.jenisRealisasi());
+        String keteranganCapaian = keteranganCapaian(r.realisasi(), targetNext, r.jenisRealisasi());
+
+        return new LaporanRBTematikPerTargetResponse.RealisasiTargetResponse(
+                r.id(), r.bulan(), r.realisasi(),
+                capaian, keteranganCapaian,
+                r.jenisRealisasi() != null ? r.jenisRealisasi().name() : null,
+                r.faktorPenunjang(), r.faktorPenghambat(),
+                r.buktiPendukung(), r.keteranganBuktiPendukung());
     }
 
     private PerencanaanLaporanRBTematikResponse.LaporanPerencanaanResponse mapLaporan(
