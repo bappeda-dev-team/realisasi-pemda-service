@@ -2,7 +2,6 @@ package cc.kertaskerja.realisasi_opd_service.renaksi.web;
 
 import cc.kertaskerja.realisasi_opd_service.renaksi.domain.RenaksiOpd;
 import cc.kertaskerja.realisasi_opd_service.renaksi.domain.RenaksiOpdService;
-import cc.kertaskerja.realisasi_opd_service.renaksi.web.renaksi_triwulan_response.RenaksiTriwulanRekapResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
@@ -34,20 +34,53 @@ public class RenaksiOpdController {
         this.renaksiOpdService = renaksiOpdService;
     }
 
-    @GetMapping("/by-kode-opd/{kodeOpd}/by-tahun/{tahun}/rekap-triwulan")
-    @Operation(summary = "Rekap realisasi renaksi OPD per triwulan (digunakan untuk menampilkan data laporan print")
+    @GetMapping("/{kodeOpd}/tahun/{tahun}/penetapan")
+    @Operation(summary = "Integrasi penetapan dengan realisasi renaksi OPD", description = "Menggabungkan data penetapan renaksi OPD (dari external service) dengan realisasi yang tersimpan di service ini, berdasarkan kode OPD dan tahun. Objek `realisasi` selalu dikembalikan pada setiap item, bahkan ketika realisasinya masih kosong. Parameter bulan bersifat opsional; jika tidak dikirim, objek `realisasi` tetap dikembalikan dengan `bulan` null dan `realisasi` 0. Ketika bulan diisi, nilai realisasi diambil dari bulan tersebut. `target` dihitung dari penjumlahan bobot tw1+tw2+tw3+tw4, dan `capaian` dihitung dari realisasi terhadap target tersebut.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Daftar rekap per triwulan", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RenaksiTriwulanRekapResponse.class)))),
+            @ApiResponse(responseCode = "200", description = "Data penetapan terintegrasi dengan realisasi", content = @Content(schema = @Schema(implementation = PenetapanRenaksiOpdListResponse.class))),
             @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
-    public Flux<RenaksiTriwulanRekapResponse> getRekapTriwulanByTahun(
-            @Parameter(description = "Kode OPD") @PathVariable String kodeOpd,
-            @Parameter(description = "Tahun realisasi") @PathVariable String tahun) {
+    public Mono<PenetapanRenaksiOpdListResponse> getPenetapanWithRealisasi(
+            @Parameter(description = "Kode OPD", example = "8.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
+            @Parameter(description = "Tahun", example = "2026") @PathVariable String tahun,
+            @Parameter(description = "Bulan realisasi (opsional)", example = "1") @RequestParam(required = false) String bulan) {
         if (kodeOpd == null || kodeOpd.isBlank() || tahun == null || tahun.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter kodeOpd dan tahun tidak boleh kosong");
         }
-        return renaksiOpdService.getRekapTriwulanByTahun(kodeOpd, tahun);
+        validateBulan(bulan);
+        return renaksiOpdService.getPenetapanWithRealisasi(kodeOpd, Integer.parseInt(tahun), bulan);
+    }
+
+    @PostMapping("/{kodeOpd}/tahun/{tahun}/sync/penetapan")
+    @Operation(summary = "Sinkronisasi renaksi OPD", description = "Memicu sinkronisasi data renaksi OPD dari service penetapan dan langsung mengembalikan data penetapan beserta realisasi terbaru. Parameter bulan bersifat opsional; jika tidak dikirim, hanya data penetapan tanpa realisasi yang dikembalikan. Kegagalan sinkronisasi tidak menggagalkan response; data penetapan tetap dikembalikan.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Data penetapan ter-sinkronisasi dan terintegrasi dengan realisasi", content = @Content(schema = @Schema(implementation = PenetapanRenaksiOpdListResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Parameter tidak valid", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
+    public Mono<PenetapanRenaksiOpdListResponse> syncRenaksiOpd(
+            @Parameter(description = "Kode OPD", example = "8.01.0.00.0.00.01.0000") @PathVariable String kodeOpd,
+            @Parameter(description = "Tahun", example = "2026") @PathVariable String tahun,
+            @Parameter(description = "Bulan realisasi (opsional)", example = "1") @RequestParam(required = false) String bulan) {
+        if (kodeOpd == null || kodeOpd.isBlank() || tahun == null || tahun.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter kodeOpd dan tahun tidak boleh kosong");
+        }
+        validateBulan(bulan);
+        return renaksiOpdService.syncPenetapanRenaksiOpd(kodeOpd, Integer.parseInt(tahun))
+                .then(renaksiOpdService.getPenetapanWithRealisasi(kodeOpd, Integer.parseInt(tahun), bulan));
+    }
+
+    private void validateBulan(String bulan) {
+        if (bulan == null || bulan.isBlank()) return;
+        try {
+            int nilai = Integer.parseInt(bulan.trim());
+            if (nilai < 1 || nilai > 12) {
+                throw new NumberFormatException("di luar rentang");
+            }
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter bulan harus berupa angka 1-12");
+        }
     }
 
     @GetMapping("/by-kode-opd/{kodeOpd}/by-tahun/{tahun}/by-bulan/{bulan}")
@@ -74,7 +107,7 @@ public class RenaksiOpdController {
     }
 
     @PostMapping("/faktor-penunjang")
-    @Operation(summary = "Perbarui faktor penunjang renaksi OPD", description = "Memperbarui hanya field faktor_penunjang pada record RenaksiOpd yang cocok dengan composite key (kodeOpd, tahun, bulan, rekinId, renaksiId, targetId).")
+    @Operation(summary = "Perbarui faktor penunjang renaksi OPD", description = "Memperbarui hanya field faktor_penunjang pada record RenaksiOpd yang cocok dengan composite key (kodeOpd, tahun, bulan, kodeRencanaAksiOpd).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RenaksiOpd.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
@@ -89,7 +122,7 @@ public class RenaksiOpdController {
     }
 
     @PostMapping("/faktor-penghambat")
-    @Operation(summary = "Perbarui faktor penghambat renaksi OPD", description = "Memperbarui hanya field faktor_penghambat pada record RenaksiOpd yang cocok dengan composite key (kodeOpd, tahun, bulan, rekinId, renaksiId, targetId).")
+    @Operation(summary = "Perbarui faktor penghambat renaksi OPD", description = "Memperbarui hanya field faktor_penghambat pada record RenaksiOpd yang cocok dengan composite key (kodeOpd, tahun, bulan, kodeRencanaAksiOpd).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil diperbarui", content = @Content(schema = @Schema(implementation = RenaksiOpd.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
