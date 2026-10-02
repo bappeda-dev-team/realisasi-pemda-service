@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class PerencanaanClientConfig {
 
     @Bean("perencanaanWebClient")
-    public WebClient perencanaanWebClient(PerencanaanProperties properties) {
+    public WebClient perencanaanWebClient(PerencanaanProperties properties, WebClient.Builder builder) {
         var httpClient = HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,
                         (int) properties.connectTimeout().toMillis())
@@ -25,7 +25,7 @@ public class PerencanaanClientConfig {
                         .addHandlerLast(new WriteTimeoutHandler(
                                 properties.readTimeout().toMillis(), TimeUnit.MILLISECONDS)));
 
-        return WebClient.builder()
+        return builder
                 .baseUrl(properties.baseUrl())
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();

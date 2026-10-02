@@ -9,15 +9,10 @@ public interface RenaksiOpdRepository extends ReactiveCrudRepository<RenaksiOpd,
 
     Flux<RenaksiOpd> findAllByKodeOpdAndTahunAndBulan(String kodeOpd, String tahun, String bulan);
 
-    Flux<RenaksiOpd> findAllByKodeOpdAndTahunAndRenaksiIdAndTargetId(
+    Mono<RenaksiOpd> findFirstByKodeOpdAndTahunAndBulanAndKodeRencanaAksiOpd(
             String kodeOpd,
             String tahun,
-            String renaksiId,
-            String targetId
+            String bulan,
+            String kodeRencanaAksiOpd
     );
-
-    Mono<RenaksiOpd> findFirstByKodeOpdAndBulanAndRekinIdAndRenaksiId(String kodeOpd, String bulan, String rekinId, String renaksiId);
-
-    Mono<RenaksiOpd> findFirstByKodeOpdAndTahunAndBulanAndRekinIdAndRenaksiIdAndTargetId(
-            String kodeOpd, String tahun, String bulan, String rekinId, String renaksiId, String targetId);
 }

@@ -1,86 +1,91 @@
 package cc.kertaskerja.realisasi_opd_service.renaksi.domain;
 
-import cc.kertaskerja.capaian.domain.Capaian;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
-@Table("renaksi_opd")
+@Table("realisasi_target_renaksi_opd")
 public record RenaksiOpd(
         @Id Long id,
-        @Column("renaksi_id") String renaksiId,
-        String renaksi,
-        @Column("rekin_id") String rekinId,
-        String rekin,
-        @Column("target_id") String targetId,
-        String target,
-        Integer realisasi,
-        String satuan,
-        String bulan,
+
+        @Column("kode_opd")
+        String kodeOpd,
+
         String tahun,
-        @Column("jenis_realisasi") JenisRealisasi jenisRealisasi,
-        @Column("kode_opd") String kodeOpd,
-        @Column("faktor_penunjang") String faktorPenunjang,
-        @Column("faktor_penghambat") String faktorPenghambat,
-        RenaksiOpdStatus status,
-        @CreatedBy @Column("created_by") String createdBy,
-        @LastModifiedBy @Column("last_modified_by") String lastModifiedBy,
-        @CreatedDate @Column("created_date") Instant createdDate,
-        @LastModifiedDate @Column("last_modified_date") Instant lastModifiedDate,
-        @Version int version
+
+        String bulan,
+
+        @Column("kode_rencana_aksi_opd")
+        String kodeRencanaAksiOpd,
+
+        BigDecimal realisasi,
+
+        @Column("jenis_realisasi")
+        JenisRealisasi jenisRealisasi,
+
+        @Column("faktor_penunjang")
+        String faktorPenunjang,
+
+        @Column("faktor_penghambat")
+        String faktorPenghambat,
+
+        @CreatedBy
+        @Column("created_by")
+        String createdBy,
+
+        @CreatedDate
+        Instant createdDate,
+
+        @LastModifiedDate
+        Instant lastModifiedDate,
+
+        @LastModifiedBy
+        @Column("last_modified_by")
+        String lastModifiedBy
 ) {
     public static RenaksiOpd of(
-            String renaksiId,
-            String renaksi,
-            String rekinId,
-            String rekin,
-            String targetId,
-            String target,
-            Integer realisasi,
-            String satuan,
-            String bulan,
-            String tahun,
-            JenisRealisasi jenisRealisasi,
             String kodeOpd,
+            String tahun,
+            String bulan,
+            String kodeRencanaAksiOpd,
+            BigDecimal realisasi,
+            JenisRealisasi jenisRealisasi,
             String faktorPenunjang,
-            String faktorPenghambat,
-            RenaksiOpdStatus status
+            String faktorPenghambat
     ) {
-        return new RenaksiOpd(null, renaksiId, renaksi, rekinId, rekin, targetId, target, realisasi, satuan,
-                bulan, tahun, jenisRealisasi, kodeOpd, faktorPenunjang, faktorPenghambat, status, null, null, null, null, 0);
+        return new RenaksiOpd(null, kodeOpd, tahun, bulan, kodeRencanaAksiOpd, realisasi,
+                jenisRealisasi, faktorPenunjang, faktorPenghambat, null, null, null, null);
     }
 
-    @JsonProperty("capaian")
-    public String capaian() {
-        double calculatedCapaian = capaianRenaksiOpd();
-        return formatCapaian(Math.min(calculatedCapaian, 100));
-    }
+    public record CapaianResult(Double capaian, String keteranganCapaian) {}
 
-    @JsonProperty("keteranganCapaian")
-    public String keteranganCapaian() {
-        double calculatedCapaian = capaianRenaksiOpd();
-        return calculatedCapaian > 100 ? "nilai capaian lebih dari 100% (" + formatCapaian(calculatedCapaian) + ")" : null;
-    }
-
-    private String formatCapaian(double value) {
-        return String.format("%.2f%%", value);
-    }
-
-    public Double capaianRenaksiOpd() {
-        if (realisasi == null) {
-            return 0.0;
+    public static CapaianResult hitungCapaian(Double realisasi, Double target) {
+        if (realisasi == null || target == null || target == 0 || realisasi == 0) {
+            return new CapaianResult(null, null);
         }
+        double calculatedCapaian = realisasi / target * 100;
+        String keteranganCapaian = null;
+        if (calculatedCapaian > 100) {
+            keteranganCapaian = "nilai capaian lebih dari 100% (" + String.format("%.2f%%", calculatedCapaian) + ")";
+        }
+        return new CapaianResult(Math.min(calculatedCapaian, 100), keteranganCapaian);
+    }
 
-        Capaian capaian = new Capaian(realisasi.doubleValue(), target, jenisRealisasi);
-        return capaian.hasilCapaian();
+    public RenaksiOpd withFaktorPenunjang(String faktorPenunjang) {
+        return new RenaksiOpd(id, kodeOpd, tahun, bulan, kodeRencanaAksiOpd, realisasi,
+                jenisRealisasi, faktorPenunjang, faktorPenghambat, createdBy, createdDate, lastModifiedDate, lastModifiedBy);
+    }
+
+    public RenaksiOpd withFaktorPenghambat(String faktorPenghambat) {
+        return new RenaksiOpd(id, kodeOpd, tahun, bulan, kodeRencanaAksiOpd, realisasi,
+                jenisRealisasi, faktorPenunjang, faktorPenghambat, createdBy, createdDate, lastModifiedDate, lastModifiedBy);
     }
 }

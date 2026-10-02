@@ -13,7 +13,7 @@ public record FaktorPenghambatRenaksiOpdRequest(
 
         @NotNull(message = "Tahun tidak boleh kosong")
         @NotEmpty(message = "Tahun tidak boleh kosong")
-        @Schema(description = "Tahun realisasi", example = "2025")
+        @Schema(description = "Tahun realisasi", example = "2026")
         String tahun,
 
         @NotNull(message = "Bulan tidak boleh kosong")
@@ -21,20 +21,10 @@ public record FaktorPenghambatRenaksiOpdRequest(
         @Schema(description = "Bulan realisasi", example = "1")
         String bulan,
 
-        @NotNull(message = "ID rekin tidak boleh kosong")
-        @NotEmpty(message = "ID rekin tidak boleh kosong")
-        @Schema(description = "ID rekin", example = "REKIN-001")
-        String rekinId,
-
-        @NotNull(message = "ID renaksi tidak boleh kosong")
-        @NotEmpty(message = "ID renaksi tidak boleh kosong")
-        @Schema(description = "ID renaksi", example = "RENAKSI-001")
-        String renaksiId,
-
-        @NotNull(message = "ID target tidak boleh kosong")
-        @NotEmpty(message = "ID target tidak boleh kosong")
-        @Schema(description = "ID target", example = "TAR-1")
-        String targetId,
+        @NotNull(message = "Kode rencana aksi OPD tidak boleh kosong")
+        @NotEmpty(message = "Kode rencana aksi OPD tidak boleh kosong")
+        @Schema(description = "Kode rencana aksi OPD", example = "REN-OPD-1")
+        String kodeRencanaAksiOpd,
 
         @Schema(description = "Faktor penghambat renaksi", example = "Perubahan prioritas")
         String faktorPenghambat
