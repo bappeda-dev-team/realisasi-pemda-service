@@ -596,7 +596,8 @@ public class RekinService {
         String faktorPenghambat = local != null ? local.faktorPenghambat() : null;
         String buktiPendukung = local != null ? local.buktiPendukung() : null;
         String keteranganBuktiPendukung = local != null ? local.keteranganBuktiPendukung() : null;
-        String jenisRealisasi = "NAIK";
+        JenisRealisasi calculatedJenisRealisasi = JenisRealisasi.fromCapaian(capaianResult.capaian());
+        String jenisRealisasi = calculatedJenisRealisasi != null ? calculatedJenisRealisasi.name() : null;
         return new PenetapanRekinIndividuResponse.TargetPenetapanResponse(
                 target.id(), target.kodeTargetSasaranOpd(), target.kodeTargetPk(), target.tahun(), target.target(), target.satuan(),
                 realisasiValue, capaianResult.capaian(), capaianResult.keteranganCapaian(),

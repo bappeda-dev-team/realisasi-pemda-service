@@ -65,7 +65,7 @@ public record LaporanRBTematikResponse(
         return new LaporanRBTematikResponse(
                 entity.id(), entity.kodeOpd(), entity.nip(), entity.tahun(), entity.bulan(),
                 entity.idRbTematik(), entity.idIndikatorRbTematik(), entity.idTargetRbTematik(),
-                entity.realisasi(), entity.jenisRealisasi(),
+                entity.realisasi(), JenisRealisasi.fromCapaian(capaian),
                 entity.faktorPenunjang(), entity.faktorPenghambat(), entity.buktiPendukung(),
                 entity.createdBy(), entity.lastModifiedBy(),
                 entity.createdDate(), entity.lastModifiedDate(),

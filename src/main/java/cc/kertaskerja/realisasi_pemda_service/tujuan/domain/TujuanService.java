@@ -80,7 +80,7 @@ public class TujuanService {
                 entity.realisasi(), entity.satuan(), entity.tahun(), entity.bulan(),
                 entity.faktorPenunjang(), entity.faktorPenghambat(),
                 null, null, null, null, null, null, null, null,
-                entity.jenisRealisasi(), entity.createdBy(), entity.lastModifiedBy(),
+                JenisRealisasi.fromCapaian(null), entity.createdBy(), entity.lastModifiedBy(),
                 entity.buktiPendukung(), entity.keteranganBuktiPendukung()
         );
     }
@@ -118,7 +118,7 @@ public class TujuanService {
                     response.realisasi(), response.satuan(), response.tahun(), response.bulan(),
                     response.faktorPenunjang(), response.faktorPenghambat(),
                     penetapan.tujuanPemda(), null, null, null, null, null, null, null,
-                    response.jenisRealisasi(), response.createdBy(), response.lastModifiedBy(),
+                    JenisRealisasi.fromCapaian(null), response.createdBy(), response.lastModifiedBy(),
                     response.buktiPendukung(), response.keteranganBuktiPendukung()
             );
         }
@@ -151,7 +151,7 @@ public class TujuanService {
                 matchedIndikator.get().sumberData(),
                 matchedIndikator.get().definisiOperasional(),
                 target, capaian, keteranganCapaian,
-                response.jenisRealisasi(), response.createdBy(), response.lastModifiedBy(),
+                JenisRealisasi.fromCapaian(capaian), response.createdBy(), response.lastModifiedBy(),
                 response.buktiPendukung(), response.keteranganBuktiPendukung()
         );
     }
