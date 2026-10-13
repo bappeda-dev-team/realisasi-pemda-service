@@ -3,6 +3,7 @@ package cc.kertaskerja.realisasi_individu_service.rekin.domain;
 import cc.kertaskerja.integration.penetapan.PenetapanRekinIndividuClient;
 import cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpdService;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.FaktorPenghambatRekinRequest;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.FaktorPenunjangRekinRequest;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.RekinRequest;
@@ -30,6 +31,9 @@ public class RekinServiceTests {
 
     @Mock
     private PenetapanRekinIndividuClient penetapanClient;
+
+    @Mock
+    private SasaranOpdService sasaranOpdService;
 
     @InjectMocks
     private RekinService rekinService;
@@ -222,5 +226,96 @@ public class RekinServiceTests {
                 .verifyComplete();
 
         verify(repository, times(1)).findAllByKodeOpdAndTahunAndBulan(kodeOpd, tahun, bulan);
+    }
+
+    @Test
+    void whenCreateRekinWithKodeSasaranOpd_thenSyncsToSasaranOpd() {
+        when(repository.findFirstByKodeOpdAndNipAndTahunAndBulanAndKodePkRekinAndKodeIndikatorPkRekinAndKodeTargetPkRekin(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(Mono.empty());
+        when(repository.save(ArgumentMatchers.any(RekinIndividu.class)))
+                .thenAnswer(invocation -> {
+                    RekinIndividu r = invocation.getArgument(0);
+                    return Mono.just(new RekinIndividu(
+                            1L, r.kodeOpd(), r.nip(), r.tahun(), r.bulan(),
+                            r.kodePkRekin(), r.kodeIndikatorPkRekin(), r.kodeTargetPkRekin(),
+                            r.kodeSasaranOpd(),
+                            r.realisasi(), r.jenisRealisasi(), r.faktorPenunjang(), r.faktorPenghambat(), r.buktiPendukung(), r.keteranganBuktiPendukung(),
+                            null, null, null, null));
+                });
+        when(penetapanClient.fetchRekinIndividu(anyString(), anyString(), anyInt()))
+                .thenReturn(Mono.empty());
+        when(sasaranOpdService.syncRealisasiFromRekin(
+                eq(req.kodeOpd()), eq(req.tahun()), eq(req.bulan()),
+                eq("SAS-001"), eq(req.kodeIndikatorPKrekin()), eq(req.kodeTargetPKrekin()),
+                eq(req.realisasi())))
+                .thenReturn(Mono.empty());
+
+        var result = rekinService.createRekin(req);
+
+        StepVerifier.create(result)
+                .expectNextMatches(r -> r.kodeSasaranOpd().equals("SAS-001"))
+                .verifyComplete();
+
+        verify(sasaranOpdService, times(1)).syncRealisasiFromRekin(
+                eq(req.kodeOpd()), eq(req.tahun()), eq(req.bulan()),
+                eq("SAS-001"), eq(req.kodeIndikatorPKrekin()), eq(req.kodeTargetPKrekin()),
+                eq(req.realisasi()));
+    }
+
+    @Test
+    void whenCreateRekinWithoutKodeSasaranOpd_thenFallsBackToPenetapanAndSyncs() {
+        RekinRequest reqWithoutSasaran = new RekinRequest(
+                "1.01.0.00.0.00.01.0000",
+                "198012312005011001",
+                "REKIN-001",
+                null,
+                "IND-REKIN-001",
+                "TAR-1",
+                new BigDecimal("75.5"),
+                JenisRealisasi.NAIK,
+                "2026",
+                "1",
+                null,
+                null
+        );
+
+        when(repository.findFirstByKodeOpdAndNipAndTahunAndBulanAndKodePkRekinAndKodeIndikatorPkRekinAndKodeTargetPkRekin(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(Mono.empty());
+        when(repository.save(ArgumentMatchers.any(RekinIndividu.class)))
+                .thenAnswer(invocation -> {
+                    RekinIndividu r = invocation.getArgument(0);
+                    return Mono.just(new RekinIndividu(
+                            1L, r.kodeOpd(), r.nip(), r.tahun(), r.bulan(),
+                            r.kodePkRekin(), r.kodeIndikatorPkRekin(), r.kodeTargetPkRekin(),
+                            r.kodeSasaranOpd(),
+                            r.realisasi(), r.jenisRealisasi(), r.faktorPenunjang(), r.faktorPenghambat(), r.buktiPendukung(), r.keteranganBuktiPendukung(),
+                            null, null, null, null));
+                });
+
+        var target = new PenetapanRekinIndividu.TargetRekinData(1L, "TAR-1", 2026, 100.0, "%");
+        var indikator = new PenetapanRekinIndividu.IndikatorRekinData(1L, "IND-REKIN-001", "Indikator test", List.of(target));
+        var rekin = new PenetapanRekinIndividu.RekinData(1L, 1, "SAS-FROM-PENETAPAN", "REKIN-001", "Rekin test", null, 1000L, 1, List.of(indikator), List.of());
+        var penetapanData = new PenetapanRekinIndividu.RekinIndividuData("198012312005011001", "Test User", "1.01.0.00.0.00.01.0000", 2026, List.of(rekin));
+
+        when(penetapanClient.fetchRekinIndividu(anyString(), anyString(), anyInt()))
+                .thenReturn(Mono.just(penetapanData));
+        when(sasaranOpdService.syncRealisasiFromRekin(
+                eq(reqWithoutSasaran.kodeOpd()), eq(reqWithoutSasaran.tahun()), eq(reqWithoutSasaran.bulan()),
+                eq("SAS-FROM-PENETAPAN"), eq(reqWithoutSasaran.kodeIndikatorPKrekin()), eq(reqWithoutSasaran.kodeTargetPKrekin()),
+                eq(reqWithoutSasaran.realisasi())))
+                .thenReturn(Mono.empty());
+
+        var result = rekinService.createRekin(reqWithoutSasaran);
+
+        StepVerifier.create(result)
+                .expectNextMatches(r -> "SAS-FROM-PENETAPAN".equals(r.kodeSasaranOpd()))
+                .verifyComplete();
+
+        verify(sasaranOpdService, times(1)).syncRealisasiFromRekin(
+                eq(reqWithoutSasaran.kodeOpd()), eq(reqWithoutSasaran.tahun()), eq(reqWithoutSasaran.bulan()),
+                eq("SAS-FROM-PENETAPAN"), eq(reqWithoutSasaran.kodeIndikatorPKrekin()), eq(reqWithoutSasaran.kodeTargetPKrekin()),
+                eq(reqWithoutSasaran.realisasi()));
     }
 }

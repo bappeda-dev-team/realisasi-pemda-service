@@ -83,6 +83,40 @@ public class SasaranOpdService {
                 .flatMap(this::submitRealisasiSasaranOpd);
     }
 
+    public Mono<SasaranOpd> syncRealisasiFromRekin(
+            String kodeOpd, String tahun, String bulan,
+            String kodeSasaranOpd, String kodeIndikator, String kodeTarget,
+            BigDecimal realisasi) {
+        JenisRealisasi jenisRealisasi = JenisRealisasi.NAIK;
+        return sasaranOpdRepository
+                .findFirstByKodeOpdAndKodeSasaranOpdAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                        kodeOpd, kodeSasaranOpd, kodeIndikator, kodeTarget, tahun, bulan)
+                .flatMap(existing -> sasaranOpdRepository.save(
+                        new SasaranOpd(
+                                existing.id(), existing.kodeOpd(), existing.tahun(), existing.bulan(),
+                                existing.kodeSasaranOpd(), existing.kodeIndikator(), existing.kodeTarget(),
+                                realisasi,
+                                existing.jenisRealisasi() != null ? existing.jenisRealisasi() : jenisRealisasi,
+                                existing.faktorPenunjang(),
+                                existing.faktorPenghambat(),
+                                existing.buktiPendukung(),
+                                existing.keteranganBuktiPendukung(),
+                                existing.createdBy(), existing.createdDate(),
+                                null, null
+                        )
+                ))
+                .switchIfEmpty(Mono.defer(() -> sasaranOpdRepository.save(
+                        new SasaranOpd(
+                                null, kodeOpd, tahun, bulan,
+                                kodeSasaranOpd, kodeIndikator, kodeTarget,
+                                realisasi,
+                                jenisRealisasi,
+                                "", "", null, null,
+                                null, null, null, null
+                        )
+                )));
+    }
+
     public Mono<SasaranOpd> updateFaktorPenunjang(FaktorPenunjangSasaranOpdRequest req) {
         return findAndUpdateFaktor(
                 req.kodeOpd(), req.kodeSasaranOpd(), req.kodeIndikator(), req.kodeTarget(),

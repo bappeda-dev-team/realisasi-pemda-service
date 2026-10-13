@@ -4,6 +4,7 @@ import cc.kertaskerja.integration.penetapan.PenetapanRekinIndividuClient;
 import cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu;
 import cc.kertaskerja.realisasi.domain.JenisLaporan;
 import cc.kertaskerja.realisasi.domain.JenisRealisasi;
+import cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpdService;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.FaktorPenghambatRekinRequest;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.FaktorPenunjangRekinRequest;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.LaporanRealisasiRekinIndividuResponse;
@@ -34,6 +35,7 @@ public class RekinService {
     private final PenetapanRekinIndividuClient penetapanClient;
     private final PegawaiClient pegawaiClient;
     private final UploadClient uploadClient;
+    private final SasaranOpdService sasaranOpdService;
 
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
@@ -42,18 +44,47 @@ public class RekinService {
             RekinIndividuRepository repository,
             PenetapanRekinIndividuClient penetapanClient,
             PegawaiClient pegawaiClient,
-            UploadClient uploadClient
+            UploadClient uploadClient,
+            SasaranOpdService sasaranOpdService
     ) {
         this.repository = repository;
         this.penetapanClient = penetapanClient;
         this.pegawaiClient = pegawaiClient;
         this.uploadClient = uploadClient;
+        this.sasaranOpdService = sasaranOpdService;
     }
 
     public Mono<RekinResponse> createRekin(RekinRequest req) {
         return upsert(req)
                 .map(this::toResponse)
-                .flatMap(response -> applyPenetapan(Mono.just(response), req));
+                .flatMap(response -> applyPenetapan(Mono.just(response), req))
+                .flatMap(this::syncToSasaranOpd);
+    }
+
+    private Mono<RekinResponse> syncToSasaranOpd(RekinResponse response) {
+        String kodeSasaranOpd = response.kodeSasaranOpd();
+        if (kodeSasaranOpd == null || kodeSasaranOpd.isBlank() || sasaranOpdService == null) {
+            return Mono.just(response);
+        }
+        Mono<cc.kertaskerja.realisasi_opd_service.sasaran.domain.SasaranOpd> syncMono = sasaranOpdService.syncRealisasiFromRekin(
+                response.kodeOpd(),
+                response.tahun(),
+                response.bulan(),
+                kodeSasaranOpd,
+                response.kodeIndikatorPkRekin(),
+                response.kodeTargetPkRekin(),
+                response.realisasi()
+        );
+        if (syncMono == null) {
+            return Mono.just(response);
+        }
+        return syncMono
+                .thenReturn(response)
+                .onErrorResume(e -> {
+                    log.warn("Gagal sinkronisasi realisasi ke Sasaran OPD untuk kodeSasaranOpd={}: {}",
+                            kodeSasaranOpd, e.getMessage());
+                    return Mono.just(response);
+                });
     }
 
     private Mono<RekinIndividu> upsert(RekinRequest req) {
@@ -64,11 +95,14 @@ public class RekinService {
                         req.kodeOpd(), req.nip(), req.tahun(), req.bulan(),
                         req.kodePkRekin(), req.kodeIndikatorPKrekin(), req.kodeTargetPKrekin())
                 .flatMap(existing -> {
+                    String kodeSasaranOpd = req.kodeSasaranOpd() != null && !req.kodeSasaranOpd().isBlank()
+                            ? req.kodeSasaranOpd()
+                            : existing.kodeSasaranOpd();
                     RekinIndividu updated = new RekinIndividu(
                             existing.id(),
                             existing.kodeOpd(), existing.nip(), existing.tahun(), existing.bulan(),
                             existing.kodePkRekin(), existing.kodeIndikatorPkRekin(), existing.kodeTargetPkRekin(),
-                            req.kodeSasaranOpd(),
+                            kodeSasaranOpd,
                             req.realisasi(), jenisRealisasi,
                             existing.faktorPenunjang(), existing.faktorPenghambat(),
                             bukti != null && !bukti.isBlank() ? bukti : existing.buktiPendukung(),
@@ -138,12 +172,15 @@ public class RekinService {
         Double realisasiValue = response.realisasi() != null
                 ? response.realisasi().doubleValue() : null;
         var capaianResult = RekinIndividu.hitungCapaian(realisasiValue, matchingTarget.target());
+        String kodeSasaranOpd = response.kodeSasaranOpd() != null && !response.kodeSasaranOpd().isBlank()
+                ? response.kodeSasaranOpd()
+                : matchingRekin.kodeSasaranOpd();
         return new RekinResponse(
                 response.id(), response.kodeOpd(), response.nip(),
                 response.tahun(), response.bulan(),
                 response.kodePkRekin(), response.kodeIndikatorPkRekin(), response.kodeTargetPkRekin(),
-                response.kodeSasaranOpd(),
-                response.realisasi(), response.jenisRealisasi(),
+                kodeSasaranOpd,
+                response.realisasi(), JenisRealisasi.fromCapaian(capaianResult.capaian()),
                 response.faktorPenunjang(), response.faktorPenghambat(), response.buktiPendukung(),
                 response.createdBy(), response.lastModifiedBy(),
                 response.createdDate(), response.lastModifiedDate(),
