@@ -49,7 +49,6 @@ public record PenetapanRekinIndividuResponse(
 
     public record IndikatorPenetapanResponse(
             Long id,
-            @JsonProperty("kode_indikator_sasaran_opd") String kodeIndikatorSasaranOpd,
             @JsonProperty("kode_indikator_pk") String kodeIndikatorPk,
             @JsonProperty("nama_indikator_pk") String namaIndikatorPk,
             @JsonProperty("target_pk") List<TargetPenetapanResponse> targetPk
@@ -57,7 +56,6 @@ public record PenetapanRekinIndividuResponse(
 
     public record TargetPenetapanResponse(
             Long id,
-            @JsonProperty("kode_target_sasaran_opd") String kodeTargetSasaranOpd,
             @JsonProperty("kode_target_pk") String kodeTargetPk,
             Integer tahun,
             Double target,
