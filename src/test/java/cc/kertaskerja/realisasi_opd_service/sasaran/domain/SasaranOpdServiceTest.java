@@ -118,4 +118,54 @@ class SasaranOpdServiceTest {
                 })
                 .verifyComplete();
     }
+
+    @Test
+    void syncRealisasiFromRekin_WhenExisting_ShouldUpdateRealisasiAndPreserveFactors() {
+        SasaranOpd existing = new SasaranOpd(1L, "5.01.5.05.0.00.01.0000", "2026", "3",
+                "SAS-OPD-001", "IND-01", "TGT-001", BigDecimal.valueOf(50),
+                JenisRealisasi.NAIK, "faktor penunjang lama", "faktor penghambat lama", "file.pdf", "keterangan",
+                "creator", Instant.now(), null, null);
+
+        when(sasaranOpdRepository.findFirstByKodeOpdAndKodeSasaranOpdAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                "5.01.5.05.0.00.01.0000", "SAS-OPD-001", "IND-01", "TGT-001", "2026", "3"))
+                .thenReturn(Mono.just(existing));
+        when(sasaranOpdRepository.save(any(SasaranOpd.class)))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+        StepVerifier.create(sasaranOpdService.syncRealisasiFromRekin(
+                "5.01.5.05.0.00.01.0000", "2026", "3",
+                "SAS-OPD-001", "IND-01", "TGT-001",
+                BigDecimal.valueOf(95.0)))
+                .assertNext(saved -> {
+                    org.junit.jupiter.api.Assertions.assertEquals(BigDecimal.valueOf(95.0), saved.realisasi());
+                    org.junit.jupiter.api.Assertions.assertEquals("faktor penunjang lama", saved.faktorPenunjang());
+                    org.junit.jupiter.api.Assertions.assertEquals("faktor penghambat lama", saved.faktorPenghambat());
+                    org.junit.jupiter.api.Assertions.assertEquals("file.pdf", saved.buktiPendukung());
+                    org.junit.jupiter.api.Assertions.assertEquals("keterangan", saved.keteranganBuktiPendukung());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void syncRealisasiFromRekin_WhenNotExists_ShouldCreateNewWithRealisasi() {
+        when(sasaranOpdRepository.findFirstByKodeOpdAndKodeSasaranOpdAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                "5.01.5.05.0.00.01.0000", "SAS-OPD-001", "IND-01", "TGT-001", "2026", "3"))
+                .thenReturn(Mono.empty());
+        when(sasaranOpdRepository.save(any(SasaranOpd.class)))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+        StepVerifier.create(sasaranOpdService.syncRealisasiFromRekin(
+                "5.01.5.05.0.00.01.0000", "2026", "3",
+                "SAS-OPD-001", "IND-01", "TGT-001",
+                BigDecimal.valueOf(80.0)))
+                .assertNext(saved -> {
+                    org.junit.jupiter.api.Assertions.assertEquals(BigDecimal.valueOf(80.0), saved.realisasi());
+                    org.junit.jupiter.api.Assertions.assertEquals("SAS-OPD-001", saved.kodeSasaranOpd());
+                    org.junit.jupiter.api.Assertions.assertEquals("IND-01", saved.kodeIndikator());
+                    org.junit.jupiter.api.Assertions.assertEquals("TGT-001", saved.kodeTarget());
+                    org.junit.jupiter.api.Assertions.assertEquals("", saved.faktorPenunjang());
+                    org.junit.jupiter.api.Assertions.assertEquals("", saved.faktorPenghambat());
+                })
+                .verifyComplete();
+    }
 }

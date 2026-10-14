@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 @Component
 public class PenetapanRenjaOpdClient {
@@ -42,11 +45,12 @@ public class PenetapanRenjaOpdClient {
 
     public Mono<String> syncRenjaOpd(String kodeOpd, int tahun) {
         return webClient.post()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/opd/renja/sync")
-                        .queryParam("kodeOpd", kodeOpd)
-                        .queryParam("tahun", tahun)
-                        .build())
+                .uri("/opd/renja/sync")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of(
+                        "kode_opd", kodeOpd,
+                        "tahun", tahun
+                ))
                 .retrieve()
                 .bodyToMono(String.class)
                 .onErrorResume(e -> {

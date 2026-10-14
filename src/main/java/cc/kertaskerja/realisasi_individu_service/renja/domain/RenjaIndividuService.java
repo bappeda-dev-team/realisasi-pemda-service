@@ -1,6 +1,7 @@
 package cc.kertaskerja.realisasi_individu_service.renja.domain;
 
 import cc.kertaskerja.realisasi.domain.JenisLaporan;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_individu_service.renja.domain.kegiatan.RenjaKegiatanIndividu;
 import cc.kertaskerja.realisasi_individu_service.renja.domain.kegiatan.RenjaKegiatanIndividuRepository;
 import cc.kertaskerja.realisasi_individu_service.renja.domain.program.RenjaProgramIndividu;
@@ -685,7 +686,7 @@ public class RenjaIndividuService {
                                 saved.kodePagu(), r.paguProgram() != null ? r.paguProgram().doubleValue() : null,
                                 tgt.target(),
                                 realisasi,
-                                saved.jenisRealisasi(),
+                                jenisRealisasiFromCapaian(capaianResult.capaian()),
                                 capaianResult.capaian(), capaianResult.keteranganCapaian(),
                                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
                                 saved.createdBy(), saved.lastModifiedBy()
@@ -709,7 +710,7 @@ public class RenjaIndividuService {
                 saved.kodePagu(), null,
                 null,
                 saved.realisasi() != null ? saved.realisasi().doubleValue() : null,
-                saved.jenisRealisasi(),
+                jenisRealisasiFromCapaian(null),
                 null, null,
                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
                 saved.createdBy(), saved.lastModifiedBy());
@@ -735,7 +736,7 @@ public class RenjaIndividuService {
                                 saved.kodePagu(), r.paguKegiatan() != null ? r.paguKegiatan().doubleValue() : null,
                                 tgt.target(),
                                 realisasi,
-                                saved.jenisRealisasi(),
+                                jenisRealisasiFromCapaian(capaianResult.capaian()),
                                 capaianResult.capaian(), capaianResult.keteranganCapaian(),
                                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
                                 saved.createdBy(), saved.lastModifiedBy()
@@ -759,7 +760,7 @@ public class RenjaIndividuService {
                 saved.kodePagu(), null,
                 null,
                 saved.realisasi() != null ? saved.realisasi().doubleValue() : null,
-                saved.jenisRealisasi(),
+                jenisRealisasiFromCapaian(null),
                 null, null,
                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
                 saved.createdBy(), saved.lastModifiedBy());
@@ -789,7 +790,7 @@ public class RenjaIndividuService {
                                 tgt.target(),
                                 realisasiTarget,
                                 realisasiPagu,
-                                saved.jenisRealisasi(),
+                                jenisRealisasiFromCapaian(capaianTargetResult.capaian()),
                                 capaianTargetResult.capaian(), capaianTargetResult.keteranganCapaian(),
                                 capaianPaguResult.capaian(), capaianPaguResult.keteranganCapaian(),
                                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
@@ -815,7 +816,7 @@ public class RenjaIndividuService {
                 null,
                 saved.realisasiTarget() != null ? saved.realisasiTarget().doubleValue() : null,
                 saved.realisasiPagu() != null ? saved.realisasiPagu().doubleValue() : null,
-                saved.jenisRealisasi(),
+                jenisRealisasiFromCapaian(null),
                 null, null,
                 null, null,
                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
@@ -836,6 +837,11 @@ public class RenjaIndividuService {
             calculated = 100.0;
         }
         return new CapaianResult(calculated, keterangan);
+    }
+
+    private static String jenisRealisasiFromCapaian(Double capaian) {
+        JenisRealisasi jenisRealisasi = JenisRealisasi.fromCapaian(capaian);
+        return jenisRealisasi != null ? jenisRealisasi.name() : null;
     }
 
     private <T> Map<String, Double> buildLaporanData(
@@ -1079,7 +1085,7 @@ public class RenjaIndividuService {
                 data != null ? data.faktorPenghambat() : null,
                 data != null ? data.buktiPendukung() : null,
                 data != null ? data.keteranganBuktiPendukung() : null,
-                data != null && data.jenisRealisasi() != null ? data.jenisRealisasi() : "NAIK"
+                jenisRealisasiFromCapaian(capaianTargetResult.capaian())
         );
     }
 

@@ -83,6 +83,40 @@ public class SasaranOpdService {
                 .flatMap(this::submitRealisasiSasaranOpd);
     }
 
+    public Mono<SasaranOpd> syncRealisasiFromRekin(
+            String kodeOpd, String tahun, String bulan,
+            String kodeSasaranOpd, String kodeIndikator, String kodeTarget,
+            BigDecimal realisasi) {
+        JenisRealisasi jenisRealisasi = JenisRealisasi.NAIK;
+        return sasaranOpdRepository
+                .findFirstByKodeOpdAndKodeSasaranOpdAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                        kodeOpd, kodeSasaranOpd, kodeIndikator, kodeTarget, tahun, bulan)
+                .flatMap(existing -> sasaranOpdRepository.save(
+                        new SasaranOpd(
+                                existing.id(), existing.kodeOpd(), existing.tahun(), existing.bulan(),
+                                existing.kodeSasaranOpd(), existing.kodeIndikator(), existing.kodeTarget(),
+                                realisasi,
+                                existing.jenisRealisasi() != null ? existing.jenisRealisasi() : jenisRealisasi,
+                                existing.faktorPenunjang(),
+                                existing.faktorPenghambat(),
+                                existing.buktiPendukung(),
+                                existing.keteranganBuktiPendukung(),
+                                existing.createdBy(), existing.createdDate(),
+                                null, null
+                        )
+                ))
+                .switchIfEmpty(Mono.defer(() -> sasaranOpdRepository.save(
+                        new SasaranOpd(
+                                null, kodeOpd, tahun, bulan,
+                                kodeSasaranOpd, kodeIndikator, kodeTarget,
+                                realisasi,
+                                jenisRealisasi,
+                                "", "", null, null,
+                                null, null, null, null
+                        )
+                )));
+    }
+
     public Mono<SasaranOpd> updateFaktorPenunjang(FaktorPenunjangSasaranOpdRequest req) {
         return findAndUpdateFaktor(
                 req.kodeOpd(), req.kodeSasaranOpd(), req.kodeIndikator(), req.kodeTarget(),
@@ -232,7 +266,7 @@ public class SasaranOpdService {
                 entity.realisasi() != null ? entity.realisasi().doubleValue() : null,
                 entity.faktorPenunjang(), entity.faktorPenghambat(),
                 null, null, null, null, null, null, null, null, null,
-                entity.jenisRealisasi(),
+                JenisRealisasi.fromCapaian(null),
                 entity.createdBy(), entity.lastModifiedBy(), entity.buktiPendukung(), entity.keteranganBuktiPendukung());
     }
 
@@ -270,7 +304,7 @@ public class SasaranOpdService {
                     response.kodeSasaranOpd(), response.kodeIndikator(), response.kodeTarget(),
                     response.realisasi(), response.faktorPenunjang(), response.faktorPenghambat(),
                     penetapan.sasaranOpd(), null, null, null, null, null, null, null, null,
-                    response.jenisRealisasi(),
+                    JenisRealisasi.fromCapaian(null),
                     response.createdBy(), response.lastModifiedBy(), response.buktiPendukung(), response.keteranganBuktiPendukung());
         }
 
@@ -293,7 +327,7 @@ public class SasaranOpdService {
                 matchedIndikator.get().definisiOperasional(),
                 target, satuan,
                 capaianResult.capaian(), capaianResult.keteranganCapaian(),
-                response.jenisRealisasi(),
+                JenisRealisasi.fromCapaian(capaianResult.capaian()),
                 response.createdBy(), response.lastModifiedBy(), response.buktiPendukung(), response.keteranganBuktiPendukung()
         );
     }

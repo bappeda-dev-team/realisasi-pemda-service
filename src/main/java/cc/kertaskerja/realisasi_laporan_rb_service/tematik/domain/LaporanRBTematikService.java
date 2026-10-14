@@ -196,7 +196,7 @@ public class LaporanRBTematikService {
         return new LaporanRBTematikResponse(
                 response.id(), response.kodeOpd(), response.nip(), response.tahun(), response.bulan(),
                 response.idRbTematik(), response.idIndikatorRbTematik(), response.idTargetRbTematik(),
-                response.realisasi(), response.jenisRealisasi(),
+                response.realisasi(), JenisRealisasi.fromCapaian(capaian),
                 response.faktorPenunjang(), response.faktorPenghambat(), response.buktiPendukung(),
                 response.createdBy(), response.lastModifiedBy(),
                 response.createdDate(), response.lastModifiedDate(),
@@ -327,11 +327,12 @@ public class LaporanRBTematikService {
     ) {
         Double capaian = hitungCapaian(r.realisasi(), targetNext, r.jenisRealisasi());
         String keteranganCapaian = keteranganCapaian(r.realisasi(), targetNext, r.jenisRealisasi());
+        JenisRealisasi calculatedJenisRealisasi = JenisRealisasi.fromCapaian(capaian);
 
         return new LaporanRBTematikPerTargetResponse.RealisasiTargetResponse(
                 r.id(), r.bulan(), r.realisasi(),
                 capaian, keteranganCapaian,
-                r.jenisRealisasi() != null ? r.jenisRealisasi().name() : null,
+                calculatedJenisRealisasi != null ? calculatedJenisRealisasi.name() : null,
                 r.faktorPenunjang(), r.faktorPenghambat(),
                 r.buktiPendukung(), r.keteranganBuktiPendukung());
     }
@@ -400,10 +401,12 @@ public class LaporanRBTematikService {
             faktorPenghambat = first.faktorPenghambat();
             buktiPendukung = first.buktiPendukung();
             keteranganBuktiPendukung = first.keteranganBuktiPendukung();
-            jenisRealisasi = first.jenisRealisasi() != null ? first.jenisRealisasi().name() : null;
 
             capaian = hitungCapaian(realisasi, target.targetNext(), first.jenisRealisasi());
             keteranganCapaian = keteranganCapaian(realisasi, target.targetNext(), first.jenisRealisasi());
+
+            JenisRealisasi calculatedJenisRealisasi = JenisRealisasi.fromCapaian(capaian);
+            jenisRealisasi = calculatedJenisRealisasi != null ? calculatedJenisRealisasi.name() : null;
         }
 
         return new PerencanaanLaporanRBTematikResponse.TargetPerencanaanResponse(

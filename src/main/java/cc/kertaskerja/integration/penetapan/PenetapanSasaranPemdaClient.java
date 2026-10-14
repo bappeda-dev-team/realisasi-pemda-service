@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class PenetapanSasaranPemdaClient {
@@ -43,10 +45,9 @@ public class PenetapanSasaranPemdaClient {
 
     public Mono<String> syncSasaranPemda(int tahun) {
         return webClient.post()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/pemda/sasaran/sync")
-                        .queryParam("tahun", tahun)
-                        .build())
+                .uri("/pemda/sasaran/sync")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("tahun", tahun))
                 .retrieve()
                 .bodyToMono(String.class)
                 .doOnError(e -> log.error("Failed to sync penetapan sasaran pemda for tahun={}", tahun, e));

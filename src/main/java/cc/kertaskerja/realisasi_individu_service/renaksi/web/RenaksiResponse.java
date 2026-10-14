@@ -49,7 +49,7 @@ public record RenaksiResponse(
                 entity.bulan(),
                 entity.satuan(),
                 entity.status(),
-                entity.jenisRealisasi(),
+                JenisRealisasi.fromCapaian(capaian),
                 entity.faktorPenunjang(),
                 entity.faktorPenghambat(),
                 entity.buktiPendukung(),
