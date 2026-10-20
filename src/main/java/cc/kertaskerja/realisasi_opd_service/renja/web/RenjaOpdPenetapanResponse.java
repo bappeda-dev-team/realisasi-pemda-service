@@ -68,6 +68,13 @@ public record RenjaOpdPenetapanResponse(
             Long id,
             @JsonProperty("kode_pagu") String kodePagu,
             Double pagu,
-            @JsonProperty("jenis_pagu") String jenisPagu
-    ) {}
+            @JsonProperty("jenis_pagu") String jenisPagu,
+            Double realisasi,
+            Double capaian,
+            @JsonProperty("keterangan_capaian") String keteranganCapaian
+    ) {
+        public PaguAnggaranPenetapan(Long id, String kodePagu, Double pagu, String jenisPagu) {
+            this(id, kodePagu, pagu, jenisPagu, null, null, null);
+        }
+    }
 }

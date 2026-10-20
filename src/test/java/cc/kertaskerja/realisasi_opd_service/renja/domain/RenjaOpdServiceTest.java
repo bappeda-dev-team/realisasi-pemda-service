@@ -16,7 +16,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RenjaOpdServiceTest {
@@ -64,7 +66,9 @@ class RenjaOpdServiceTest {
                                     3L, "TGT-003", 2026, 100.0, "%"
                             ))
                     )),
-                    null
+                    List.of(new PenetapanRenjaOpd.PaguAnggaranData(
+                            1L, "PAGU-3", 10000000.0, "PENDAPATAN"
+                    ))
             ))
     );
 
@@ -75,13 +79,13 @@ class RenjaOpdServiceTest {
 
         StepVerifier.create(renjaOpdService.getPenetapanWithRealisasi("5.01.5.05.0.00.01.0000", 2026, null))
                 .assertNext(response -> {
-                    org.junit.jupiter.api.Assertions.assertEquals("5.01.5.05.0.00.01.0000", response.kodeOpd());
-                    org.junit.jupiter.api.Assertions.assertEquals(2026, response.tahun());
-                    org.junit.jupiter.api.Assertions.assertNull(response.bulan());
-                    org.junit.jupiter.api.Assertions.assertEquals(1, response.programs().size());
-                    org.junit.jupiter.api.Assertions.assertEquals(1, response.kegiatans().size());
-                    org.junit.jupiter.api.Assertions.assertEquals(1, response.subkegiatans().size());
-                    org.junit.jupiter.api.Assertions.assertNull(response.programs().getFirst().indikators().getFirst().targets().getFirst().realisasi());
+                    assertEquals("5.01.5.05.0.00.01.0000", response.kodeOpd());
+                    assertEquals(2026, response.tahun());
+                    assertNull(response.bulan());
+                    assertEquals(1, response.programs().size());
+                    assertEquals(1, response.kegiatans().size());
+                    assertEquals(1, response.subkegiatans().size());
+                    assertNull(response.programs().getFirst().indikators().getFirst().targets().getFirst().realisasi());
                 })
                 .verifyComplete();
     }
@@ -90,32 +94,37 @@ class RenjaOpdServiceTest {
     void getPenetapanWithRealisasi_WithBulan_ShouldMergeRealisasi() {
         when(penetapanClient.fetchRenjaOpd("5.01.5.05.0.00.01.0000", 2026))
                 .thenReturn(Mono.just(penetapanRoot));
-        when(targetProgramRepo.findAllByTahunAndBulan("2026", "1"))
+        when(targetProgramRepo.findAllByKodeOpdAndTahunAndBulan("5.01.5.05.0.00.01.0000", "2026", "1"))
                 .thenReturn(Flux.just(
                         new RenjaProgramOpd(1L, "5.01.5.05.0.00.01.0000", "2026", "1",
-                                "5.01.02", "IND-001", "TGT-001", "", BigDecimal.valueOf(70), "", "", "", "",
+                                "5.01.02", "IND-001", "TGT-001", "", BigDecimal.valueOf(70), "NAIK", "", "", "",
                                 Instant.now(), Instant.now(), null, null)
                 ));
-        when(targetKegiatanRepo.findAllByTahunAndBulan("2026", "1"))
+        when(targetKegiatanRepo.findAllByKodeOpdAndTahunAndBulan("5.01.5.05.0.00.01.0000", "2026", "1"))
                 .thenReturn(Flux.just(
                         new RenjaKegiatanOpd(2L, "5.01.5.05.0.00.01.0000", "2026", "1",
-                                "5.01.02.2.01", "IND-002", "TGT-002", "", BigDecimal.valueOf(70), "", "", "", "",
+                                "5.01.02.2.01", "IND-002", "TGT-002", "", BigDecimal.valueOf(70), "NAIK", "", "", "",
                                 Instant.now(), Instant.now(), null, null)
                 ));
-        when(targetSubKegiatanRepo.findAllByTahunAndBulan("2026", "1"))
+        when(targetSubKegiatanRepo.findAllByKodeOpdAndTahunAndBulan("5.01.5.05.0.00.01.0000", "2026", "1"))
                 .thenReturn(Flux.just(
                         new RenjaSubKegiatanOpd(3L, "5.01.5.05.0.00.01.0000", "2026", "1",
-                                "5.01.02.2.01.0005", "IND-003", "TGT-003", "", BigDecimal.valueOf(70), "", "", "", "",
+                                "5.01.02.2.01.0005", "IND-003", "TGT-003", "PAGU-3", BigDecimal.valueOf(70),
+                                BigDecimal.valueOf(5000000.0), "NAIK", "", "", "",
                                 Instant.now(), Instant.now(), null, null)
                 ));
 
         StepVerifier.create(renjaOpdService.getPenetapanWithRealisasi("5.01.5.05.0.00.01.0000", 2026, "1"))
                 .assertNext(response -> {
-                    org.junit.jupiter.api.Assertions.assertEquals(1, response.bulan());
-                    org.junit.jupiter.api.Assertions.assertEquals(70.0, response.programs().getFirst().indikators().getFirst().targets().getFirst().realisasi());
-                    org.junit.jupiter.api.Assertions.assertEquals(70.0, response.programs().getFirst().indikators().getFirst().targets().getFirst().capaian());
-                    org.junit.jupiter.api.Assertions.assertEquals(70.0, response.kegiatans().getFirst().indikators().getFirst().targets().getFirst().realisasi());
-                    org.junit.jupiter.api.Assertions.assertEquals(70.0, response.subkegiatans().getFirst().indikators().getFirst().targets().getFirst().realisasi());
+                    assertEquals(1, response.bulan());
+                    assertEquals(70.0, response.programs().getFirst().indikators().getFirst().targets().getFirst().realisasi());
+                    assertEquals(70.0, response.programs().getFirst().indikators().getFirst().targets().getFirst().capaian());
+                    assertEquals(70.0, response.kegiatans().getFirst().indikators().getFirst().targets().getFirst().realisasi());
+                    assertEquals(70.0, response.subkegiatans().getFirst().indikators().getFirst().targets().getFirst().realisasi());
+                    
+                    var pagu = response.subkegiatans().getFirst().paguAnggaran().getFirst();
+                    assertEquals(5000000.0, pagu.realisasi());
+                    assertEquals(50.0, pagu.capaian());
                 })
                 .verifyComplete();
     }
@@ -127,10 +136,79 @@ class RenjaOpdServiceTest {
 
         StepVerifier.create(renjaOpdService.getPenetapanWithRealisasi("5.01.5.05.0.00.01.0000", 2026, "1"))
                 .assertNext(response -> {
-                    org.junit.jupiter.api.Assertions.assertEquals("5.01.5.05.0.00.01.0000", response.kodeOpd());
-                    org.junit.jupiter.api.Assertions.assertTrue(response.programs().isEmpty());
-                    org.junit.jupiter.api.Assertions.assertTrue(response.kegiatans().isEmpty());
-                    org.junit.jupiter.api.Assertions.assertTrue(response.subkegiatans().isEmpty());
+                    assertEquals("5.01.5.05.0.00.01.0000", response.kodeOpd());
+                    assertTrue(response.programs().isEmpty());
+                    assertTrue(response.kegiatans().isEmpty());
+                    assertTrue(response.subkegiatans().isEmpty());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void syncRealisasiProgram_WhenNew_ShouldInsert() {
+        when(targetProgramRepo.findByKodeOpdAndKodeProgramAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                "5.01.5.05.0.00.01.0000", "5.01.02", "IND-001", "TGT-001", "2026", "1"))
+                .thenReturn(Mono.empty());
+        when(targetProgramRepo.save(any(RenjaProgramOpd.class)))
+                .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+
+        StepVerifier.create(renjaOpdService.syncRealisasiProgram(
+                "5.01.5.05.0.00.01.0000", "2026", "1",
+                "5.01.02", "IND-001", "TGT-001", "PAGU-1",
+                BigDecimal.valueOf(85.0)))
+                .assertNext(res -> {
+                    assertEquals("5.01.02", res.kodeProgram());
+                    assertEquals(BigDecimal.valueOf(85.0), res.realisasi());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void syncRealisasiProgram_WhenExisting_ShouldUpdateRealisasiAndPreserveFactors() {
+        RenjaProgramOpd existing = new RenjaProgramOpd(
+                1L, "5.01.5.05.0.00.01.0000", "2026", "1",
+                "5.01.02", "IND-001", "TGT-001", "PAGU-1",
+                BigDecimal.valueOf(40.0), "NAIK", "Faktor A", "Faktor B", "bukti.pdf",
+                Instant.now(), Instant.now(), "admin", "admin"
+        );
+        when(targetProgramRepo.findByKodeOpdAndKodeProgramAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                "5.01.5.05.0.00.01.0000", "5.01.02", "IND-001", "TGT-001", "2026", "1"))
+                .thenReturn(Mono.just(existing));
+        when(targetProgramRepo.save(any(RenjaProgramOpd.class)))
+                .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+
+        StepVerifier.create(renjaOpdService.syncRealisasiProgram(
+                "5.01.5.05.0.00.01.0000", "2026", "1",
+                "5.01.02", "IND-001", "TGT-001", "PAGU-1",
+                BigDecimal.valueOf(90.0)))
+                .assertNext(res -> {
+                    assertEquals(BigDecimal.valueOf(90.0), res.realisasi());
+                    assertEquals("Faktor A", res.faktorPenunjang());
+                    assertEquals("Faktor B", res.faktorPenghambat());
+                    assertEquals("bukti.pdf", res.buktiPendukung());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void syncRealisasiSubKegiatan_WhenNew_ShouldInsertTargetAndPagu() {
+        when(targetSubKegiatanRepo.findByKodeOpdAndKodeSubkegiatanAndKodeIndikatorAndKodeTargetAndKodePaguAndTahunAndBulan(
+                "5.01.5.05.0.00.01.0000", "5.01.02.2.01.0005", "IND-003", "TGT-003", "PAGU-3", "2026", "1"))
+                .thenReturn(Mono.empty());
+        when(targetSubKegiatanRepo.findByKodeOpdAndKodeSubkegiatanAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                "5.01.5.05.0.00.01.0000", "5.01.02.2.01.0005", "IND-003", "TGT-003", "2026", "1"))
+                .thenReturn(Mono.empty());
+        when(targetSubKegiatanRepo.save(any(RenjaSubKegiatanOpd.class)))
+                .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+
+        StepVerifier.create(renjaOpdService.syncRealisasiSubKegiatan(
+                "5.01.5.05.0.00.01.0000", "2026", "1",
+                "5.01.02.2.01.0005", "IND-003", "TGT-003", "PAGU-3",
+                BigDecimal.valueOf(75.0), BigDecimal.valueOf(7500000.0)))
+                .assertNext(res -> {
+                    assertEquals("5.01.02.2.01.0005", res.kodeSubkegiatan());
+                    assertEquals(BigDecimal.valueOf(75.0), res.realisasi());
+                    assertEquals(BigDecimal.valueOf(7500000.0), res.realisasiPagu());
                 })
                 .verifyComplete();
     }
@@ -138,36 +216,36 @@ class RenjaOpdServiceTest {
     @Test
     void hitungCapaian_WhenTargetNull_ShouldReturnNull() {
         var result = RenjaOpdService.hitungCapaian(70.0, null);
-        org.junit.jupiter.api.Assertions.assertNull(result.capaian());
-        org.junit.jupiter.api.Assertions.assertNull(result.keteranganCapaian());
+        assertNull(result.capaian());
+        assertNull(result.keteranganCapaian());
     }
 
     @Test
     void hitungCapaian_WhenRealisasiNull_ShouldReturnNull() {
         var result = RenjaOpdService.hitungCapaian(null, 100.0);
-        org.junit.jupiter.api.Assertions.assertNull(result.capaian());
-        org.junit.jupiter.api.Assertions.assertNull(result.keteranganCapaian());
+        assertNull(result.capaian());
+        assertNull(result.keteranganCapaian());
     }
 
     @Test
     void hitungCapaian_WhenTargetZero_ShouldReturnNull() {
         var result = RenjaOpdService.hitungCapaian(70.0, 0.0);
-        org.junit.jupiter.api.Assertions.assertNull(result.capaian());
-        org.junit.jupiter.api.Assertions.assertNull(result.keteranganCapaian());
+        assertNull(result.capaian());
+        assertNull(result.keteranganCapaian());
     }
 
     @Test
     void hitungCapaian_WhenNormal_ShouldCalculateCorrectly() {
         var result = RenjaOpdService.hitungCapaian(70.0, 100.0);
-        org.junit.jupiter.api.Assertions.assertEquals(70.0, result.capaian());
-        org.junit.jupiter.api.Assertions.assertNull(result.keteranganCapaian());
+        assertEquals(70.0, result.capaian());
+        assertNull(result.keteranganCapaian());
     }
 
     @Test
     void hitungCapaian_WhenOver100_ShouldCapAndAddKeterangan() {
         var result = RenjaOpdService.hitungCapaian(150.0, 100.0);
-        org.junit.jupiter.api.Assertions.assertEquals(100.0, result.capaian());
-        org.junit.jupiter.api.Assertions.assertNotNull(result.keteranganCapaian());
-        org.junit.jupiter.api.Assertions.assertTrue(result.keteranganCapaian().contains("lebih dari 100%"));
+        assertEquals(100.0, result.capaian());
+        assertNotNull(result.keteranganCapaian());
+        assertTrue(result.keteranganCapaian().contains("lebih dari 100%"));
     }
 }
