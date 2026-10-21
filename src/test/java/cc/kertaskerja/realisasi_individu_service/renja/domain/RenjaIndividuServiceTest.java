@@ -39,6 +39,8 @@ class RenjaIndividuServiceTest {
     private PegawaiClient pegawaiClient;
     @Mock
     private PenetapanRenjaIndividuClient penetapanClient;
+    @Mock
+    private cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaOpdService renjaOpdService;
 
     @InjectMocks
     private RenjaIndividuService renjaIndividuService;
@@ -142,6 +144,9 @@ class RenjaIndividuServiceTest {
         );
         when(programRepo.save(any(RenjaProgramIndividu.class))).thenReturn(Mono.just(savedProg));
 
+        when(renjaOpdService.syncRealisasiProgram(any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(Mono.empty());
+
         StepVerifier.create(renjaIndividuService.submitProgram(req))
                 .assertNext(res -> {
                     assertEquals(50.0, res.realisasiTarget());
@@ -150,5 +155,90 @@ class RenjaIndividuServiceTest {
                     assertEquals("PROGRAM PENINGKATAN PERAN", res.program());
                 })
                 .verifyComplete();
+
+        verify(renjaOpdService, times(1)).syncRealisasiProgram(
+                eq("8.01.0.00.0.00.01.0000"), eq("2026"), eq("1"),
+                eq("8.01.03"), eq("IND-001"), eq("TGT-001"), eq("PAGU-1"),
+                eq(BigDecimal.valueOf(50.0))
+        );
+    }
+
+    @Test
+    void submitKegiatan_ShouldSyncToRenjaOpd() {
+        var req = new cc.kertaskerja.realisasi_individu_service.renja.web.kegiatan.RenjaIndividuKegiatanRequest(
+                "8.01.0.00.0.00.01.0000", "2026", "1", "198701252015051001",
+                "8.01.03.2.01", "IND-002", "TGT-002", "PAGU-2",
+                75.0, "NAIK", "bukti.pdf", "keterangan"
+        );
+
+        when(penetapanClient.fetchRenjaIndividu("198701252015051001", "8.01.0.00.0.00.01.0000", 2026))
+                .thenReturn(Mono.empty());
+
+        when(kegiatanRepo.findByKodeOpdAndKodeKegiatanAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                "8.01.0.00.0.00.01.0000", "8.01.03.2.01", "IND-002", "TGT-002", "2026", "1"))
+                .thenReturn(Mono.empty());
+
+        var savedKeg = new cc.kertaskerja.realisasi_individu_service.renja.domain.kegiatan.RenjaKegiatanIndividu(
+                1L, "8.01.0.00.0.00.01.0000", "198701252015051001", "2026", "1",
+                "8.01.03.2.01", "IND-002", "TGT-002", "PAGU-2",
+                BigDecimal.valueOf(75.0), "NAIK",
+                "", "", "bukti.pdf", "keterangan",
+                null, null, null, null
+        );
+        when(kegiatanRepo.save(any())).thenReturn(Mono.just(savedKeg));
+        when(renjaOpdService.syncRealisasiKegiatan(any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(Mono.empty());
+
+        StepVerifier.create(renjaIndividuService.submitKegiatan(req))
+                .assertNext(res -> {
+                    assertEquals(75.0, res.realisasiTarget());
+                })
+                .verifyComplete();
+
+        verify(renjaOpdService, times(1)).syncRealisasiKegiatan(
+                eq("8.01.0.00.0.00.01.0000"), eq("2026"), eq("1"),
+                eq("8.01.03.2.01"), eq("IND-002"), eq("TGT-002"), eq("PAGU-2"),
+                eq(BigDecimal.valueOf(75.0))
+        );
+    }
+
+    @Test
+    void submitSubKegiatan_ShouldSyncToRenjaOpd() {
+        var req = new cc.kertaskerja.realisasi_individu_service.renja.web.subkegiatan.RenjaIndividuSubKegiatanRequest(
+                "8.01.0.00.0.00.01.0000", "2026", "1", "198701252015051001",
+                "8.01.03.2.01.0003", "IND-003", "TGT-003", "PAGU-3",
+                80.0, 5000000.0, "NAIK", "bukti.pdf", "keterangan"
+        );
+
+        when(penetapanClient.fetchRenjaIndividu("198701252015051001", "8.01.0.00.0.00.01.0000", 2026))
+                .thenReturn(Mono.empty());
+
+        when(subKegiatanRepo.findByKodeOpdAndKodeSubKegiatanAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
+                "8.01.0.00.0.00.01.0000", "8.01.03.2.01.0003", "IND-003", "TGT-003", "2026", "1"))
+                .thenReturn(Mono.empty());
+
+        var savedSub = new cc.kertaskerja.realisasi_individu_service.renja.domain.subkegiatan.RenjaSubKegiatanIndividu(
+                1L, "8.01.0.00.0.00.01.0000", "198701252015051001", "2026", "1",
+                "8.01.03.2.01.0003", "IND-003", "TGT-003", "PAGU-3",
+                BigDecimal.valueOf(80.0), BigDecimal.valueOf(5000000.0), "NAIK",
+                "", "", "bukti.pdf", "keterangan",
+                null, null, null, null
+        );
+        when(subKegiatanRepo.save(any())).thenReturn(Mono.just(savedSub));
+        when(renjaOpdService.syncRealisasiSubKegiatan(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(Mono.empty());
+
+        StepVerifier.create(renjaIndividuService.submitSubKegiatan(req))
+                .assertNext(res -> {
+                    assertEquals(80.0, res.realisasiTarget());
+                    assertEquals(5000000.0, res.realisasiPagu());
+                })
+                .verifyComplete();
+
+        verify(renjaOpdService, times(1)).syncRealisasiSubKegiatan(
+                eq("8.01.0.00.0.00.01.0000"), eq("2026"), eq("1"),
+                eq("8.01.03.2.01.0003"), eq("IND-003"), eq("TGT-003"), eq("PAGU-3"),
+                eq(BigDecimal.valueOf(80.0)), eq(BigDecimal.valueOf(5000000.0))
+        );
     }
 }

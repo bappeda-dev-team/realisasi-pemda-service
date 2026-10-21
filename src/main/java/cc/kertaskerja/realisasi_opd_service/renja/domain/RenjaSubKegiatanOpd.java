@@ -31,6 +31,9 @@ public record RenjaSubKegiatanOpd(
 
         BigDecimal realisasi,
 
+        @Column("realisasi_pagu")
+        BigDecimal realisasiPagu,
+
         @Column("jenis_realisasi")
         String jenisRealisasi,
 
@@ -51,7 +54,7 @@ public record RenjaSubKegiatanOpd(
     public RenjaSubKegiatanOpd withFaktorPenunjang(String faktorPenunjang) {
         return new RenjaSubKegiatanOpd(
                 id, kodeOpd, tahun, bulan, kodeSubkegiatan, kodeIndikator, kodeTarget, kodePagu,
-                realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat, buktiPendukung,
+                realisasi, realisasiPagu, jenisRealisasi, faktorPenunjang, faktorPenghambat, buktiPendukung,
                 createdDate, lastModifiedDate, createdBy, lastModifiedBy
         );
     }
@@ -59,7 +62,7 @@ public record RenjaSubKegiatanOpd(
     public RenjaSubKegiatanOpd withFaktorPenghambat(String faktorPenghambat) {
         return new RenjaSubKegiatanOpd(
                 id, kodeOpd, tahun, bulan, kodeSubkegiatan, kodeIndikator, kodeTarget, kodePagu,
-                realisasi, jenisRealisasi, faktorPenunjang, faktorPenghambat, buktiPendukung,
+                realisasi, realisasiPagu, jenisRealisasi, faktorPenunjang, faktorPenghambat, buktiPendukung,
                 createdDate, lastModifiedDate, createdBy, lastModifiedBy
         );
     }

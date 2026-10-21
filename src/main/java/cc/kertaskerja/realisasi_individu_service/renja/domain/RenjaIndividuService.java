@@ -23,6 +23,10 @@ import cc.kertaskerja.realisasi_individu_service.renja.web.subkegiatan.FaktorPen
 import cc.kertaskerja.realisasi_individu_service.renja.web.subkegiatan.LaporanRealisasiRenjaSubKegiatanIndividuResponse;
 import cc.kertaskerja.realisasi_individu_service.renja.web.subkegiatan.RenjaIndividuSubKegiatanRequest;
 import cc.kertaskerja.realisasi_individu_service.renja.web.subkegiatan.RenjaIndividuSubKegiatanResponse;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaOpdService;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaProgramOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaKegiatanOpd;
+import cc.kertaskerja.realisasi_opd_service.renja.domain.RenjaSubKegiatanOpd;
 import cc.kertaskerja.integration.penetapan.PenetapanRenjaIndividuClient;
 import cc.kertaskerja.integration.penetapan.renja.PenetapanRenjaIndividu;
 import cc.kertaskerja.realisasi_individu_service.renja.web.PenetapanRenjaIndividuResponse;
@@ -58,6 +62,7 @@ public class RenjaIndividuService {
     private final UploadClient uploadClient;
     private final PegawaiClient pegawaiClient;
     private final PenetapanRenjaIndividuClient penetapanClient;
+    private final RenjaOpdService renjaOpdService;
 
     record CapaianResult(Double capaian, String keteranganCapaian) {
     }
@@ -78,48 +83,132 @@ public class RenjaIndividuService {
             RenjaSubKegiatanIndividuRepository subKegiatanRepo,
             UploadClient uploadClient,
             PegawaiClient pegawaiClient,
-            PenetapanRenjaIndividuClient penetapanClient) {
+            PenetapanRenjaIndividuClient penetapanClient,
+            RenjaOpdService renjaOpdService) {
         this.programRepo = programRepo;
         this.kegiatanRepo = kegiatanRepo;
         this.subKegiatanRepo = subKegiatanRepo;
         this.uploadClient = uploadClient;
         this.pegawaiClient = pegawaiClient;
         this.penetapanClient = penetapanClient;
+        this.renjaOpdService = renjaOpdService;
     }
 
     @Transactional
     public Mono<RenjaIndividuProgramResponse> submitProgram(RenjaIndividuProgramRequest req) {
         return penetapanClient.fetchRenjaIndividu(req.nip(), req.kodeOpd(), Integer.parseInt(req.tahun()))
+                .defaultIfEmpty(new PenetapanRenjaIndividu.RenjaIndividuData(req.nip(), null, req.kodeOpd(), Integer.parseInt(req.tahun()), List.of()))
                 .flatMap(penetapanData -> upsertProgram(req)
                         .map(saved -> enrichProgramWithPenetapan(saved, penetapanData)))
                 .onErrorResume(e -> {
                     log.warn("Gagal menghubungi penetapan untuk nip={}, kodeOpd={}, tahun={}: {}",
                             req.nip(), req.kodeOpd(), req.tahun(), e.getMessage());
                     return upsertProgram(req).flatMap(this::enrichProgramResponse);
-                });
+                })
+                .flatMap(res -> syncToProgramOpd(res, req));
     }
 
     @Transactional
     public Mono<RenjaIndividuKegiatanResponse> submitKegiatan(RenjaIndividuKegiatanRequest req) {
         return penetapanClient.fetchRenjaIndividu(req.nip(), req.kodeOpd(), Integer.parseInt(req.tahun()))
+                .defaultIfEmpty(new PenetapanRenjaIndividu.RenjaIndividuData(req.nip(), null, req.kodeOpd(), Integer.parseInt(req.tahun()), List.of()))
                 .flatMap(penetapanData -> upsertKegiatan(req)
                         .map(saved -> enrichKegiatanWithPenetapan(saved, penetapanData)))
                 .onErrorResume(e -> {
                     log.warn("Gagal menghubungi penetapan untuk nip={}, kodeOpd={}, tahun={}: {}",
                             req.nip(), req.kodeOpd(), req.tahun(), e.getMessage());
                     return upsertKegiatan(req).flatMap(this::enrichKegiatanResponse);
-                });
+                })
+                .flatMap(res -> syncToKegiatanOpd(res, req));
     }
 
     @Transactional
     public Mono<RenjaIndividuSubKegiatanResponse> submitSubKegiatan(RenjaIndividuSubKegiatanRequest req) {
         return penetapanClient.fetchRenjaIndividu(req.nip(), req.kodeOpd(), Integer.parseInt(req.tahun()))
+                .defaultIfEmpty(new PenetapanRenjaIndividu.RenjaIndividuData(req.nip(), null, req.kodeOpd(), Integer.parseInt(req.tahun()), List.of()))
                 .flatMap(penetapanData -> upsertSubKegiatan(req)
                         .map(saved -> enrichSubKegiatanWithPenetapan(saved, penetapanData)))
                 .onErrorResume(e -> {
                     log.warn("Gagal menghubungi penetapan untuk nip={}, kodeOpd={}, tahun={}: {}",
                             req.nip(), req.kodeOpd(), req.tahun(), e.getMessage());
                     return upsertSubKegiatan(req).flatMap(this::enrichSubKegiatanResponse);
+                })
+                .flatMap(res -> syncToSubKegiatanOpd(res, req));
+    }
+
+    private Mono<RenjaIndividuProgramResponse> syncToProgramOpd(RenjaIndividuProgramResponse response, RenjaIndividuProgramRequest req) {
+        if (renjaOpdService == null) {
+            return Mono.just(response);
+        }
+        Mono<RenjaProgramOpd> syncMono = renjaOpdService.syncRealisasiProgram(
+                req.kodeOpd(),
+                req.tahun(),
+                req.bulan(),
+                req.kodeProgram(),
+                req.kodeIndikator(),
+                req.kodeTarget(),
+                req.kodePagu(),
+                BigDecimal.valueOf(req.realisasi())
+        );
+        if (syncMono == null) {
+            return Mono.just(response);
+        }
+        return syncMono
+                .then(Mono.just(response))
+                .onErrorResume(e -> {
+                    log.warn("Gagal sinkronisasi realisasi ke Renja OPD Program untuk kodeProgram={}: {}", req.kodeProgram(), e.getMessage());
+                    return Mono.just(response);
+                });
+    }
+
+    private Mono<RenjaIndividuKegiatanResponse> syncToKegiatanOpd(RenjaIndividuKegiatanResponse response, RenjaIndividuKegiatanRequest req) {
+        if (renjaOpdService == null) {
+            return Mono.just(response);
+        }
+        Mono<RenjaKegiatanOpd> syncMono = renjaOpdService.syncRealisasiKegiatan(
+                req.kodeOpd(),
+                req.tahun(),
+                req.bulan(),
+                req.kodeKegiatan(),
+                req.kodeIndikator(),
+                req.kodeTarget(),
+                req.kodePagu(),
+                BigDecimal.valueOf(req.realisasi())
+        );
+        if (syncMono == null) {
+            return Mono.just(response);
+        }
+        return syncMono
+                .then(Mono.just(response))
+                .onErrorResume(e -> {
+                    log.warn("Gagal sinkronisasi realisasi ke Renja OPD Kegiatan untuk kodeKegiatan={}: {}", req.kodeKegiatan(), e.getMessage());
+                    return Mono.just(response);
+                });
+    }
+
+    private Mono<RenjaIndividuSubKegiatanResponse> syncToSubKegiatanOpd(RenjaIndividuSubKegiatanResponse response, RenjaIndividuSubKegiatanRequest req) {
+        if (renjaOpdService == null) {
+            return Mono.just(response);
+        }
+        Mono<RenjaSubKegiatanOpd> syncMono = renjaOpdService.syncRealisasiSubKegiatan(
+                req.kodeOpd(),
+                req.tahun(),
+                req.bulan(),
+                req.kodeSubKegiatan(),
+                req.kodeIndikator(),
+                req.kodeTarget(),
+                req.kodePagu(),
+                BigDecimal.valueOf(req.realisasiTarget()),
+                BigDecimal.valueOf(req.realisasiPagu())
+        );
+        if (syncMono == null) {
+            return Mono.just(response);
+        }
+        return syncMono
+                .then(Mono.just(response))
+                .onErrorResume(e -> {
+                    log.warn("Gagal sinkronisasi realisasi ke Renja OPD SubKegiatan untuk kodeSubKegiatan={}: {}", req.kodeSubKegiatan(), e.getMessage());
+                    return Mono.just(response);
                 });
     }
 
