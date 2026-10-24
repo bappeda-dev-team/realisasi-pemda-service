@@ -192,6 +192,7 @@ public class SasaranServiceTests {
                             .orElseThrow();
                     assertEquals(80.0, normal.targets().getFirst().realisasi());
                     assertEquals(80.0, normal.targets().getFirst().capaian());
+                    assertEquals(JenisRealisasi.NAIK, normal.targets().getFirst().jenisRealisasi());
                     return true;
                 })
                 .verifyComplete();
@@ -214,6 +215,7 @@ public class SasaranServiceTests {
                     assertNull(target.capaian());
                     assertNull(target.faktorPenunjang());
                     assertNull(target.buktiPendukung());
+                    assertNull(target.jenisRealisasi());
                     return true;
                 })
                 .verifyComplete();

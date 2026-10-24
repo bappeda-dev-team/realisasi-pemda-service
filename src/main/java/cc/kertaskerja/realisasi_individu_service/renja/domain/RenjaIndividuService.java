@@ -674,7 +674,7 @@ public class RenjaIndividuService {
 
     private Mono<RenjaProgramIndividu> upsertProgram(RenjaIndividuProgramRequest req) {
         String kodePagu = req.kodePagu() != null ? req.kodePagu() : "";
-        String jenisRealisasi = req.jenisRealisasi() != null ? req.jenisRealisasi() : "NAIK";
+        String jenisRealisasi = JenisRealisasi.defaultIfNull(req.jenisRealisasi()).name();
         return programRepo.findByKodeOpdAndKodeProgramAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
                 req.kodeOpd(), req.kodeProgram(), req.kodeIndikator(), req.kodeTarget(), req.tahun(), req.bulan())
                 .flatMap(existing -> programRepo.save(new RenjaProgramIndividu(
@@ -701,7 +701,7 @@ public class RenjaIndividuService {
 
     private Mono<RenjaKegiatanIndividu> upsertKegiatan(RenjaIndividuKegiatanRequest req) {
         String kodePagu = req.kodePagu() != null ? req.kodePagu() : "";
-        String jenisRealisasi = req.jenisRealisasi() != null ? req.jenisRealisasi() : "NAIK";
+        String jenisRealisasi = JenisRealisasi.defaultIfNull(req.jenisRealisasi()).name();
         return kegiatanRepo.findByKodeOpdAndKodeKegiatanAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
                 req.kodeOpd(), req.kodeKegiatan(), req.kodeIndikator(), req.kodeTarget(), req.tahun(), req.bulan())
                 .flatMap(existing -> kegiatanRepo.save(new RenjaKegiatanIndividu(
@@ -728,7 +728,7 @@ public class RenjaIndividuService {
 
     private Mono<RenjaSubKegiatanIndividu> upsertSubKegiatan(RenjaIndividuSubKegiatanRequest req) {
         String kodePagu = req.kodePagu() != null ? req.kodePagu() : "";
-        String jenisRealisasi = req.jenisRealisasi() != null ? req.jenisRealisasi() : "NAIK";
+        String jenisRealisasi = JenisRealisasi.defaultIfNull(req.jenisRealisasi()).name();
         return subKegiatanRepo.findByKodeOpdAndKodeSubKegiatanAndKodeIndikatorAndKodeTargetAndTahunAndBulan(
                 req.kodeOpd(), req.kodeSubKegiatan(), req.kodeIndikator(), req.kodeTarget(), req.tahun(), req.bulan())
                 .flatMap(existing -> subKegiatanRepo.save(new RenjaSubKegiatanIndividu(
@@ -775,7 +775,7 @@ public class RenjaIndividuService {
                                 saved.kodePagu(), r.paguProgram() != null ? r.paguProgram().doubleValue() : null,
                                 tgt.target(),
                                 realisasi,
-                                jenisRealisasiFromCapaian(capaianResult.capaian()),
+                                saved.jenisRealisasi(),
                                 capaianResult.capaian(), capaianResult.keteranganCapaian(),
                                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
                                 saved.createdBy(), saved.lastModifiedBy()
@@ -799,7 +799,7 @@ public class RenjaIndividuService {
                 saved.kodePagu(), null,
                 null,
                 saved.realisasi() != null ? saved.realisasi().doubleValue() : null,
-                jenisRealisasiFromCapaian(null),
+                saved.jenisRealisasi(),
                 null, null,
                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
                 saved.createdBy(), saved.lastModifiedBy());
@@ -825,7 +825,7 @@ public class RenjaIndividuService {
                                 saved.kodePagu(), r.paguKegiatan() != null ? r.paguKegiatan().doubleValue() : null,
                                 tgt.target(),
                                 realisasi,
-                                jenisRealisasiFromCapaian(capaianResult.capaian()),
+                                saved.jenisRealisasi(),
                                 capaianResult.capaian(), capaianResult.keteranganCapaian(),
                                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
                                 saved.createdBy(), saved.lastModifiedBy()
@@ -849,7 +849,7 @@ public class RenjaIndividuService {
                 saved.kodePagu(), null,
                 null,
                 saved.realisasi() != null ? saved.realisasi().doubleValue() : null,
-                jenisRealisasiFromCapaian(null),
+                saved.jenisRealisasi(),
                 null, null,
                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
                 saved.createdBy(), saved.lastModifiedBy());
@@ -879,7 +879,7 @@ public class RenjaIndividuService {
                                 tgt.target(),
                                 realisasiTarget,
                                 realisasiPagu,
-                                jenisRealisasiFromCapaian(capaianTargetResult.capaian()),
+                                saved.jenisRealisasi(),
                                 capaianTargetResult.capaian(), capaianTargetResult.keteranganCapaian(),
                                 capaianPaguResult.capaian(), capaianPaguResult.keteranganCapaian(),
                                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
@@ -905,7 +905,7 @@ public class RenjaIndividuService {
                 null,
                 saved.realisasiTarget() != null ? saved.realisasiTarget().doubleValue() : null,
                 saved.realisasiPagu() != null ? saved.realisasiPagu().doubleValue() : null,
-                jenisRealisasiFromCapaian(null),
+                saved.jenisRealisasi(),
                 null, null,
                 null, null,
                 saved.faktorPenunjang(), saved.faktorPenghambat(), saved.buktiPendukung(),
@@ -926,11 +926,6 @@ public class RenjaIndividuService {
             calculated = 100.0;
         }
         return new CapaianResult(calculated, keterangan);
-    }
-
-    private static String jenisRealisasiFromCapaian(Double capaian) {
-        JenisRealisasi jenisRealisasi = JenisRealisasi.fromCapaian(capaian);
-        return jenisRealisasi != null ? jenisRealisasi.name() : null;
     }
 
     private <T> Map<String, Double> buildLaporanData(
@@ -1174,7 +1169,7 @@ public class RenjaIndividuService {
                 data != null ? data.faktorPenghambat() : null,
                 data != null ? data.buktiPendukung() : null,
                 data != null ? data.keteranganBuktiPendukung() : null,
-                jenisRealisasiFromCapaian(capaianTargetResult.capaian())
+                data != null && data.jenisRealisasi() != null ? data.jenisRealisasi() : "NAIK"
         );
     }
 

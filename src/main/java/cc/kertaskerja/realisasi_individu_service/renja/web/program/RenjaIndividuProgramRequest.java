@@ -1,5 +1,6 @@
 package cc.kertaskerja.realisasi_individu_service.renja.web.program;
 
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -43,8 +44,9 @@ public record RenjaIndividuProgramRequest(
         @Schema(example = "70")
         Double realisasi,
 
-        @Schema(hidden = true)
-        String jenisRealisasi,
+        @NotNull(message = "Pilih jenis NAIK atau TURUN")
+        @Schema(description = "Jenis perhitungan capaian", example = "NAIK", allowableValues = {"NAIK", "TURUN"})
+        JenisRealisasi jenisRealisasi,
 
         @Schema(description = "URL bukti pendukung realisasi", example = "https://example.com/bukti.pdf")
         String buktiPendukung,

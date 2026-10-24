@@ -29,6 +29,8 @@ public record TujuanOpdRequest(
         @Schema(description = "Nilai realisasi aktual", example = "75.5", minimum = "0")
         Double realisasi,
 
+        @NotNull(message = "Pilih jenis NAIK atau TURUN")
+        @Schema(description = "Jenis perhitungan capaian", example = "NAIK", allowableValues = {"NAIK", "TURUN"})
         JenisRealisasi jenisRealisasi,
 
         @NotNull(message = "Tahun harus terdefinisi")

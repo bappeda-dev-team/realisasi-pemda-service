@@ -339,10 +339,11 @@ public class SasaranService {
         
         Double capaian = matched != null ? matched.hitungCapaian(t.target()) : null;
         String keteranganCapaian = matched != null ? matched.keteranganCapaian(t.target()) : null;
+        JenisRealisasi jenisRealisasi = matched != null ? matched.jenisRealisasi() : null;
         
         return new SasaranPemdaPenetapanResponse.TargetPenetapan(
                 t.kodeTarget(), t.satuan(), t.target(),
-                realisasiValue, capaian, keteranganCapaian,
+                realisasiValue, capaian, keteranganCapaian, jenisRealisasi,
                 faktorPenunjang, faktorPenghambat, buktiPendukung, keteranganBuktiPendukung
         );
     }

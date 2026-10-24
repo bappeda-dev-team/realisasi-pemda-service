@@ -120,7 +120,7 @@ public class RekinController {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Buat realisasi target rekin individu (upsert)", description = "Menyimpan realisasi target rekin individu. Jika data dengan composite key yang sama sudah ada, akan diperbarui.")
+    @Operation(summary = "Buat realisasi target rekin individu (upsert)", description = "Menyimpan realisasi target rekin individu. Field `jenisRealisasi` wajib diisi (`NAIK` atau `TURUN`). Jika data dengan composite key yang sama sudah ada, akan diperbarui.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Realisasi tersimpan", content = @Content(schema = @Schema(implementation = RekinResponse.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),

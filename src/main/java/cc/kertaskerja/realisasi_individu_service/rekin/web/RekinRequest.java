@@ -42,7 +42,8 @@ public record RekinRequest(
         @Schema(description = "Nilai realisasi aktual", example = "70")
         BigDecimal realisasi,
 
-        @Schema(hidden = true)
+        @NotNull(message = "Pilih jenis NAIK atau TURUN")
+        @Schema(description = "Jenis perhitungan capaian", example = "NAIK", allowableValues = {"NAIK", "TURUN"})
         JenisRealisasi jenisRealisasi,
 
         @NotNull(message = "Tahun harus terdefinisi")

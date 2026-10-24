@@ -75,7 +75,7 @@ public class TujuanController {
     }
 
     @PostMapping(value = "/tujuans", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Simpan realisasi tujuan", description = "Menyimpan satu data realisasi tujuan via JSON.")
+    @Operation(summary = "Simpan realisasi tujuan", description = "Menyimpan satu data realisasi tujuan via JSON. Field `jenisRealisasi` wajib diisi (`NAIK` atau `TURUN`).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Data realisasi tujuan tersimpan", content = @Content(schema = @Schema(implementation = TujuanResponse.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
