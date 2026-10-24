@@ -1,11 +1,13 @@
 package cc.kertaskerja.realisasi_opd_service.tujuan.web;
 
 import cc.kertaskerja.config.SecurityConfig;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_opd_service.tujuan.domain.TujuanOpdService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -14,6 +16,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(TujuanOpdController.class)
@@ -72,5 +77,66 @@ class TujuanOpdControllerWebFluxTests {
                 .jsonPath("$.tujuanOpds[0].kode_tujuan_opd").isEqualTo("TUJ-OPD-193")
                 .jsonPath("$.tujuanOpds[0].indikators[0].kode_indikator").isEqualTo("IND-59")
                 .jsonPath("$.tujuanOpds[0].indikators[0].targets[0].realisasi").isEqualTo(80.0);
+    }
+
+    @Test
+    void whenSubmitTujuanOpdWithoutJenisRealisasi_thenBadRequest() {
+        String payload = """
+                {
+                  "kodeTujuanOpd": "TUJ-1",
+                  "kodeIndikator": "IND-1",
+                  "kodeTarget": "TGT-1",
+                  "realisasi": 75.5,
+                  "tahun": "2026",
+                  "bulan": "1",
+                  "kodeOpd": "5.01.5.05.0.00.01.0000"
+                }
+                """;
+
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt().authorities(new SimpleGrantedAuthority("super_admin")))
+                .post()
+                .uri("/tujuan_opd")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(payload)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    void whenSubmitTujuanOpdWithJenisRealisasiTurun_thenPassedToService() {
+        TujuanOpdResponse response = new TujuanOpdResponse(
+                1L, "5.01.5.05.0.00.01.0000", 2026, 1, "TUJ-1", "IND-1", "TGT-1",
+                75.5, null, null, null, null, null, null, null, 100.0, "%", 26.0, null,
+                JenisRealisasi.TURUN, null, null, null, null
+        );
+
+        when(tujuanOpdService.submitRealisasiTujuanOpd(any())).thenReturn(Mono.just(response));
+
+        String payload = """
+                {
+                  "kodeTujuanOpd": "TUJ-1",
+                  "kodeIndikator": "IND-1",
+                  "kodeTarget": "TGT-1",
+                  "realisasi": 75.5,
+                  "tahun": "2026",
+                  "bulan": "1",
+                  "kodeOpd": "5.01.5.05.0.00.01.0000",
+                  "jenisRealisasi": "TURUN"
+                }
+                """;
+
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt().authorities(new SimpleGrantedAuthority("super_admin")))
+                .post()
+                .uri("/tujuan_opd")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(payload)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TujuanOpdResponse.class)
+                .isEqualTo(response);
+
+        verify(tujuanOpdService).submitRealisasiTujuanOpd(argThat(req -> req.jenisRealisasi() == JenisRealisasi.TURUN));
     }
 }

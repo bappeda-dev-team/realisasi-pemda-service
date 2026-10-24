@@ -180,7 +180,7 @@ public class RekinService {
                 response.tahun(), response.bulan(),
                 response.kodePkRekin(), response.kodeIndikatorPkRekin(), response.kodeTargetPkRekin(),
                 kodeSasaranOpd,
-                response.realisasi(), JenisRealisasi.fromCapaian(capaianResult.capaian()),
+                response.realisasi(), response.jenisRealisasi(),
                 response.faktorPenunjang(), response.faktorPenghambat(), response.buktiPendukung(),
                 response.createdBy(), response.lastModifiedBy(),
                 response.createdDate(), response.lastModifiedDate(),
@@ -633,8 +633,7 @@ public class RekinService {
         String faktorPenghambat = local != null ? local.faktorPenghambat() : null;
         String buktiPendukung = local != null ? local.buktiPendukung() : null;
         String keteranganBuktiPendukung = local != null ? local.keteranganBuktiPendukung() : null;
-        JenisRealisasi calculatedJenisRealisasi = JenisRealisasi.fromCapaian(capaianResult.capaian());
-        String jenisRealisasi = calculatedJenisRealisasi != null ? calculatedJenisRealisasi.name() : null;
+        String jenisRealisasi = local != null && local.jenisRealisasi() != null ? local.jenisRealisasi().name() : null;
         return new PenetapanRekinIndividuResponse.TargetPenetapanResponse(
                 target.id(), target.kodeTargetPk(), target.tahun(), target.target(), target.satuan(),
                 realisasiValue, capaianResult.capaian(), capaianResult.keteranganCapaian(),

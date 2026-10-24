@@ -1,5 +1,6 @@
 package cc.kertaskerja.realisasi_pemda_service.tujuan.web;
 
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -52,6 +53,9 @@ public record TujuanPemdaPenetapanResponse(
 
             @JsonProperty("keterangan_capaian")
             String keteranganCapaian,
+
+            @JsonProperty("jenis_realisasi")
+            JenisRealisasi jenisRealisasi,
 
             @JsonProperty("faktor_penunjang")
             String faktorPenunjang,

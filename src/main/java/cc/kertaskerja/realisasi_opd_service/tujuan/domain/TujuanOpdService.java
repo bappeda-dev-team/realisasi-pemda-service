@@ -235,7 +235,7 @@ public class TujuanOpdService {
                 entity.realisasi() != null ? entity.realisasi().doubleValue() : null,
                 entity.faktorPenunjang(), entity.faktorPenghambat(),
                 null, null, null, null, null, null, null, null, null,
-                JenisRealisasi.fromCapaian(null),
+                entity.jenisRealisasi(),
                 entity.createdBy(), entity.lastModifiedBy(), entity.buktiPendukung(),
                 entity.keteranganBuktiPendukung());
     }
@@ -274,7 +274,7 @@ public class TujuanOpdService {
                     response.kodeTujuanOpd(), response.kodeIndikator(), response.kodeTarget(),
                     response.realisasi(), response.faktorPenunjang(), response.faktorPenghambat(),
                     penetapan.tujuanOpd(), null, null, null, null, null, null, null, null,
-                    JenisRealisasi.fromCapaian(null),
+                    response.jenisRealisasi(),
                     response.createdBy(), response.lastModifiedBy(), response.buktiPendukung(),
                     response.keteranganBuktiPendukung());
         }
@@ -298,7 +298,7 @@ public class TujuanOpdService {
                 matchedIndikator.get().definisiOperasional(),
                 target, satuan,
                 capaianResult.capaian(), capaianResult.keteranganCapaian(),
-                JenisRealisasi.fromCapaian(capaianResult.capaian()),
+                response.jenisRealisasi(),
                 response.createdBy(), response.lastModifiedBy(), response.buktiPendukung(),
                 response.keteranganBuktiPendukung()
         );

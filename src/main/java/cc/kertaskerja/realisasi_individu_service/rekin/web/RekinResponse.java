@@ -70,7 +70,7 @@ public record RekinResponse(
                 entity.id(), entity.kodeOpd(), entity.nip(), entity.tahun(), entity.bulan(),
                 entity.kodePkRekin(), entity.kodeIndikatorPkRekin(), entity.kodeTargetPkRekin(),
                 entity.kodeSasaranOpd(),
-                entity.realisasi(), JenisRealisasi.fromCapaian(capaian),
+                entity.realisasi(), entity.jenisRealisasi(),
                 entity.faktorPenunjang(), entity.faktorPenghambat(), entity.buktiPendukung(),
                 entity.createdBy(), entity.lastModifiedBy(),
                 entity.createdDate(), entity.lastModifiedDate(),

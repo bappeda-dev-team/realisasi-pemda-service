@@ -82,4 +82,17 @@ class CapaianTest {
         Double result = capaian.hasilCapaian();
         assertEquals(51.0, result);
     }
+
+    @Test
+    void testHasilCapaian_JenisRealisasiTurun_ShouldCalculateCorrectly() {
+        Capaian capaian = new Capaian(50.0, "100", JenisRealisasi.TURUN);
+        Double result = capaian.hasilCapaian();
+        assertEquals(51.0, result);
+    }
+
+    @Test
+    void testDefaultIfNull_WhenNull_ShouldReturnNaik() {
+        assertEquals(JenisRealisasi.NAIK, JenisRealisasi.defaultIfNull(null));
+        assertEquals(JenisRealisasi.TURUN, JenisRealisasi.defaultIfNull(JenisRealisasi.TURUN));
+    }
 }

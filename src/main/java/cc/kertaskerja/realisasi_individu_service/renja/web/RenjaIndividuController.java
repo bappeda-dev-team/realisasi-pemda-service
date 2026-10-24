@@ -306,7 +306,7 @@ public class RenjaIndividuController {
     }
 
     @PostMapping(value = "/program", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Simpan realisasi renja individu - PROGRAM", description = "Menyimpan realisasi renja individu tingkat PROGRAM.")
+    @Operation(summary = "Simpan realisasi renja individu - PROGRAM", description = "Menyimpan realisasi renja individu tingkat PROGRAM. Field `jenisRealisasi` wajib diisi (`NAIK` atau `TURUN`).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Data realisasi renja program tersimpan", content = @Content(schema = @Schema(implementation = RenjaIndividuProgramResponse.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
@@ -320,7 +320,7 @@ public class RenjaIndividuController {
     }
 
     @PostMapping(value = "/kegiatan", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Simpan realisasi renja individu - KEGIATAN", description = "Menyimpan realisasi renja individu tingkat KEGIATAN.")
+    @Operation(summary = "Simpan realisasi renja individu - KEGIATAN", description = "Menyimpan realisasi renja individu tingkat KEGIATAN. Field `jenisRealisasi` wajib diisi (`NAIK` atau `TURUN`).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Data realisasi renja kegiatan tersimpan", content = @Content(schema = @Schema(implementation = RenjaIndividuKegiatanResponse.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
@@ -334,7 +334,7 @@ public class RenjaIndividuController {
     }
 
     @PostMapping(value = "/subkegiatan", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Simpan realisasi renja individu - SUBKEGIATAN", description = "Menyimpan realisasi renja individu tingkat SUBKEGIATAN.")
+    @Operation(summary = "Simpan realisasi renja individu - SUBKEGIATAN", description = "Menyimpan realisasi renja individu tingkat SUBKEGIATAN. Field `jenisRealisasi` wajib diisi (`NAIK` atau `TURUN`).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Data realisasi renja subkegiatan tersimpan", content = @Content(schema = @Schema(implementation = RenjaIndividuSubKegiatanResponse.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),

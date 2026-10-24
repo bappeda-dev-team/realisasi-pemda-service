@@ -266,7 +266,7 @@ public class SasaranOpdService {
                 entity.realisasi() != null ? entity.realisasi().doubleValue() : null,
                 entity.faktorPenunjang(), entity.faktorPenghambat(),
                 null, null, null, null, null, null, null, null, null,
-                JenisRealisasi.fromCapaian(null),
+                entity.jenisRealisasi(),
                 entity.createdBy(), entity.lastModifiedBy(), entity.buktiPendukung(), entity.keteranganBuktiPendukung());
     }
 
@@ -304,7 +304,7 @@ public class SasaranOpdService {
                     response.kodeSasaranOpd(), response.kodeIndikator(), response.kodeTarget(),
                     response.realisasi(), response.faktorPenunjang(), response.faktorPenghambat(),
                     penetapan.sasaranOpd(), null, null, null, null, null, null, null, null,
-                    JenisRealisasi.fromCapaian(null),
+                    response.jenisRealisasi(),
                     response.createdBy(), response.lastModifiedBy(), response.buktiPendukung(), response.keteranganBuktiPendukung());
         }
 
@@ -327,7 +327,7 @@ public class SasaranOpdService {
                 matchedIndikator.get().definisiOperasional(),
                 target, satuan,
                 capaianResult.capaian(), capaianResult.keteranganCapaian(),
-                JenisRealisasi.fromCapaian(capaianResult.capaian()),
+                response.jenisRealisasi(),
                 response.createdBy(), response.lastModifiedBy(), response.buktiPendukung(), response.keteranganBuktiPendukung()
         );
     }

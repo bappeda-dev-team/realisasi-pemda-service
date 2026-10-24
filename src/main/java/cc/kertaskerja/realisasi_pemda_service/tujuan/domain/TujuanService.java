@@ -80,7 +80,7 @@ public class TujuanService {
                 entity.realisasi(), entity.satuan(), entity.tahun(), entity.bulan(),
                 entity.faktorPenunjang(), entity.faktorPenghambat(),
                 null, null, null, null, null, null, null, null,
-                JenisRealisasi.fromCapaian(null), entity.createdBy(), entity.lastModifiedBy(),
+                entity.jenisRealisasi(), entity.createdBy(), entity.lastModifiedBy(),
                 entity.buktiPendukung(), entity.keteranganBuktiPendukung()
         );
     }
@@ -118,7 +118,7 @@ public class TujuanService {
                     response.realisasi(), response.satuan(), response.tahun(), response.bulan(),
                     response.faktorPenunjang(), response.faktorPenghambat(),
                     penetapan.tujuanPemda(), null, null, null, null, null, null, null,
-                    JenisRealisasi.fromCapaian(null), response.createdBy(), response.lastModifiedBy(),
+                    response.jenisRealisasi(), response.createdBy(), response.lastModifiedBy(),
                     response.buktiPendukung(), response.keteranganBuktiPendukung()
             );
         }
@@ -151,7 +151,7 @@ public class TujuanService {
                 matchedIndikator.get().sumberData(),
                 matchedIndikator.get().definisiOperasional(),
                 target, capaian, keteranganCapaian,
-                JenisRealisasi.fromCapaian(capaian), response.createdBy(), response.lastModifiedBy(),
+                response.jenisRealisasi(), response.createdBy(), response.lastModifiedBy(),
                 response.buktiPendukung(), response.keteranganBuktiPendukung()
         );
     }
@@ -433,10 +433,11 @@ public class TujuanService {
         
         Double capaian = matched != null ? matched.hitungCapaian(t.target()) : null;
         String keteranganCapaian = matched != null ? matched.keteranganCapaian(t.target()) : null;
+        JenisRealisasi jenisRealisasi = matched != null ? matched.jenisRealisasi() : null;
         
         return new TujuanPemdaPenetapanResponse.TargetPenetapan(
                 t.kodeTarget(), t.satuan(), t.target(),
-                realisasiValue, capaian, keteranganCapaian,
+                realisasiValue, capaian, keteranganCapaian, jenisRealisasi,
                 faktorPenunjang, faktorPenghambat, buktiPendukung, keteranganBuktiPendukung
         );
     }

@@ -120,7 +120,7 @@ public class RenaksiController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Simpan realisasi target renaksi individu (upsert)", description = "Menyimpan realisasi target renaksi individu. Jika data dengan composite key yang sama sudah ada, akan diperbarui.")
+    @Operation(summary = "Simpan realisasi target renaksi individu (upsert)", description = "Menyimpan realisasi target renaksi individu. Field `jenisRealisasi` wajib diisi (`NAIK` atau `TURUN`). Jika data dengan composite key yang sama sudah ada, akan diperbarui.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Realisasi tersimpan", content = @Content(schema = @Schema(implementation = RenaksiResponse.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),

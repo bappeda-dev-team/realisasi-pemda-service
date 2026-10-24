@@ -4,6 +4,7 @@ import cc.kertaskerja.integration.kepegawaian.PegawaiClient;
 import cc.kertaskerja.integration.penetapan.PenetapanRenjaIndividuClient;
 import cc.kertaskerja.integration.penetapan.renja.PenetapanRenjaIndividu;
 import cc.kertaskerja.integration.upload.UploadClient;
+import cc.kertaskerja.realisasi.domain.JenisRealisasi;
 import cc.kertaskerja.realisasi_individu_service.renja.domain.kegiatan.RenjaKegiatanIndividuRepository;
 import cc.kertaskerja.realisasi_individu_service.renja.domain.program.RenjaProgramIndividu;
 import cc.kertaskerja.realisasi_individu_service.renja.domain.program.RenjaProgramIndividuRepository;
@@ -125,7 +126,7 @@ class RenjaIndividuServiceTest {
         var req = new cc.kertaskerja.realisasi_individu_service.renja.web.program.RenjaIndividuProgramRequest(
                 "8.01.0.00.0.00.01.0000", "2026", "1", "198701252015051001",
                 "8.01.03", "IND-001", "TGT-001", "PAGU-1",
-                50.0, "NAIK", "bukti.pdf", "keterangan"
+                50.0, JenisRealisasi.NAIK, "bukti.pdf", "keterangan"
         );
 
         when(penetapanClient.fetchRenjaIndividu("198701252015051001", "8.01.0.00.0.00.01.0000", 2026))
@@ -168,7 +169,7 @@ class RenjaIndividuServiceTest {
         var req = new cc.kertaskerja.realisasi_individu_service.renja.web.kegiatan.RenjaIndividuKegiatanRequest(
                 "8.01.0.00.0.00.01.0000", "2026", "1", "198701252015051001",
                 "8.01.03.2.01", "IND-002", "TGT-002", "PAGU-2",
-                75.0, "NAIK", "bukti.pdf", "keterangan"
+                75.0, JenisRealisasi.NAIK, "bukti.pdf", "keterangan"
         );
 
         when(penetapanClient.fetchRenjaIndividu("198701252015051001", "8.01.0.00.0.00.01.0000", 2026))
@@ -207,7 +208,7 @@ class RenjaIndividuServiceTest {
         var req = new cc.kertaskerja.realisasi_individu_service.renja.web.subkegiatan.RenjaIndividuSubKegiatanRequest(
                 "8.01.0.00.0.00.01.0000", "2026", "1", "198701252015051001",
                 "8.01.03.2.01.0003", "IND-003", "TGT-003", "PAGU-3",
-                80.0, 5000000.0, "NAIK", "bukti.pdf", "keterangan"
+                80.0, 5000000.0, JenisRealisasi.NAIK, "bukti.pdf", "keterangan"
         );
 
         when(penetapanClient.fetchRenjaIndividu("198701252015051001", "8.01.0.00.0.00.01.0000", 2026))
