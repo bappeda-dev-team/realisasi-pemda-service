@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -62,6 +63,58 @@ class RenaksiOpdServiceTest {
                 JenisRealisasi.NAIK, "", "",
                 null, Instant.now(), Instant.now(), null
         );
+    }
+
+    @Test
+    void syncRealisasiFromRenaksiIndividu_WhenRowNotExists_ShouldInsertWithNaiK() {
+        when(renaksiOpdRepository.findFirstByKodeOpdAndTahunAndBulanAndKodeRencanaAksiOpd(
+                KODE_OPD, "2026", "3", KODE_RENAKSI))
+                .thenReturn(Mono.empty());
+        when(renaksiOpdRepository.save(any(RenaksiOpd.class)))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+        StepVerifier.create(renaksiOpdService.syncRealisasiFromRenaksiIndividu(
+                        KODE_OPD, "2026", "3", KODE_RENAKSI, BigDecimal.valueOf(4)))
+                .assertNext(saved -> {
+                    org.junit.jupiter.api.Assertions.assertEquals(KODE_OPD, saved.kodeOpd());
+                    org.junit.jupiter.api.Assertions.assertEquals("2026", saved.tahun());
+                    org.junit.jupiter.api.Assertions.assertEquals("3", saved.bulan());
+                    org.junit.jupiter.api.Assertions.assertEquals(KODE_RENAKSI, saved.kodeRencanaAksiOpd());
+                    org.junit.jupiter.api.Assertions.assertEquals(0, BigDecimal.valueOf(4).compareTo(saved.realisasi()));
+                    org.junit.jupiter.api.Assertions.assertEquals(JenisRealisasi.NAIK, saved.jenisRealisasi());
+                    org.junit.jupiter.api.Assertions.assertEquals("", saved.faktorPenunjang());
+                    org.junit.jupiter.api.Assertions.assertEquals("", saved.faktorPenghambat());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void syncRealisasiFromRenaksiIndividu_WhenRowExists_ShouldOnlyUpdateRealisasi() {
+        Instant createdDate = Instant.parse("2026-01-05T00:00:00Z");
+        RenaksiOpd existing = new RenaksiOpd(
+                9L, KODE_OPD, "2026", "3", KODE_RENAKSI, BigDecimal.valueOf(4),
+                JenisRealisasi.TURUN, "Dukungan anggaran", "Keterbatasan SDM",
+                "pegawai", createdDate, createdDate, "pegawai"
+        );
+        when(renaksiOpdRepository.findFirstByKodeOpdAndTahunAndBulanAndKodeRencanaAksiOpd(
+                KODE_OPD, "2026", "3", KODE_RENAKSI))
+                .thenReturn(Mono.just(existing));
+        when(renaksiOpdRepository.save(any(RenaksiOpd.class)))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+        StepVerifier.create(renaksiOpdService.syncRealisasiFromRenaksiIndividu(
+                        KODE_OPD, "2026", "3", KODE_RENAKSI, BigDecimal.valueOf(12)))
+                .assertNext(saved -> {
+                    org.junit.jupiter.api.Assertions.assertEquals(9L, saved.id());
+                    org.junit.jupiter.api.Assertions.assertEquals(0, BigDecimal.valueOf(12).compareTo(saved.realisasi()));
+                    // Faktor, jenis realisasi, dan audit lama tidak boleh berubah.
+                    org.junit.jupiter.api.Assertions.assertEquals(JenisRealisasi.TURUN, saved.jenisRealisasi());
+                    org.junit.jupiter.api.Assertions.assertEquals("Dukungan anggaran", saved.faktorPenunjang());
+                    org.junit.jupiter.api.Assertions.assertEquals("Keterbatasan SDM", saved.faktorPenghambat());
+                    org.junit.jupiter.api.Assertions.assertEquals("pegawai", saved.createdBy());
+                    org.junit.jupiter.api.Assertions.assertEquals(createdDate, saved.createdDate());
+                })
+                .verifyComplete();
     }
 
     @Test

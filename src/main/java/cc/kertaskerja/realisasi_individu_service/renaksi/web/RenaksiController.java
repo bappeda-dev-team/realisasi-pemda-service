@@ -120,7 +120,7 @@ public class RenaksiController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Simpan realisasi target renaksi individu (upsert)", description = "Menyimpan realisasi target renaksi individu. Field `jenisRealisasi` wajib diisi (`NAIK` atau `TURUN`). Jika data dengan composite key yang sama sudah ada, akan diperbarui.")
+    @Operation(summary = "Simpan realisasi target renaksi individu (upsert)", description = "Menyimpan realisasi target renaksi individu. Field `jenisRealisasi` wajib diisi (`NAIK` atau `TURUN`). Jika data dengan composite key yang sama sudah ada, akan diperbarui. Setelah tersimpan, nilai realisasi otomatis disinkronkan ke renaksi OPD: baris renaksi OPD yang cocok berdasarkan `kode_pk` (`kodeRekin`), NIP, kode OPD, tahun, dan bulan akan diisi dengan penjumlahan realisasi seluruh pelaksanaan pada `kode_pk` tersebut di bulan yang sama. Kegagalan sinkronisasi tidak menggagalkan penyimpanan realisasi individu.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Realisasi tersimpan", content = @Content(schema = @Schema(implementation = RenaksiResponse.class))),
             @ApiResponse(responseCode = "400", description = "Payload tidak valid", content = @Content),
