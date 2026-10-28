@@ -9,7 +9,9 @@ import cc.kertaskerja.realisasi_individu_service.renaksi.web.RenaksiResponse;
 import cc.kertaskerja.realisasi_individu_service.rekin.web.PenetapanRekinIndividuResponse;
 import cc.kertaskerja.integration.upload.UploadClient;
 import cc.kertaskerja.integration.kepegawaian.PegawaiClient;
+import cc.kertaskerja.integration.penetapan.PenetapanRenaksiOpdClient;
 import cc.kertaskerja.integration.penetapan.PenetapanRekinIndividuClient;
+import cc.kertaskerja.realisasi_opd_service.renaksi.domain.RenaksiOpdService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,8 +20,10 @@ import reactor.core.publisher.Mono;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.multipart.FilePart;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 @Service
@@ -29,19 +33,26 @@ public class RenaksiService {
     private final UploadClient uploadClient;
     private final PegawaiClient pegawaiClient;
     private final PenetapanRekinIndividuClient penetapanClient;
+    private final PenetapanRenaksiOpdClient penetapanRenaksiOpdClient;
+    private final RenaksiOpdService renaksiOpdService;
 
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
 
-    public RenaksiService(RenaksiIndividuRepository renaksiIndividuRepository, UploadClient uploadClient, PegawaiClient pegawaiClient, PenetapanRekinIndividuClient penetapanClient) {
+    public RenaksiService(RenaksiIndividuRepository renaksiIndividuRepository, UploadClient uploadClient, PegawaiClient pegawaiClient, PenetapanRekinIndividuClient penetapanClient, PenetapanRenaksiOpdClient penetapanRenaksiOpdClient, RenaksiOpdService renaksiOpdService) {
         this.renaksiIndividuRepository = renaksiIndividuRepository;
         this.uploadClient = uploadClient;
         this.pegawaiClient = pegawaiClient;
         this.penetapanClient = penetapanClient;
+        this.penetapanRenaksiOpdClient = penetapanRenaksiOpdClient;
+        this.renaksiOpdService = renaksiOpdService;
     }
 
     public Mono<RenaksiResponse> submitRealisasiTarget(RenaksiIndividuRequest req) {
         return penetapanClient.fetchRekinIndividu(req.nip(), req.kodeOpd(), Integer.parseInt(req.tahun()))
+                // Penetapan bisa mengembalikan body kosong; jangan sampai realisasi individu tidak tersimpan.
+                .defaultIfEmpty(new cc.kertaskerja.integration.penetapan.rekin.PenetapanRekinIndividu.RekinIndividuData(
+                        req.nip(), null, req.kodeOpd(), Integer.parseInt(req.tahun()), List.of()))
                 .flatMap(penetapanData -> {
                     return saveRealisasiTarget(req)
                             .map(response -> enrichWithPenetapan(response, penetapanData));
@@ -51,7 +62,64 @@ public class RenaksiService {
                             req.nip(), req.kodeOpd(), req.tahun(), e.getMessage());
                     return saveRealisasiTarget(req)
                             .map(r -> RenaksiResponse.from(r, null, null, null));
-                });
+                })
+                .flatMap(response -> syncToRenaksiOpd(response, req));
+    }
+
+    private Mono<RenaksiResponse> syncToRenaksiOpd(RenaksiResponse response, RenaksiIndividuRequest req) {
+        if (renaksiOpdService == null || req.bulan() == null || req.bulan().isBlank()) {
+            return Mono.just(response);
+        }
+
+        return penetapanRenaksiOpdClient.fetchRenaksiOpd(req.kodeOpd(), Integer.parseInt(req.tahun()))
+                .onErrorResume(e -> {
+                    log.warn("Gagal mengambil penetapan renaksi OPD untuk kodeOpd={}, tahun={}: {}",
+                            req.kodeOpd(), req.tahun(), e.getMessage());
+                    return Mono.empty();
+                })
+                .flatMap(root -> {
+                    cc.kertaskerja.integration.penetapan.renaksi.PenetapanRenaksiOpd.RenaksiPenetapanData matching =
+                            findPenetapanRenaksiOpd(root, req.kodeRekin(), req.nip());
+                    if (matching == null) {
+                        log.warn("Penetapan renaksi OPD tidak ditemukan untuk kodePk={}, nip={}, kodeOpd={}, tahun={}",
+                                req.kodeRekin(), req.nip(), req.kodeOpd(), req.tahun());
+                        return Mono.just(response);
+                    }
+                    return sumRealisasiIndividu(req)
+                            .flatMap(total -> renaksiOpdService.syncRealisasiFromRenaksiIndividu(
+                                    req.kodeOpd(), req.tahun(), req.bulan(),
+                                    matching.kodeRencanaAksiOpd(), total))
+                            .thenReturn(response)
+                            .onErrorResume(e -> {
+                                log.warn("Gagal sinkronisasi realisasi renaksi individu ke Renaksi OPD untuk kodePk={}: {}",
+                                        req.kodeRekin(), e.getMessage());
+                                return Mono.just(response);
+                            });
+                })
+                .switchIfEmpty(Mono.just(response));
+    }
+
+    private cc.kertaskerja.integration.penetapan.renaksi.PenetapanRenaksiOpd.RenaksiPenetapanData findPenetapanRenaksiOpd(
+            cc.kertaskerja.integration.penetapan.renaksi.PenetapanRenaksiOpd.PenetapanRenaksiOpdRoot root,
+            String kodeRekin,
+            String nip
+    ) {
+        if (root == null || root.renaksiOpds() == null) {
+            return null;
+        }
+        return root.renaksiOpds().stream()
+                .filter(item -> Objects.equals(item.kodePk(), kodeRekin)
+                        && Objects.equals(item.pegawaiId(), nip))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Mono<BigDecimal> sumRealisasiIndividu(RenaksiIndividuRequest req) {
+        return renaksiIndividuRepository
+                .findAllByKodeOpdAndNipAndKodeRekinAndTahunAndBulan(
+                        req.kodeOpd(), req.nip(), req.kodeRekin(), req.tahun(), req.bulan())
+                .map(item -> item.realisasi() == null ? BigDecimal.ZERO : item.realisasi())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private Mono<RenaksiIndividu> saveRealisasiTarget(RenaksiIndividuRequest req) {
@@ -107,6 +175,13 @@ public class RenaksiService {
                 ? response.realisasi().doubleValue() : null;
         Double bobotValue = matchingPelaksanaan.bobotPelaksanaan() != null
                 ? matchingPelaksanaan.bobotPelaksanaan().doubleValue() : null;
+        if (matchingPelaksanaan.bulanPelaksanaan() != null
+                && response.bulan() != null
+                && !matchingPelaksanaan.bulanPelaksanaan().toString().equals(response.bulan().trim())) {
+            log.warn("Bulan realisasi ({}) berbeda dengan bulan pelaksanaan penetapan ({}) untuk kodePelaksanaan={}. "
+                            + "Nilai akan tersimpan pada bulan yang dikirim.",
+                    response.bulan(), matchingPelaksanaan.bulanPelaksanaan(), response.kodePelaksanaan());
+        }
         log.info("enrichWithPenetapan: found bobotValue={}", bobotValue);
         var capaianResult = RenaksiIndividu.hitungCapaian(realisasiValue, bobotValue);
         return RenaksiResponse.from(

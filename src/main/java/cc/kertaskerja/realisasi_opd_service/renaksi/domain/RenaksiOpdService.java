@@ -66,6 +66,37 @@ public class RenaksiOpdService {
         return penetapanRenaksiOpdClient.syncRenaksiOpd(kodeOpd, tahun);
     }
 
+    public Mono<RenaksiOpd> syncRealisasiFromRenaksiIndividu(
+            String kodeOpd,
+            String tahun,
+            String bulan,
+            String kodeRencanaAksiOpd,
+            BigDecimal realisasi
+    ) {
+        if (!hasText(kodeRencanaAksiOpd)) {
+            return Mono.error(new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Kode rencana aksi OPD tidak boleh kosong"));
+        }
+        BigDecimal nilaiRealisasi = realisasi != null ? realisasi : BigDecimal.ZERO;
+
+        return renaksiOpdRepository
+                .findFirstByKodeOpdAndTahunAndBulanAndKodeRencanaAksiOpd(
+                        kodeOpd, tahun, bulan, kodeRencanaAksiOpd)
+                .flatMap(existing -> renaksiOpdRepository.save(new RenaksiOpd(
+                        existing.id(),
+                        existing.kodeOpd(), existing.tahun(), existing.bulan(),
+                        existing.kodeRencanaAksiOpd(), nilaiRealisasi,
+                        existing.jenisRealisasi() != null ? existing.jenisRealisasi() : JenisRealisasi.NAIK,
+                        existing.faktorPenunjang(), existing.faktorPenghambat(),
+                        existing.createdBy(), existing.createdDate(),
+                        existing.lastModifiedDate(), existing.lastModifiedBy()
+                )))
+                .switchIfEmpty(Mono.defer(() -> renaksiOpdRepository.save(RenaksiOpd.of(
+                        kodeOpd, tahun, bulan, kodeRencanaAksiOpd, nilaiRealisasi,
+                        JenisRealisasi.NAIK, "", ""
+                ))));
+    }
+
     private PenetapanRenaksiOpdListResponse buildPenetapanResponse(
             PenetapanRenaksiOpd.PenetapanRenaksiOpdRoot root,
             List<RenaksiOpd> realisasiList,

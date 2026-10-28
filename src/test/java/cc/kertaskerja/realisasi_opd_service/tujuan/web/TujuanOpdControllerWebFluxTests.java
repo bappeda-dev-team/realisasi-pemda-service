@@ -53,6 +53,7 @@ class TujuanOpdControllerWebFluxTests {
                                         80.0,
                                         null,
                                         null,
+                                        JenisRealisasi.NAIK,
                                         null,
                                         null,
                                         null,
